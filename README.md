@@ -62,6 +62,24 @@ However, contributors are responsible for:
 
 AI should be treated as an assistant, not as a substitute for reviewing and validating educational material.
 
+## Contributor Responsibility
+
+Each contributor is solely responsible for the content they submit to this repository.
+
+By submitting a handbook, document, code example, image, diagram, or other material, the contributor confirms that:
+
+- They have the legal right to submit and share the content.
+- The content does not improperly copy copyrighted or proprietary material.
+- Any required permissions, licenses, or attributions have been obtained.
+- The content does not contain confidential, private, leaked, or restricted information.
+- The content complies with the repository's licensing requirements.
+- The contributor has reviewed the material for reasonable accuracy before submitting it.
+- AI-generated or AI-assisted content has been reviewed before publication.
+
+The repository owner and maintainers may review, edit, reject, or remove contributed content, but contributors remain responsible for the material they originally submit.
+
+By creating a Pull Request or otherwise contributing content, the contributor accepts responsibility for ensuring that their submission is lawful, copyright-safe, and appropriate for public distribution.
+
 ## Open Learning Philosophy
 
 This repository exists to make learning:
