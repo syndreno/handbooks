@@ -12,7 +12,7 @@
 - **Audience:** Complete beginners, frontend developers, full-stack developers, UI engineers, and developers maintaining legacy or modern Less codebases
 - **Learning style:** Concept → mental model → syntax → examples → real-world scenario → common mistakes → best practices
 - **Target:** Modern Less 4.x
-- **Verified current Less release when this handbook was prepared:** **4.8.1** (July 2026)
+- **Verified current Less release on August 17, 2026:** **4.8.1**
 - **Primary official references:**
   - https://lesscss.org/
   - https://lesscss.org/features/
@@ -394,6 +394,20 @@ Use this rule:
 - **Less variable** → build-time design value
 - **CSS custom property** → runtime/cascade-aware value
 
+
+## What the compiler is doing
+
+Compilation is a **build-time transformation**. The compiler reads `.less` source, resolves Less-only features such as variables, mixins, guards, imports, calculations, and nesting, and emits normal CSS. The browser never needs to know that Less was used.
+
+That distinction explains an important debugging rule:
+
+```text
+If the compiler rejects the file -> debug Less/build configuration.
+If compilation succeeds but the page looks wrong -> inspect the generated CSS and browser cascade.
+```
+
+The compiler input is your Less source plus any imported Less files and options. Its main output is CSS; depending on the toolchain it may also emit a source map. Keep generated CSS reproducible from source rather than hand-editing it.
+
 ---
 
 # 5. Installation and Setup
@@ -470,6 +484,31 @@ less-learning/
 └── dist/
 ```
 
+
+## Choosing an installation approach
+
+For a project, install Less as a development dependency so the compiler version is captured by `package.json` and the lockfile:
+
+```bash
+npm install --save-dev less
+```
+
+Then compile through `npx` or a package script. A package script is easier for a team because everyone uses the same command:
+
+```json
+{
+  "scripts": {
+    "build:css": "lessc src/styles/main.less dist/main.css"
+  }
+}
+```
+
+```bash
+npm run build:css
+```
+
+A global installation can be convenient for experimentation, but it is a weaker choice for reproducible team builds because different machines may have different compiler versions.
+
 ---
 
 # 6. Your First Less File
@@ -516,6 +555,24 @@ Possible CSS:
   transform: translateY(-2px);
 }
 ```
+
+
+## Walkthrough
+
+This first example demonstrates four separate Less ideas:
+
+- `@primary` and `@spacing` are **build-time variables**;
+- `@spacing * 2` is evaluated by the compiler;
+- `&__title` combines the parent selector with `__title`;
+- `&:hover` reuses the current selector for a state.
+
+The command has two positional file arguments:
+
+```text
+lessc <input.less> <output.css>
+```
+
+So `main.less` is the source and `main.css` is the generated browser-ready file. After compiling, open `main.css` and compare it with the source. Doing this regularly is one of the fastest ways to understand what a Less abstraction actually costs in CSS.
 
 ---
 
@@ -620,6 +677,23 @@ Prefer:
 
 Semantic naming describes purpose rather than implementation.
 
+
+## Build-time variable mental model
+
+A Less variable is resolved while CSS is being generated. It does **not** remain as a live variable in the browser.
+
+```less
+@brand: #2563eb;
+
+.button {
+  color: @brand;
+}
+```
+
+becomes a concrete CSS value. This is different from a CSS custom property such as `var(--brand)`, which can still change at runtime through the cascade, media queries, JavaScript, or theme attributes.
+
+Use Less variables for compiler-time configuration, repeated constants, calculations, and tokens that do not need runtime behavior. Prefer CSS custom properties when descendants should inherit a value dynamically or the value must change without recompiling.
+
 ---
 
 # 9. Variable Interpolation
@@ -695,6 +769,28 @@ Compiles to:
   mask-image: url("/icons/@{icon}.svg");
 }
 ```
+
+
+## When interpolation is appropriate
+
+Normal value positions usually use `@name` directly. Use `@{name}` when the variable must become part of **CSS syntax text**, such as a selector, property name, URL, or import path.
+
+Compare:
+
+```less
+@color: #2563eb;
+@state: active;
+
+.link {
+  color: @color;          // normal value use
+}
+
+.link--@{state} {
+  font-weight: 700;       // selector construction
+}
+```
+
+Avoid generating large numbers of unpredictable selectors with interpolation. If a fixed class name or a map lookup expresses the intent more clearly, prefer the simpler form.
 
 ---
 
@@ -797,6 +893,20 @@ Large Less projects often use:
 
 Do not rely on obscure scope side effects. Keep important values explicit.
 
+
+## Why this can surprise beginners
+
+Less variable lookup is not identical to JavaScript's top-to-bottom assignment model. Because variables are evaluated lazily and scoped, moving or redeclaring a variable can change the value seen by a rule in ways that are not obvious to someone reading linearly.
+
+For maintainable code:
+
+- define project tokens in predictable token files;
+- keep component-local overrides near the component;
+- avoid redeclaring the same important name many times in one scope;
+- do not depend on clever forward references merely because Less permits them.
+
+When a value looks wrong, inspect both the active scope and the final generated CSS before assuming the browser is at fault.
+
 ---
 
 # 12. Properties as Variables
@@ -829,6 +939,22 @@ Another example:
 ```
 
 Use it when it genuinely improves readability. A clearly named `@variable` is often more understandable across large files.
+
+
+## What `$property` means
+
+`$property` reads the value of a property declared in the current or relevant ruleset. The input is a property name; the result is that property's Less value, which can then be reused in another declaration.
+
+This is useful for tightly local relationships:
+
+```less
+.badge {
+  color: #1d4ed8;
+  border-color: $color;
+}
+```
+
+Do not use it to hide important design tokens. If a value needs to be shared by several components or understood outside one ruleset, a named `@variable` usually communicates intent better.
 
 ---
 
@@ -981,6 +1107,23 @@ Produces:
 
 Here `&` is inserted into a different position in the final selector.
 
+
+## Read `&` as “the selector being built”
+
+The parent selector is not limited to hover states. It is a selector-construction operator. For `.button`, `&:hover` becomes `.button:hover`, while `&--primary` becomes `.button--primary`.
+
+Before using a complicated `&` expression, write down the CSS selector you expect to generate. This catches accidental selectors early.
+
+```less
+.card {
+  .theme-dark & {
+    border-color: #374151;
+  }
+}
+```
+
+produces a selector where the theme ancestor comes before the card. This can be useful, but if nested selector construction becomes difficult to predict, use an explicit selector instead.
+
 ---
 
 # 15. Combinators and Advanced Selector Nesting
@@ -1084,6 +1227,15 @@ Output:
 }
 ```
 
+
+## Mixin inputs and output
+
+A mixin is invoked during compilation. Its **inputs** are any parameters supplied to it; its **output** is declarations or nested rules inserted into the caller's generated CSS.
+
+This means calling the same large mixin in fifty selectors can duplicate a large amount of CSS. Mixins are excellent for small reusable patterns, parameterized behavior, and rules that genuinely need to vary per call. For a single shared visual class, a normal CSS class may produce less output.
+
+When choosing between a mixin and `:extend()`, inspect the generated CSS: mixins copy declarations, while extend changes selector sharing.
+
 ---
 
 # 17. Parametric Mixins
@@ -1138,6 +1290,22 @@ Mixins can receive parameters.
   .button-variant(#dc2626, white, #dc2626);
 }
 ```
+
+
+## Think of parameters as a styling contract
+
+A parametric mixin becomes easier to reuse when its arguments have clear units and meaning:
+
+```less
+.inset(@x, @y) {
+  padding-inline: @x;
+  padding-block: @y;
+}
+```
+
+Callers provide values; the mixin emits declarations. Prefer a small number of purposeful parameters over a “do everything” mixin with many unrelated switches.
+
+If a parameter has a sensible common value, give it a default. If only a few symbolic variants are valid, pattern matching can make invalid or unexpected combinations less likely.
 
 ---
 
@@ -1229,6 +1397,13 @@ Output:
 
 This is helpful when arguments map directly to one CSS shorthand.
 
+
+## When it helps—and when it hurts
+
+`@arguments` preserves the arguments received by the current mixin in their argument order. It works especially well when that order intentionally mirrors a CSS shorthand.
+
+The trade-off is readability: a future reader must know the parameter order to understand the output. Use named parameters or explicit declarations when the mapping is not obvious. `@arguments` is a convenience, not a replacement for clear parameter names.
+
 ---
 
 # 20. Mixin Pattern Matching
@@ -1274,6 +1449,20 @@ This behaves somewhat like function overloading.
 ```
 
 Pattern matching is powerful but should remain predictable.
+
+
+## How dispatch works conceptually
+
+Pattern matching lets several mixins share a name while literal argument patterns select which definition participates. The literal token such as `light` or `dark` acts like a variant key.
+
+This is useful for a **small closed set of variants**:
+
+```less
+.status(success) { color: #166534; }
+.status(error)   { color: #991b1b; }
+```
+
+For arbitrary numeric or relational conditions, guards communicate the rule more directly. For data that simply maps names to values, a map may be clearer than several pattern-matched mixins.
 
 ---
 
@@ -1343,6 +1532,13 @@ Guard syntax can express alternative matches.
 
 Use guards when the logic belongs to the styling abstraction. Do not turn your stylesheet into a general-purpose application language.
 
+
+## Input, decision, output
+
+A guard evaluates a compile-time condition against mixin arguments or variables. If the condition matches, that definition contributes CSS; if it does not, it contributes nothing.
+
+Use guards for styling decisions that can be resolved from known build-time values. They cannot inspect runtime browser state such as viewport measurements, DOM content, or a CSS custom property's current computed value. Use CSS features such as media queries, container queries, selectors, and custom properties for those runtime concerns.
+
 ---
 
 # 22. Mixin Return Values and Accessors
@@ -1380,6 +1576,13 @@ Result:
 ```
 
 This is often clearer than relying on old mixin scope leakage.
+
+
+## Why accessors are useful
+
+A mixin can act as a small computation or data provider when you call it and look up one of its variables or properties. The arguments are the input; the accessor such as `[@result]` selects the value you want back.
+
+Use this when related calculations naturally belong together. If the operation is a straightforward built-in Less function or simple arithmetic, prefer the simpler expression. The goal is to make the source easier to understand, not to imitate a general-purpose programming language.
 
 ---
 
@@ -1421,6 +1624,19 @@ Why namespace?
 ```
 
 This avoids polluting the global mixin naming space.
+
+
+## Namespace as an API boundary
+
+A namespace groups related helpers behind one recognizable prefix. This reduces accidental naming collisions and makes call sites self-documenting:
+
+```less
+.button {
+  #ui.focus-ring();
+}
+```
+
+A reader can immediately see that `focus-ring` comes from the `#ui` helper group rather than from the component itself. Namespaces are most valuable in large projects or reusable libraries; for a tiny stylesheet, extra indirection can be unnecessary.
 
 ---
 
@@ -1476,6 +1692,13 @@ A detached ruleset is a block of Less rules stored in a variable.
 ```
 
 Detached rulesets are useful for higher-order styling patterns but can be overused.
+
+
+## Mental model
+
+A detached ruleset is similar to storing a block of stylesheet instructions in a value. You can pass that block into another mixin and invoke it later. This enables higher-order patterns such as wrappers that accept caller-provided styles.
+
+Because execution and scope become less obvious, reserve detached rulesets for cases where passing a block really improves an API. A normal mixin is usually easier for fixed reusable behavior, and a map is usually clearer for plain data.
 
 ---
 
@@ -1546,6 +1769,21 @@ Map:
 ```
 
 Use a map when the values are meaningfully grouped and lookup behavior helps.
+
+
+## Maps are for related data
+
+A map lets one variable hold a named collection. The lookup key is the input and the corresponding stored value is the result.
+
+Typical uses include:
+
+- breakpoints;
+- spacing scales;
+- semantic colors;
+- component size tokens;
+- theme values.
+
+Prefer meaningful keys such as `primary`, `danger`, or `lg`. If a key is misspelled or the structure is deeply nested, debugging becomes harder, so keep token maps shallow enough to scan. For values that must change in the browser at runtime, consider emitting CSS custom properties from the map rather than keeping the values only in Less.
 
 ---
 
@@ -1713,6 +1951,21 @@ Modern CSS itself uses `/` in valid syntax, so preprocessors must avoid interpre
 }
 ```
 
+
+## Compile-time arithmetic
+
+Less can perform arithmetic on compatible values while compiling. This is useful for deriving a scale from a smaller set of source tokens.
+
+```less
+@base-space: 8px;
+
+.card {
+  gap: @base-space * 2;
+}
+```
+
+The browser receives the computed result, not the Less expression. Be careful with units: adding or comparing incompatible dimensions can produce invalid or unintended results. Also distinguish Less arithmetic from CSS `calc()`: `calc()` is intentionally evaluated by the browser and can combine runtime values such as percentages and custom properties.
+
 ---
 
 # 29. Units
@@ -1876,6 +2129,19 @@ Compile only `main.less`.
 
 This produces one build graph rather than separately compiling every partial.
 
+
+## What an import changes
+
+An import makes another stylesheet's content or definitions available to the current compilation. In a conventional project, use imports to assemble small focused source files into one or a few entry points.
+
+```less
+// main.less
+@import "tokens.less";
+@import "components/button.less";
+```
+
+The final CSS output depends on the imported files, so a change in any dependency requires recompilation. Avoid circular dependency designs and repeated imports that unexpectedly duplicate CSS. Import options can change the behavior, so use them deliberately rather than as routine syntax.
+
 ---
 
 # 33. Import Options
@@ -2012,6 +2278,13 @@ This is called **bubbling**.
   });
 }
 ```
+
+
+## Nested media queries are reorganized for you
+
+Less lets a media query live near the component rule it affects. During compilation, Less bubbles the media query outward into valid CSS while keeping the selector relationship.
+
+This is an authoring convenience, not a new browser capability. The browser still receives an ordinary `@media` rule. Keep breakpoint logic consistent across components; a shared breakpoint variable or map is usually easier to maintain than dozens of unrelated literal widths.
 
 ---
 
@@ -2502,6 +2775,20 @@ Prefer design breakpoint semantics:
 
 Breakpoints should respond to your layout, not a specific phone model.
 
+
+## Prefer CSS for runtime responsiveness
+
+Less can centralize breakpoint values and generate media-query code, but the **browser** must still decide which responsive rule matches the current environment.
+
+A useful division of responsibility is:
+
+```text
+Less -> organize/generate breakpoint rules at build time
+CSS  -> evaluate media/container queries at runtime
+```
+
+Do not attempt to use a Less guard to replace a media query: the Less compiler does not know the user's viewport. For reusable components, also consider container queries when behavior should depend on available component space rather than the whole viewport.
+
 ---
 
 # 45. Component Architecture
@@ -2752,6 +3039,27 @@ The browser resolves `var(--primary)`.
 }
 ```
 
+
+## Build-time and runtime variables can work together
+
+Less variables and CSS custom properties solve different problems, and a project can use both:
+
+```less
+@brand-default: #2563eb;
+
+:root {
+  --brand: @brand-default;
+}
+
+.button {
+  background: var(--brand);
+}
+```
+
+Here Less provides a build-time default, but the emitted custom property remains changeable in the browser.
+
+Use Less variables for compilation, maps, mixins, and generated values. Use custom properties for inheritance, runtime themes, browser calculations, and values changed by states or JavaScript.
+
 ---
 
 # 49. Less and `calc()`
@@ -2803,6 +3111,21 @@ Compiled:
   width: calc(100% - 24px);
 }
 ```
+
+
+## Keep browser math as browser math
+
+`calc()` is CSS syntax evaluated by the browser. It is especially useful when a result depends on runtime information:
+
+```less
+.sidebar {
+  width: calc(100% - 18rem);
+}
+```
+
+By contrast, a pure Less calculation such as `@space * 2` can be resolved before the CSS is delivered.
+
+When mixing Less values with `calc()`, inspect the generated CSS to confirm that the expression you expect was preserved. Do not force a calculation into Less when the browser needs to combine percentages, viewport units, container-relative values, or CSS custom properties at runtime.
 
 ---
 
@@ -2945,6 +3268,21 @@ Real use cases:
 
 Prefer standard bundler/CLI integration unless you genuinely need programmatic control.
 
+
+## What the API workflow looks like
+
+The JavaScript API is useful when CSS generation is part of a custom Node.js tool rather than a normal bundler pipeline. The basic flow is:
+
+```text
+Less source string
+    ↓
+less.render(...)
+    ↓
+result.css (+ optional metadata such as map/import information)
+```
+
+Treat rendering as asynchronous in application code and handle compiler errors rather than assuming every source string is valid. For ordinary Vite/Webpack projects, the framework integration is usually simpler than writing your own compilation wrapper. Use the API when you genuinely need programmatic control over source, options, or generated output.
+
 ---
 
 # 53. Browser-Side Less
@@ -2984,6 +3322,13 @@ Use browser-side Less mainly for:
 - specialized runtime variable/theme experiments
 
 For ordinary production sites, precompile.
+
+
+## Why this is mainly a learning/development technique
+
+Browser-side compilation makes the client download Less source and a Less compiler, then generate CSS after the page loads. That adds work and failure modes before styling is ready.
+
+It can be useful for demos, playgrounds, teaching, or specialized runtime experimentation. For normal production applications, precompile Less during the build so users receive ready-to-use CSS. This improves caching, removes the compiler from the client path, and makes build failures visible before deployment.
 
 ---
 
@@ -3047,6 +3392,21 @@ modifyVars → injected after source  → override source value
 ```
 
 This can be useful for theme builds.
+
+
+## Reading a CLI command
+
+The common shape is:
+
+```text
+lessc [options] <source> [destination]
+```
+
+- **source** — the Less entry file;
+- **destination** — optional CSS output file;
+- **options** — compiler behavior such as source-map or include-path settings.
+
+Use `lessc --help` for the exact options supported by the installed compiler version rather than copying flags from an old blog post. In a project, store the command in `package.json` so CI and local development execute the same build.
 
 ---
 
@@ -3294,6 +3654,19 @@ If mixin not found, verify:
 ## 6. Inspect generated CSS
 
 Some "Less bugs" are actually normal CSS cascade/specificity issues.
+
+
+## Debug from source to browser in layers
+
+When a Less-powered page is wrong, isolate the layer:
+
+1. **Compiler** — does `lessc` report a syntax, import, or type error?
+2. **Generated CSS** — did the mixin, guard, nesting, or calculation emit what you expected?
+3. **Delivery** — is the correct CSS file actually loaded by the page?
+4. **Cascade/layout** — does another CSS rule win in DevTools?
+5. **Runtime state** — is a media query, custom property, or class different from what you assumed?
+
+This avoids the common mistake of adding more Less code to solve what is really a browser cascade problem.
 
 ---
 

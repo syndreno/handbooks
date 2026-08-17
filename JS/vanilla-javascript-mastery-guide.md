@@ -1,4 +1,6 @@
 # Vanilla JavaScript Mastery Guide
+> **Revision note:** weak-section reinforcement pass completed August 2026. The guide remains framework-free and keeps the web platform itself as the source of truth.
+
 
 > **Goal:** Master modern Vanilla JavaScript from absolute beginner fundamentals to advanced, production-ready usage without relying on frameworks. Every major topic includes beginner-friendly meaning, purpose, mental models, examples, real-world scenarios, pitfalls, and practice guidance.
 >
@@ -2043,6 +2045,8 @@ const byId = employees.reduce((result, employee) => {
 ---
 
 # 22. Strings
+A JavaScript string is an immutable sequence of UTF-16 code units used for text. String methods return new values rather than changing the original string. Be careful with “characters” outside the basic multilingual plane because `.length` is not always the number of user-perceived characters.
+
 
 > ### Beginner explanation
 >
@@ -7153,6 +7157,8 @@ This example is sequential by design. If all pages can safely load concurrently,
 ---
 
 # 88. Typed Arrays, ArrayBuffer, and Binary Data
+`ArrayBuffer` represents a fixed-size block of raw binary memory; typed-array/DataView objects provide numeric views over those bytes. Use them for binary file formats, network protocols, media, cryptography APIs, or high-performance numeric work—not for ordinary lists of business objects.
+
 
 > ### Beginner explanation
 >

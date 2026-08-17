@@ -99,6 +99,8 @@ For each topic, ask:
 
 # 2. What Are Data Structures and Algorithms?
 
+Data Structures and Algorithms (DSA) is the study of how to organize data and how to process it efficiently and correctly. The practical skill is choosing operations and representations that fit the constraints, then proving correctness and understanding the time/memory trade-off.
+
 ## 2.1 Data Structure
 
 A **data structure** is a method for organizing data so that certain operations become efficient.
@@ -190,6 +192,8 @@ You do not need all of JavaScript before learning DSA, but you must be comfortab
 
 ## 3.1 Variables
 
+Variables give names to values and state used by an algorithm. In DSA code, use descriptive names for indexes, boundaries, counters, and accumulated results because unclear state is a common source of off-by-one and update-order bugs.
+
 ```js
 let count = 0;
 const limit = 10;
@@ -200,6 +204,8 @@ Prefer `const` unless reassignment is required.
 ---
 
 ## 3.2 Arrays
+
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
 
 ```js
 const nums = [10, 20, 30];
@@ -228,23 +234,36 @@ arr.sort();
 
 ### Important warning
 
-JavaScript's default `sort()` converts values to strings.
+This warning highlights a language behavior that can silently change the algorithm's result or complexity. Treat default library semantics—especially sorting, numeric precision, and mutating array methods—as part of the algorithm contract rather than assuming behavior from another language.
+
+JavaScript's default `sort()` compares elements as strings unless you provide a comparator. That can produce an order that is wrong for numeric DSA problems. `sort()` also **mutates the array**.
 
 ```js
-console.log([10, 2, 30].sort());
-// [10, 2, 30] in lexicographic behavior
+const values = [1, 30, 4, 21, 100000];
+
+console.log([...values].sort());
+// [1, 100000, 21, 30, 4]  <- string/lexicographic order
+
+console.log([...values].sort((a, b) => a - b));
+// [1, 4, 21, 30, 100000]  <- numeric ascending order
 ```
+
+The comparator receives two elements, `a` and `b`. Returning a negative value places `a` before `b`; returning a positive value places `b` before `a`; returning `0` leaves them equal for ordering purposes.
 
 Use:
 
 ```js
-nums.sort((a, b) => a - b); // ascending
-nums.sort((a, b) => b - a); // descending
+nums.sort((a, b) => a - b); // numeric ascending; mutates nums
+nums.sort((a, b) => b - a); // numeric descending; mutates nums
 ```
+
+The spread expression `[...values]` above creates a shallow copy so the demonstration does not modify the original `values` array.
 
 ---
 
 ## 3.3 Objects
+
+Plain JavaScript objects can store key/value pairs, but property keys are strings or symbols and objects inherit object-oriented behavior/prototype semantics. For arbitrary dynamic DSA keys, especially non-string keys, `Map` often communicates intent more clearly and provides a dedicated key-value API.
 
 ```js
 const frequencies = {};
@@ -258,6 +277,8 @@ For DSA, `Map` is often clearer when keys are dynamic.
 ---
 
 ## 3.4 Map
+
+JavaScript `Map` stores key/value pairs and accepts keys of any value type. Core operations are `set`, `get`, `has`, and `delete`; iteration preserves insertion order. It is commonly used for frequency maps, index lookup, graph tables, and memoization.
 
 ```js
 const map = new Map();
@@ -283,6 +304,8 @@ for (const [key, value] of map) {
 
 ## 3.5 Set
 
+A set stores unique values and is designed for membership testing. In DSA it is useful for duplicate detection, visited states, and window membership. It does not provide positional indexing; use a sequence when index-based order is the main operation.
+
 ```js
 const seen = new Set();
 
@@ -305,6 +328,8 @@ Useful for:
 
 ## 3.6 Loops
 
+Loops express repeated state updates. In DSA, choose the loop form that makes boundaries and mutation obvious: index-based loops for positions and direct iteration for values. Boundary clarity matters more than syntax brevity.
+
 ```js
 for (let i = 0; i < nums.length; i++) {
   console.log(nums[i]);
@@ -323,6 +348,8 @@ Avoid `for...in` for array values because it iterates property keys.
 
 ## 3.7 Functions
 
+A function/method packages a reusable piece of algorithmic work behind inputs and a return value. For DSA helpers, make the contract explicit: what each parameter represents, whether the input is mutated, what is returned, and what happens for empty or invalid input.
+
 ```js
 function add(a, b) {
   return a + b;
@@ -339,6 +366,8 @@ const add = (a, b) => a + b;
 
 ## 3.8 Classes
 
+Classes are useful in DSA for nodes, heaps, tries, graphs, or reusable structures that own state plus operations. Keep fields tied to one invariant and expose methods that preserve it; a class is unnecessary when a small pure function solves the problem more clearly.
+
 Useful when implementing linked lists, trees, heaps, graphs, etc.
 
 ```js
@@ -354,6 +383,8 @@ class Node {
 
 ## 3.9 Destructuring
 
+Destructuring extracts values from arrays or properties from objects into local variables. It can make DSA code clearer when unpacking pairs, coordinates, queue entries, or map entries, but overly nested destructuring can make state changes harder to follow.
+
 ```js
 const [a, b] = [10, 20];
 
@@ -364,6 +395,8 @@ const { name, age } = user;
 ---
 
 ## 3.10 Swap Trick
+
+Swapping exchanges two values without changing the rest of the data. It is common in sorting, partitioning, reversal, and heap operations. Ensure both positions are valid before swapping; in-place algorithms rely on this operation preserving all values rather than losing one through overwrite.
 
 ```js
 [a, b] = [b, a];
@@ -403,6 +436,8 @@ Do not directly mix `BigInt` and `Number`:
 
 ## 3.12 Node.js Competitive Programming Input Template
 
+This template reads standard input once and tokenizes/parses it for fast contest-style access. Keep parsing logic separate from the algorithm, and be explicit about numeric conversion because input tokens arrive as strings. For very large inputs, avoid repeated expensive string operations inside the main solving loop.
+
 ```js
 const fs = require("fs");
 
@@ -424,6 +459,8 @@ console.log(nums);
 ---
 
 # 4. Time and Space Complexity
+
+Complexity analysis estimates how an algorithm's resource usage grows as input size increases. Focus on the dominant growth rate rather than machine-specific timing, and analyze both execution work and extra memory so you can compare approaches before benchmarking.
 
 Complexity measures how resource usage grows with input size.
 
@@ -452,6 +489,8 @@ Typical complexities:
 
 ## 4.2 O(1)
 
+`O(1)` means the amount of work does not grow with the number of input elements. It does **not** mean the operation takes exactly one CPU instruction; it means the step count is bounded by a constant with respect to input size. Examples include reading a known array index or checking a stored variable.
+
 ```js
 function first(arr) {
   return arr[0];
@@ -463,6 +502,8 @@ Input size does not affect the number of steps significantly.
 ---
 
 ## 4.3 O(n)
+
+`O(n)` means the running time grows proportionally with the input size. A single complete pass over an array is the standard example. Several separate linear passes are still `O(n)` because constant multipliers are omitted in asymptotic analysis.
 
 ```js
 function sum(arr) {
@@ -480,6 +521,8 @@ function sum(arr) {
 
 ## 4.4 O(n²)
 
+`O(n²)` usually appears when the algorithm examines many pairs of input elements, such as two nested loops over the same `n` items. Doubling `n` can make the dominant work roughly four times larger, so quadratic approaches become expensive quickly on large inputs.
+
 ```js
 for (let i = 0; i < n; i++) {
   for (let j = 0; j < n; j++) {
@@ -492,6 +535,8 @@ for (let i = 0; i < n; i++) {
 
 ## 4.5 O(log n)
 
+`O(log n)` appears when each step reduces the remaining problem by a constant factor, often by half. Binary search is the classic example. The logarithm base is ignored in Big-O because changing the base only multiplies the count by a constant factor.
+
 Repeatedly cutting the search space in half creates logarithmic complexity.
 
 Example: binary search.
@@ -499,6 +544,8 @@ Example: binary search.
 ---
 
 ## 4.6 O(n log n)
+
+`O(n log n)` commonly appears when an algorithm performs logarithmic levels of work and processes `O(n)` data across each level. Efficient comparison sorts such as merge sort and heap sort have this bound; divide-and-conquer algorithms often produce it as well.
 
 Efficient comparison-based sorting algorithms often achieve O(n log n).
 
@@ -511,6 +558,8 @@ Examples:
 ---
 
 ## 4.7 Space Complexity
+
+Space complexity measures how much additional memory grows with input size. Distinguish the input itself from **auxiliary space** used by the algorithm, and remember to include recursion depth, temporary arrays, hash tables, queues, and stacks. An in-place algorithm usually means `O(1)` or very small auxiliary storage, not that the input occupies no memory.
 
 Space complexity measures additional memory.
 
@@ -534,6 +583,8 @@ Extra array → O(n) auxiliary space.
 
 ## 4.8 Drop Constants
 
+Big-O ignores constant multipliers because they do not change asymptotic growth. `O(3n)` is written as `O(n)`. Constants can still matter in real benchmarking, so asymptotic simplification is for growth-rate comparison, not a claim that implementations with the same Big-O run equally fast.
+
 O(2n) becomes O(n).
 
 O(100) becomes O(1).
@@ -541,6 +592,8 @@ O(100) becomes O(1).
 ---
 
 ## 4.9 Keep Dominant Term
+
+When several growth terms are added, the fastest-growing term dominates for large `n`. For example, `O(n² + n + 10)` simplifies to `O(n²)`. This simplification is valid for asymptotic analysis even though lower-order work can matter for small inputs.
 
 O(n² + n + 10) becomes O(n²).
 
@@ -573,9 +626,13 @@ Actual limits depend on language, environment, constants, and time limit.
 
 # 5. Problem-Solving Framework
 
+A problem-solving framework turns an unfamiliar prompt into a sequence of verifiable decisions. Clarify the contract, build a correct baseline, locate repeated work, choose a structure/pattern that removes it, state why the optimization is valid, and test the boundaries.
+
 Use this framework consistently.
 
 ## Step 1: Understand the problem
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Identify:
 
@@ -591,6 +648,8 @@ Identify:
 ---
 
 ## Step 2: Work through examples
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Example problem:
 
@@ -611,6 +670,8 @@ Output:
 ---
 
 ## Step 3: Start with brute force
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 ```js
 function twoSum(nums, target) {
@@ -634,6 +695,8 @@ Complexity:
 ---
 
 ## Step 4: Identify repeated work
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 For each number, brute force repeatedly searches for its complement.
 
@@ -672,6 +735,8 @@ Complexity:
 
 ## Step 5: Test edge cases
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Test:
 
 - empty input,
@@ -685,6 +750,8 @@ Test:
 ---
 
 # 6. Arrays
+
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
 
 An array stores elements in order.
 
@@ -708,6 +775,8 @@ const arr = [10, 20, 30];
 
 ## 6.2 Traversal
 
+Traversal means visiting each relevant element/node in a defined order. The important state is the current position and the rule for advancing to the next one. A full traversal is usually `O(n)` for a linear structure, while trees/graphs additionally require a stack/queue or recursion and, for cyclic graphs, visited tracking.
+
 ```js
 for (let i = 0; i < arr.length; i++) {
   console.log(arr[i]);
@@ -717,6 +786,8 @@ for (let i = 0; i < arr.length; i++) {
 ---
 
 ## 6.3 Find Maximum
+
+Finding a maximum requires a baseline that is valid for the input domain. Initialize from the first element (after handling empty input) rather than from `0`, which fails when every value is negative. Then scan once and replace the current maximum whenever a larger value appears: `O(n)` time, `O(1)` extra space.
 
 ```js
 function maxValue(nums) {
@@ -738,6 +809,8 @@ function maxValue(nums) {
 
 ## 6.4 Reverse In Place
 
+In-place reversal swaps symmetric elements from the two ends and moves inward until the pointers meet. Each element is touched a constant number of times, giving `O(n)` time and `O(1)` auxiliary space. The input array is mutated, so callers that need the original order must copy it first.
+
 ```js
 function reverseArray(nums) {
   let left = 0;
@@ -756,6 +829,8 @@ function reverseArray(nums) {
 ---
 
 ## 6.5 Remove Duplicates from Sorted Array
+
+Because the array is sorted, equal values appear next to one another. A read pointer scans every element while a write pointer marks where the next distinct value belongs. The algorithm runs in `O(n)` time and can overwrite the input in place using `O(1)` extra space; the returned length/count tells the caller which prefix contains the unique values.
 
 ```js
 function removeDuplicates(nums) {
@@ -779,6 +854,8 @@ Pattern: **read pointer + write pointer**.
 ---
 
 ## 6.6 Rotate Array
+
+Array rotation shifts positions cyclically. Normalize the shift with modulo so values larger than the array length do not cause repeated work. Common approaches are a new array (`O(n)` extra space) or the three-reversal method (`O(1)` extra space for mutable arrays).
 
 Rotate right by `k`.
 
@@ -844,6 +921,8 @@ Space: O(1)
 
 # 7. Strings
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 JavaScript strings are immutable.
 
 ```js
@@ -868,6 +947,8 @@ text = chars.join("");
 
 ## 7.1 Character Frequency
 
+A frequency table records how many times each value occurs. Python's `Counter` constructs this mapping directly from an iterable and is useful when counts—not just membership—are needed.
+
 ```js
 function frequencyMap(str) {
   const freq = new Map();
@@ -883,6 +964,8 @@ function frequencyMap(str) {
 ---
 
 ## 7.2 Palindrome
+
+A palindrome reads the same forward and backward under the problem's comparison rules. The standard two-pointer check compares the leftmost and rightmost relevant characters and moves inward, stopping on the first mismatch. Time is `O(n)` and extra space can be `O(1)` when normalization is not stored separately.
 
 ```js
 function isPalindrome(str) {
@@ -905,6 +988,8 @@ function isPalindrome(str) {
 ---
 
 ## 7.3 Valid Anagram
+
+Two strings are anagrams when they contain the same symbols with the same frequencies, subject to the problem's normalization rules. A frequency map gives `O(n)` expected time and avoids sorting; sorting both strings is simpler in some cases but typically costs `O(n log n)`. Decide explicitly whether case, spaces, punctuation, and Unicode normalization matter.
 
 ```js
 function isAnagram(a, b) {
@@ -933,6 +1018,8 @@ function isAnagram(a, b) {
 ---
 
 ## 7.4 Longest Common Prefix
+
+The longest common prefix is the longest starting substring shared by every string in the collection. A practical approach uses one string as the candidate prefix and shortens/compares it against the others. Handle an empty collection explicitly; the answer is an empty string when no first character is shared.
 
 ```js
 function longestCommonPrefix(words) {
@@ -967,6 +1054,8 @@ function longestCommonPrefix(words) {
 ---
 
 # 8. Hash Maps and Sets
+
+Hash-based structures trade extra memory for fast average-case membership, lookup, insertion, and deletion. They are especially useful for frequency tables, duplicate detection, complement lookup, caching, and visited-state tracking. Their ordering guarantees and worst-case behavior depend on the language and implementation, so do not assume sorted iteration unless the API explicitly provides it.
 
 Hashing is one of the most important DSA techniques.
 
@@ -1005,6 +1094,8 @@ Average expected lookup is commonly treated as O(1).
 
 ## 8.2 Duplicate Detection
 
+Duplicate detection can use a set of values seen so far. If the current value is already present, a duplicate exists; otherwise add it and continue. This is `O(n)` expected time with `O(n)` extra space, compared with `O(n²)` pair checking or `O(n log n)` sorting.
+
 ```js
 function containsDuplicate(nums) {
   const seen = new Set();
@@ -1022,6 +1113,8 @@ function containsDuplicate(nums) {
 
 ## 8.3 Frequency Counting
 
+Frequency counting scans the input and stores how many times each value occurs. A hash map gives expected `O(n)` build time; a fixed-size array can be faster and more memory-efficient when the key range is small and known. The resulting counts support duplicates, grouping, anagrams, and many window problems.
+
 ```js
 function countWords(words) {
   const freq = new Map();
@@ -1037,6 +1130,8 @@ function countWords(words) {
 ---
 
 ## 8.4 First Non-Repeating Character
+
+Count each character first, then scan the original string again and return the first character whose frequency is one. The second pass is important because a hash map alone does not necessarily express the required original-position rule. Overall time is `O(n)`.
 
 ```js
 function firstUniqueChar(s) {
@@ -1060,6 +1155,8 @@ function firstUniqueChar(s) {
 
 ## 8.5 When to Think "Hash Map"
 
+Hash-based structures trade extra memory for fast average-case membership, lookup, insertion, and deletion. They are especially useful for frequency tables, duplicate detection, complement lookup, caching, and visited-state tracking. Their ordering guarantees and worst-case behavior depend on the language and implementation, so do not assume sorted iteration unless the API explicitly provides it.
+
 Use a map when you see:
 
 - count,
@@ -1076,6 +1173,8 @@ Use a map when you see:
 
 # 9. Linked Lists
 
+A linked list stores values in nodes connected by references rather than by contiguous indexed positions. This makes pointer rewiring cheap once the relevant node is known, but random access is slow because traversal normally starts from the head. Linked-list problems therefore focus heavily on pointer movement, insertion/removal, reversal, cycle detection, and fast/slow-pointer techniques.
+
 A linked list consists of nodes.
 
 Each node stores:
@@ -1086,6 +1185,8 @@ Each node stores:
 ---
 
 ## 9.1 Node
+
+A custom node class groups the value stored at one position with references to neighboring nodes. The exact fields depend on the structure—for example, `next` for a singly linked list and `left`/`right` for a binary tree. Algorithms usually pass or return node references rather than copying whole structures.
 
 ```js
 class ListNode {
@@ -1099,6 +1200,8 @@ class ListNode {
 ---
 
 ## 9.2 Singly Linked List
+
+A singly linked list node stores a value plus one `next` reference. Access to the `i`th element requires traversal from the head, but insertion/removal near a known node only changes a small number of links. Keep ownership of the head (and optional tail) explicit.
 
 ```js
 class LinkedList {
@@ -1153,6 +1256,8 @@ class LinkedList {
 
 ## 9.4 Reverse Linked List
 
+Reversing a singly linked list rewires each node's `next` reference. Keep three pieces of state: the previous node, the current node, and the original next node so the remainder of the list is not lost before reassignment. The iterative algorithm runs in `O(n)` time and `O(1)` extra space.
+
 ```js
 function reverseList(head) {
   let previous = null;
@@ -1176,6 +1281,8 @@ Important interview pattern.
 
 ## 9.5 Find Middle — Fast and Slow Pointer
 
+Move one pointer one node at a time and another two nodes at a time. When the fast pointer reaches the end, the slow pointer is at the middle. Define which middle should be returned for even-length lists; the common loop condition determines whether you get the first or second middle.
+
 ```js
 function middleNode(head) {
   let slow = head;
@@ -1193,6 +1300,8 @@ function middleNode(head) {
 ---
 
 ## 9.6 Detect Cycle — Floyd's Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 ```js
 function hasCycle(head) {
@@ -1218,6 +1327,8 @@ Space: O(1)
 ---
 
 ## 9.7 Merge Two Sorted Lists
+
+Merging two sorted linked lists repeatedly chooses the smaller current head and appends that node to the result chain. A dummy/sentinel head can simplify the first-insertion case; return the node after the dummy. Every input node is linked once, so time is `O(n + m)`.
 
 ```js
 function mergeTwoLists(a, b) {
@@ -1274,6 +1385,8 @@ console.log(stack.pop());
 
 ## 10.1 Valid Parentheses
 
+Balanced-bracket checking uses a stack of opening brackets. Each closing bracket must match the most recent unmatched opening bracket, so a mismatch or an empty stack fails immediately; after the scan, the stack must also be empty. The algorithm is `O(n)` time and `O(n)` worst-case space.
+
 ```js
 function isValidParentheses(s) {
   const stack = [];
@@ -1301,6 +1414,8 @@ function isValidParentheses(s) {
 ---
 
 ## 10.2 Min Stack
+
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
 
 Support retrieving minimum in O(1).
 
@@ -1357,6 +1472,8 @@ Examples:
 
 ## 11.1 Avoid Repeated `shift()` for Large Queues
 
+The code below is a concrete example of **11.1 Avoid Repeated `shift()` for Large Queues**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
+
 Although convenient:
 
 ```js
@@ -1380,6 +1497,8 @@ const item = queue[head++];
 ---
 
 ## 11.2 Queue Class
+
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
 
 ```js
 class Queue {
@@ -1434,6 +1553,8 @@ For performance-sensitive JavaScript, consider implementing a deque using an ind
 
 # 12. Recursion
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 Recursion occurs when a function calls itself.
 
 Every recursive solution needs:
@@ -1444,6 +1565,8 @@ Every recursive solution needs:
 ---
 
 ## 12.1 Factorial
+
+Factorial is defined for non-negative integers by `n! = n × (n-1) × ... × 1`, with `0! = 1`. A recursive implementation mirrors that definition, but an iterative version avoids recursive call-stack growth. Factorial values grow extremely quickly, so ordinary fixed-width integer types overflow at relatively small `n` values.
 
 ```js
 function factorial(n) {
@@ -1456,6 +1579,8 @@ function factorial(n) {
 ---
 
 ## 12.2 Recursive Sum
+
+A recursive sum processes one element and delegates the remainder to a smaller state until a base case such as an empty suffix/index is reached. It is `O(n)` time but also uses `O(n)` call-stack space, so an iterative loop is usually preferable when recursion adds no structural clarity.
 
 ```js
 function sum(nums, index = 0) {
@@ -1470,6 +1595,8 @@ function sum(nums, index = 0) {
 ---
 
 ## 12.3 Recursion Tree
+
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
 
 Naive Fibonacci:
 
@@ -1526,7 +1653,11 @@ JavaScript environments may throw a stack overflow for deep recursion.
 
 # 13. Searching Algorithms
 
+Searching asks whether, where, or under what condition a target can be found. Start with linear search as the no-precondition baseline, then use binary search when ordering or monotonicity lets you safely discard large parts of the search space.
+
 ## 13.1 Linear Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```js
 function linearSearch(nums, target) {
@@ -1545,6 +1676,8 @@ Time: O(n)
 ---
 
 ## 13.2 Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Requirement:
 
@@ -1579,6 +1712,8 @@ Time: O(log n)
 
 ## 13.3 Lower Bound
 
+A lower bound returns the first position whose value is **not less than** the target (equivalently, the insertion position before existing equal values). The binary-search invariant must preserve all possible answers, including the position immediately after the final element when every value is smaller.
+
 Find the first index where:
 
 ```txt
@@ -1607,6 +1742,8 @@ function lowerBound(nums, target) {
 ---
 
 ## 13.4 Upper Bound
+
+An upper bound returns the first position whose value is **greater than** the target, which is the insertion position after all existing equal values. It differs from lower bound only in the comparison that decides which half can still contain the answer.
 
 First index where:
 
@@ -1674,6 +1811,8 @@ Typical problems:
 
 # 14. Sorting Algorithms
 
+Sorting rearranges values according to an ordering rule so later operations can exploit structure. Learn not only the code but also stability, in-place behavior, best/average/worst complexity, comparator requirements, and when a language's built-in sort is preferable to a manual algorithm.
+
 Sorting often simplifies a difficult problem.
 
 It can enable:
@@ -1687,6 +1826,8 @@ It can enable:
 ---
 
 ## 14.1 Bubble Sort
+
+Bubble sort repeatedly compares adjacent elements and swaps pairs that are out of order. After each full pass, one extreme value has moved to its final end position. It is easy to learn but `O(n²)` in average/worst cases; with an early-exit flag it can be `O(n)` on already sorted input.
 
 Repeatedly swap adjacent inverted pairs.
 
@@ -1719,6 +1860,8 @@ Mainly useful for learning.
 
 ## 14.2 Selection Sort
 
+Selection sort repeatedly chooses the smallest (or largest) remaining element and places it into the next final position. It performs `O(n²)` comparisons regardless of initial order and only `O(n)` swaps, so it is mostly educational or useful when writes are unusually expensive. The usual in-place form is not stable.
+
 Select the minimum and place it next.
 
 ```js
@@ -1747,6 +1890,8 @@ Time: O(n²)
 
 ## 14.3 Insertion Sort
 
+Insertion sort grows a sorted prefix one element at a time. For each new value, it shifts larger prefix elements to the right until the correct insertion position opens. It is stable with the usual comparison, in-place, `O(n²)` in the average/worst case, and `O(n)` on already or nearly sorted data.
+
 Good conceptual fit for nearly sorted data.
 
 ```js
@@ -1774,6 +1919,8 @@ Worst: O(n²)
 ---
 
 ## 14.4 Merge Sort
+
+Merge sort divides the sequence into halves, recursively sorts each half, and merges two sorted halves in linear time. Its recurrence leads to `O(n log n)` time in all standard cases; array implementations typically need `O(n)` auxiliary merge storage. Merge sort is stable when equal elements are taken from the left half first.
 
 Divide array in half, recursively sort, merge.
 
@@ -1816,6 +1963,8 @@ Extra space: O(n)
 ---
 
 ## 14.5 Quick Sort
+
+Quick sort partitions elements around a pivot so smaller and larger values move to opposite sides, then recursively sorts the partitions. Average time is `O(n log n)` but poor pivot choices can produce `O(n²)`. Partition scheme, duplicate handling, and recursion depth are important implementation details.
 
 Choose a pivot and partition values around it.
 
@@ -1906,6 +2055,8 @@ Do not use when the numeric range is enormous.
 
 # 15. Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Two pointers use two indices that move according to a rule.
 
 Common situations:
@@ -1920,6 +2071,8 @@ Common situations:
 ---
 
 ## 15.1 Pair Sum in Sorted Array
+
+With sorted input, place one pointer at each end. If the sum is too small, moving the left pointer right is the only move that can increase it; if the sum is too large, move the right pointer left. This invariant gives `O(n)` time and `O(1)` extra space after sorting is already available.
 
 ```js
 function hasPairSum(nums, target) {
@@ -1949,6 +2102,8 @@ Time: O(n)
 ---
 
 ## 15.2 Move Zeroes
+
+Use a write pointer for the next non-zero position while a read pointer scans the array. Copy/swap non-zero values forward in original order, then fill or leave zeros in the remaining suffix depending on the implementation. This yields `O(n)` time and `O(1)` extra space.
 
 ```js
 function moveZeroes(nums) {
@@ -2016,6 +2171,8 @@ Time: O(n²)
 
 # 16. Sliding Window
 
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
+
 Sliding window is used for contiguous ranges.
 
 Clues:
@@ -2029,6 +2186,8 @@ Clues:
 ---
 
 ## 16.1 Fixed-Size Window
+
+A fixed-size sliding window maintains an aggregate for exactly `k` consecutive elements. Build the first window, then for each shift subtract/remove the outgoing contribution and add the incoming one. This turns many `O(nk)` repeated-window calculations into `O(n)`.
 
 Maximum sum of `k` consecutive values.
 
@@ -2060,6 +2219,8 @@ Time: O(n)
 ---
 
 ## 16.2 Variable-Size Window
+
+A variable-size sliding window expands one boundary and shrinks the other whenever the validity constraint is violated. This is linear when each boundary moves forward at most `n` times and when window state can be updated incrementally. The validity condition must be monotonic enough that shrinking can restore it.
 
 Longest substring without repeating characters:
 
@@ -2117,7 +2278,11 @@ Sliding window works here because all values are positive, making the sum behave
 
 # 17. Prefix Sum and Difference Arrays
 
+Prefix sums and difference arrays are complementary preprocessing techniques. Prefix sums make repeated range queries cheap; difference arrays make many range updates cheap before one final reconstruction. Their correctness depends on a clear indexing convention and careful boundary handling.
+
 ## 17.1 Prefix Sum
+
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
 
 Given:
 
@@ -2168,6 +2333,8 @@ Each query: O(1)
 
 ## 17.2 Prefix Sum + Hash Map
 
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
+
 Count subarrays with sum `k`.
 
 ```js
@@ -2195,6 +2362,8 @@ Important pattern.
 ---
 
 ## 17.3 Difference Array
+
+A difference array represents the *changes* between positions so that many range updates can be recorded cheaply. A range addition marks where an effect starts and where it stops; one final prefix accumulation reconstructs the resulting values. It is useful when updates are numerous but point-by-point results are only needed after all updates are known.
 
 Efficiently apply many range increments.
 
@@ -2235,6 +2404,8 @@ function applyRangeUpdates(n, updates) {
 
 # 18. Matrices and Grids
 
+Matrices and grids are indexed 2D structures, but many grid problems are graphs in disguise: each cell is a vertex and allowed moves define edges. Start by clarifying row/column bounds and movement rules, then choose direct iteration, prefix techniques, BFS/DFS, or DP based on the required operation.
+
 A matrix is commonly represented as:
 
 ```js
@@ -2249,6 +2420,8 @@ const grid = [
 
 ## 18.1 Traversal
 
+Traversal means visiting each relevant element/node in a defined order. The important state is the current position and the rule for advancing to the next one. A full traversal is usually `O(n)` for a linear structure, while trees/graphs additionally require a stack/queue or recursion and, for cyclic graphs, visited tracking.
+
 ```js
 for (let r = 0; r < grid.length; r++) {
   for (let c = 0; c < grid[0].length; c++) {
@@ -2260,6 +2433,8 @@ for (let r = 0; r < grid.length; r++) {
 ---
 
 ## 18.2 Direction Arrays
+
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
 
 Very useful:
 
@@ -2284,6 +2459,8 @@ for (const [dr, dc] of directions) {
 ---
 
 ## 18.3 Flood Fill
+
+Flood fill explores all grid cells connected to a start cell under a movement rule and matching condition. BFS or DFS both work; mark a cell visited (or recolor it) when it is discovered to prevent repeated work. Runtime is `O(rows × cols)` in the worst case.
 
 ```js
 function floodFill(image, sr, sc, color) {
@@ -2337,6 +2514,8 @@ Common actions:
 
 # 19. Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Backtracking explores possibilities and undoes choices.
 
 General pattern:
@@ -2361,6 +2540,8 @@ function backtrack(state, choices) {
 ---
 
 ## 19.1 Generate Subsets
+
+Generating all subsets explores two choices for each element: include it or exclude it. That creates `2^n` possible subsets, so exponential output size is unavoidable. Backtracking should add a **copy** of the current path to the result because the same mutable path is modified during later recursive calls.
 
 ```js
 function subsets(nums) {
@@ -2393,6 +2574,8 @@ Time: O(2ⁿ × n) if copying each subset.
 ---
 
 ## 19.2 Permutations
+
+Generating permutations chooses one unused item for each next position, recursively explores the remainder, and then undoes the choice. There are `n!` outputs for distinct items, so factorial work is inherent. With duplicate input values, add a duplicate-skipping rule if unique permutations are required.
 
 ```js
 function permutations(nums) {
@@ -2429,6 +2612,8 @@ function permutations(nums) {
 
 ## 19.3 Combination Sum Style
 
+Combination-sum backtracking builds a candidate combination and recurses on the remaining target. Whether the recursive call reuses the current index or advances to the next index determines whether an item may be chosen multiple times. Prune when the remaining target becomes impossible under the problem's assumptions.
+
 ```js
 function combinationSum(candidates, target) {
   const result = [];
@@ -2461,6 +2646,8 @@ function combinationSum(candidates, target) {
 
 ## 19.4 Backtracking Clues
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Think backtracking for:
 
 - "generate all",
@@ -2476,6 +2663,8 @@ Think backtracking for:
 ---
 
 # 20. Trees
+
+A tree is a connected acyclic hierarchical structure with nodes linked by parent/child relationships. Tree algorithms are easiest to understand recursively: define what one subtree call returns, choose a traversal order, and account for tree height because recursion/operation cost can degrade on skewed trees.
 
 A tree is a hierarchical structure.
 
@@ -2496,6 +2685,8 @@ Important vocabulary:
 
 ## 20.1 Binary Tree Node
 
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
+
 ```js
 class TreeNode {
   constructor(value) {
@@ -2510,7 +2701,11 @@ class TreeNode {
 
 ## 20.2 DFS Traversals
 
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
+
 ### Preorder
+
+Preorder traversal visits **node → left subtree → right subtree**. It is useful when the parent must be processed before its children, such as copying a tree, serializing certain tree formats, or producing prefix-style expression order. A complete traversal visits every node once, so time is `O(n)`.
 
 ```txt
 root -> left -> right
@@ -2530,6 +2725,8 @@ function preorder(root, result = []) {
 
 ### Inorder
 
+Inorder traversal visits **left subtree → node → right subtree**. On a Binary Search Tree with a consistent ordering rule, this produces keys in sorted order. A complete traversal is `O(n)` time and uses `O(h)` call-stack/explicit-stack space for tree height `h`.
+
 ```txt
 left -> root -> right
 ```
@@ -2547,6 +2744,8 @@ function inorder(root, result = []) {
 ```
 
 ### Postorder
+
+Postorder traversal visits **left subtree → right subtree → node**. Because children are processed before their parent, it is useful for deleting trees, computing subtree aggregates, and many tree-DP problems. A complete traversal is `O(n)` time and uses `O(h)` traversal stack space.
 
 ```txt
 left -> right -> root
@@ -2567,6 +2766,8 @@ function postorder(root, result = []) {
 ---
 
 ## 20.3 Level Order Traversal — BFS
+
+Level-order traversal is BFS on a tree. Use a queue to process nodes in increasing depth; if the output is grouped by levels, capture the queue size at the start of each level so newly enqueued children belong to the next group.
 
 ```js
 function levelOrder(root) {
@@ -2600,6 +2801,8 @@ function levelOrder(root) {
 
 ## 20.4 Maximum Depth
 
+Maximum tree depth is the number of nodes (or edges, depending on the chosen convention) on the longest root-to-leaf path. A recursive solution returns `1 + max(leftDepth, rightDepth)` for a non-null node. It visits each node once: `O(n)` time and `O(h)` stack space.
+
 ```js
 function maxDepth(root) {
   if (!root) return 0;
@@ -2614,6 +2817,8 @@ function maxDepth(root) {
 ---
 
 ## 20.5 Invert Binary Tree
+
+Inverting a binary tree swaps the left and right child of every node. DFS or BFS both work and visit each node once: `O(n)` time. Recursive DFS uses `O(h)` stack space; iterative BFS/DFS uses an explicit queue/stack proportional to the frontier.
 
 ```js
 function invertTree(root) {
@@ -2631,6 +2836,8 @@ function invertTree(root) {
 ---
 
 ## 20.6 Diameter of Binary Tree
+
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
 
 Diameter is the longest path between any two nodes, measured in edges.
 
@@ -2663,6 +2870,8 @@ Important tree-DP idea:
 
 ## 20.7 Lowest Common Ancestor in Binary Tree
 
+The lowest common ancestor (LCA) is the deepest node whose subtree contains both targets. A recursive binary-tree solution returns a target when found; if left and right recursive results are both non-null, the current node is the LCA. Clarify whether both target nodes are guaranteed to exist.
+
 ```js
 function lowestCommonAncestor(root, p, q) {
   if (!root || root === p || root === q) {
@@ -2684,6 +2893,8 @@ function lowestCommonAncestor(root, p, q) {
 
 # 21. Binary Search Trees
 
+A Binary Search Tree (BST) maintains an ordering invariant: values in one subtree compare before the node and values in the other compare after it, according to the chosen duplicate policy. Operations depend on tree height, so an unbalanced BST can degrade from `O(log n)` expected/balanced behavior to `O(n)`.
+
 BST property:
 
 For each node:
@@ -2697,6 +2908,8 @@ assuming distinct values.
 ---
 
 ## 21.1 Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```js
 function searchBST(root, target) {
@@ -2724,6 +2937,8 @@ Worst when skewed: O(n)
 
 ## 21.2 Insert
 
+Insertion must preserve the data structure's invariant. For an ordered tree, compare the new key at each node and descend to the appropriate child until an empty position is found; for duplicate keys, follow the policy defined by the problem. Runtime is proportional to the structure's height.
+
 ```js
 function insertBST(root, value) {
   if (!root) {
@@ -2743,6 +2958,8 @@ function insertBST(root, value) {
 ---
 
 ## 21.3 Validate BST
+
+Validating a BST requires checking the **entire allowed range** for each node, not only comparing a node with its immediate children. Pass lower/upper bounds (or use inorder ordering) so descendants cannot violate an ancestor's constraint. Decide how duplicates are handled before choosing strict or non-strict comparisons.
 
 Do not only compare a node with its immediate children.
 
@@ -2771,6 +2988,8 @@ function isValidBST(root) {
 
 ## 21.4 Inorder Property
 
+Inorder traversal visits **left subtree → node → right subtree**. On a Binary Search Tree with a consistent ordering rule, this produces keys in sorted order. A complete traversal is `O(n)` time and uses `O(h)` call-stack/explicit-stack space for tree height `h`.
+
 Inorder traversal of a valid BST produces sorted values.
 
 This fact powers many BST problems.
@@ -2782,6 +3001,8 @@ This fact powers many BST problems.
 A heap is a tree-based structure used to quickly access the smallest or largest element.
 
 ### Min Heap
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 Parent ≤ children.
 
@@ -2803,6 +3024,8 @@ JavaScript historically has not had a universally available built-in priority qu
 ---
 
 ## 22.1 Min Heap Implementation
+
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
 
 ```js
 class MinHeap {
@@ -2888,6 +3111,8 @@ class MinHeap {
 
 ## 22.2 Heap Complexity
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 | Operation | Complexity |
 |---|---:|
 | Peek min/max | O(1) |
@@ -2898,6 +3123,8 @@ class MinHeap {
 ---
 
 ## 22.3 K Largest Elements
+
+A min-heap of size `k` can maintain the `k` largest values seen so far. Push candidates and remove the smallest whenever the heap exceeds `k`; at the end, the heap contains the desired top `k`. This uses `O(n log k)` time and `O(k)` extra space.
 
 Keep a min heap of size `k`.
 
@@ -2943,6 +3170,8 @@ Useful for:
 
 ## 23.1 Trie Node
 
+A trie stores keys by shared prefixes. Each step consumes one symbol, so lookup time depends mainly on key length rather than on the number of stored keys. Tries are useful for autocomplete, prefix counting, dictionary search, and word-grid problems, but they can use substantially more memory than a hash-based set or map.
+
 ```js
 class TrieNode {
   constructor() {
@@ -2955,6 +3184,8 @@ class TrieNode {
 ---
 
 ## 23.2 Trie
+
+A trie stores keys by shared prefixes. Each step consumes one symbol, so lookup time depends mainly on key length rather than on the number of stored keys. Tries are useful for autocomplete, prefix counting, dictionary search, and word-grid problems, but they can use substantially more memory than a hash-based set or map.
 
 ```js
 class Trie {
@@ -3036,6 +3267,8 @@ Real-world examples:
 
 ## 24.1 Adjacency List
 
+An adjacency list stores, for each vertex, the vertices (and optionally edge weights) directly connected to it. It uses `O(V + E)` space and is usually preferred for sparse graphs because traversing a vertex touches only its actual outgoing/incident edges. For undirected graphs, each edge is normally stored in both endpoint lists.
+
 ```js
 const graph = new Map();
 
@@ -3053,6 +3286,8 @@ For sparse graphs, adjacency lists are usually preferred.
 ---
 
 ## 24.2 BFS
+
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
 
 ```js
 function bfs(graph, start) {
@@ -3088,6 +3323,8 @@ Use BFS for:
 ---
 
 ## 24.3 DFS
+
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
 
 Recursive:
 
@@ -3137,6 +3374,8 @@ function dfsIterative(graph, start) {
 
 ## 24.4 Connected Components
 
+A connected component is a maximal group of vertices reachable from one another (for the relevant directed/undirected definition). Scan all vertices; whenever an unvisited vertex is found, run BFS/DFS to mark one new component. Across the entire graph, adjacency-list traversal is `O(V + E)`.
+
 ```js
 function countComponents(n, edges) {
   const graph = Array.from({ length: n }, () => []);
@@ -3174,6 +3413,8 @@ function countComponents(n, edges) {
 
 ## 24.5 Topological Sort
 
+A topological ordering places every prerequisite before the items that depend on it. It exists only for a **directed acyclic graph (DAG)**. Common implementations use Kahn's algorithm with indegrees and a queue, or DFS with postorder; if all vertices cannot be ordered, the dependency graph contains a cycle.
+
 Used for directed acyclic graphs (DAGs).
 
 Examples:
@@ -3183,6 +3424,8 @@ Examples:
 - task scheduling.
 
 ### Kahn's Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 ```js
 function topologicalSort(n, edges) {
@@ -3228,6 +3471,8 @@ If not all nodes are processed, a directed cycle exists.
 
 ## 24.6 Dijkstra's Algorithm
 
+Dijkstra's algorithm computes single-source shortest paths when edge weights are non-negative. Maintain tentative distances and repeatedly process the smallest-distance candidate from a min-priority queue; ignore stale queue entries whose distance no longer matches the best known value. Typical adjacency-list complexity is `O((V+E) log V)`.
+
 Find shortest paths from a source when edge weights are non-negative.
 
 ```js
@@ -3269,6 +3514,8 @@ Dijkstra is not valid with negative-weight edges.
 
 # 25. Union-Find / Disjoint Set Union
 
+Union-Find, also called Disjoint Set Union (DSU), maintains a collection of non-overlapping groups under two main operations: `find` identifies a representative and `union` merges groups. Path compression plus union by rank/size makes a long sequence of operations effectively near-constant time in practice. It is useful for dynamic connectivity, cycle detection in undirected graphs, Kruskal's MST, and component grouping.
+
 DSU tracks connected groups.
 
 Operations:
@@ -3287,6 +3534,8 @@ Useful for:
 ---
 
 ## 25.1 Implementation
+
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
 
 ```js
 class DSU {
@@ -3350,6 +3599,8 @@ Common greedy clues:
 
 ## 26.1 Interval Scheduling
 
+For the classic maximum-number-of-non-overlapping-intervals problem, sorting by finishing time and repeatedly choosing the earliest finishing compatible interval is optimal. The greedy choice leaves as much room as possible for future intervals; sorting dominates at `O(n log n)`.
+
 Select maximum number of non-overlapping intervals.
 
 Strategy:
@@ -3377,6 +3628,8 @@ function maxNonOverlapping(intervals) {
 ---
 
 ## 26.2 Jump Game
+
+The greedy Jump Game invariant stores the farthest index reachable from any position processed so far. If the scan reaches an index beyond that frontier, the path is impossible; otherwise update the frontier with `i + nums[i]`. The scan is `O(n)` time and `O(1)` extra space.
 
 ```js
 function canJump(nums) {
@@ -3412,6 +3665,8 @@ When choices depend on previous state in complex ways, dynamic programming may b
 
 # 27. Dynamic Programming
 
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
+
 Dynamic Programming (DP) solves problems with:
 
 1. **overlapping subproblems**
@@ -3439,6 +3694,8 @@ For every DP problem, identify:
 
 ## 27.2 Fibonacci — Memoization
 
+Memoized Fibonacci stores the result for each `n` the first time it is computed. Later calls return the cached value instead of expanding the same recursive subtree again, reducing exponential recursion to `O(n)` distinct states and `O(n)` memo/stack space.
+
 ```js
 function fib(n, memo = new Map()) {
   if (n <= 1) return n;
@@ -3457,6 +3714,8 @@ function fib(n, memo = new Map()) {
 ---
 
 ## 27.3 Fibonacci — Tabulation
+
+Tabulated Fibonacci builds answers from the base cases upward. Each state uses the previous two values, so a full table costs `O(n)` space but can be reduced to two rolling variables when earlier states are no longer needed. Runtime is `O(n)`.
 
 ```js
 function fib(n) {
@@ -3477,6 +3736,8 @@ function fib(n) {
 ---
 
 ## 27.4 Space Optimization
+
+Space optimization removes DP states that are no longer needed. If `dp[i]` depends only on a fixed number of earlier rows/values, replace the full table with rolling variables or a small rolling array. Do this only after the full state transition is correct, because update order can accidentally overwrite a dependency.
 
 ```js
 function fib(n) {
@@ -3499,6 +3760,8 @@ function fib(n) {
 
 ## 27.5 Climbing Stairs
 
+Climbing Stairs is a simple DP model: if the final move can be one or two steps, the number of ways to reach step `i` is the sum of the ways to reach `i-1` and `i-2`. Define base cases carefully; conventions for `n = 0` depend on whether 'do nothing' counts as one valid way.
+
 State:
 
 ```txt
@@ -3514,6 +3777,8 @@ dp[i] = dp[i - 1] + dp[i - 2]
 ---
 
 ## 27.6 House Robber
+
+House Robber is a take/skip DP. For each house, compare skipping it (keep the previous best) with taking it (add its value to the best solution that excludes the adjacent previous house). Only the previous two DP values are needed, so the common optimized solution is `O(n)` time and `O(1)` extra space.
 
 At each house:
 
@@ -3582,6 +3847,8 @@ Important:
 
 ## 27.8 Unbounded Knapsack
 
+Unbounded knapsack allows an item to be selected more than once. In one-dimensional tabulation, the loop direction is important: iterating capacities upward allows the current item to contribute repeatedly to later states. This differs from 0/1 knapsack, where downward capacity iteration prevents reusing the same item in one iteration.
+
 Items can be reused.
 
 Typically iterate capacity forward.
@@ -3591,6 +3858,8 @@ This difference is fundamental.
 ---
 
 ## 27.9 Coin Change — Minimum Coins
+
+The minimum-coin problem asks for the fewest coins needed to form each amount. A common DP state stores the best answer for amount `x`; each coin proposes `1 + dp[x - coin]` when that smaller amount is reachable. Use a sentinel larger than any possible answer and distinguish 'unreachable' from a valid zero-coin base case.
 
 ```js
 function coinChange(coins, amount) {
@@ -3615,6 +3884,8 @@ function coinChange(coins, amount) {
 ---
 
 ## 27.10 Longest Increasing Subsequence — O(n²)
+
+The Longest Increasing Subsequence (LIS) keeps elements in original order but not necessarily contiguously. A simple DP is `O(n²)`; a tails/binary-search method maintains the smallest possible tail for each subsequence length and runs in `O(n log n)`. The tails array is not necessarily the actual LIS unless predecessor information is also stored.
 
 ```js
 function lengthOfLIS(nums) {
@@ -3642,6 +3913,8 @@ Advanced LIS can be solved in O(n log n) using binary search.
 ---
 
 ## 27.11 Longest Common Subsequence
+
+The Longest Common Subsequence (LCS) asks for the longest sequence that appears in two inputs in the same relative order, without requiring contiguity. A classic DP state `dp[i][j]` describes prefixes of the two sequences: matching symbols extend the answer; otherwise the transition skips one side. The standard table takes `O(mn)` time.
 
 ```js
 function longestCommonSubsequence(a, b) {
@@ -3673,6 +3946,8 @@ function longestCommonSubsequence(a, b) {
 ---
 
 ## 27.12 Grid DP
+
+Grid DP stores the best/count answer for each cell based on previously solved neighboring cells. The allowed movement determines the transition and valid evaluation order. When movement is only right/down, row-major or column-major tabulation is usually straightforward; if arbitrary cycles are allowed, the problem may be a graph problem rather than simple DP.
 
 Number of unique paths:
 
@@ -3712,6 +3987,8 @@ Learn these categories separately:
 
 # 28. Bit Manipulation
 
+Bit manipulation treats an integer as a sequence of binary bits. Operations such as AND (`&`), OR (`|`), XOR (`^`), complement (`~`), and shifts can test or modify individual bits efficiently. Use explicit parentheses around shift expressions when precedence could be unclear, and remember that signed integer width and overflow behavior are language-specific.
+
 JavaScript bitwise operators work on 32-bit signed integers.
 
 Operators:
@@ -3730,6 +4007,8 @@ Operators:
 
 ## 28.1 Check a Bit
 
+To test bit `k`, create a mask `1 << k` and AND it with the number. A non-zero result means that bit is set. State whether bit positions are zero-based and ensure `k` is within the integer width used by the language.
+
 ```js
 function isBitSet(num, bit) {
   return (num & (1 << bit)) !== 0;
@@ -3740,6 +4019,8 @@ function isBitSet(num, bit) {
 
 ## 28.2 Set a Bit
 
+To set bit `k`, OR the number with the mask `1 << k`. OR leaves all existing `1` bits unchanged and forces the selected bit to `1`. The operation modifies the numeric value but does not affect other bit positions.
+
 ```js
 num |= 1 << bit;
 ```
@@ -3747,6 +4028,8 @@ num |= 1 << bit;
 ---
 
 ## 28.3 Clear a Bit
+
+To clear bit `k`, invert the one-bit mask and AND it with the number. The inverted mask has `0` at bit `k` and `1` elsewhere, so only the selected bit is forced to zero. Signed-width/complement behavior follows the language's integer representation.
 
 ```js
 num &= ~(1 << bit);
@@ -3756,6 +4039,8 @@ num &= ~(1 << bit);
 
 ## 28.4 Toggle a Bit
 
+To toggle bit `k`, XOR the number with `1 << k`. XOR with `1` flips a bit and XOR with `0` preserves it, so all other bit positions remain unchanged.
+
 ```js
 num ^= 1 << bit;
 ```
@@ -3763,6 +4048,8 @@ num ^= 1 << bit;
 ---
 
 ## 28.5 Odd or Even
+
+The least significant binary bit tells parity: it is `1` for odd integers and `0` for even integers. Testing `n & 1` is a constant-time alternative to `n % 2`, although `% 2` is often clearer when bit operations are not otherwise relevant.
 
 ```js
 function isOdd(n) {
@@ -3773,6 +4060,8 @@ function isOdd(n) {
 ---
 
 ## 28.6 XOR Properties
+
+XOR has three useful algebraic properties for DSA: `x ^ x = 0`, `x ^ 0 = x`, and order/grouping can be rearranged because XOR is associative and commutative. These properties enable cancellation tricks, parity/state toggling, and some prefix-XOR problems.
 
 ```txt
 a ^ a = 0
@@ -3827,7 +4116,11 @@ Because JavaScript bitwise operators are 32-bit, this style is limited for large
 
 # 29. Mathematics for DSA
 
+A small set of mathematical tools appears repeatedly in DSA: modular arithmetic, divisibility, GCD/LCM, primes, logarithms, combinatorics, and exponentiation. The purpose is practical—these tools simplify constraints, prevent overflow, or reduce repeated computation in algorithms.
+
 ## 29.1 GCD — Euclidean Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 ```js
 function gcd(a, b) {
@@ -3843,6 +4136,8 @@ function gcd(a, b) {
 
 ## 29.2 LCM
 
+The least common multiple (LCM) of two non-zero integers can be derived from the GCD: `lcm(a, b) = |a / gcd(a, b) × b|`. Dividing before multiplying reduces overflow risk in fixed-width languages. Define how your implementation should behave when either input is zero; a common convention returns zero.
+
 ```js
 function lcm(a, b) {
   return Math.abs((a / gcd(a, b)) * b);
@@ -3854,6 +4149,8 @@ Divide before multiply when possible to reduce overflow risk.
 ---
 
 ## 29.3 Prime Check
+
+The example implements **29.3 Prime Check** with `isPrime(...)`. Its parameters are `n`. Trace how those inputs change or are read, then inspect the `return` statement (or observable mutation/output) to identify the result. Also account for the cost of any loop, recursion, container operation, or nested call when deriving complexity.
 
 ```js
 function isPrime(n) {
@@ -3874,6 +4171,8 @@ Time: O(√n)
 ---
 
 ## 29.4 Sieve of Eratosthenes
+
+The Sieve of Eratosthenes finds all primes up to a limit by marking multiples of each discovered prime as composite. Starting the marking at `p × p` is enough because smaller multiples already have a smaller prime factor. The standard implementation runs in `O(n log log n)` time and uses `O(n)` marking space.
 
 Find primes up to `n`.
 
@@ -3906,6 +4205,8 @@ function sieve(n) {
 
 ## 29.5 Fast Exponentiation
 
+Fast exponentiation computes `base^exp` by repeatedly squaring the base and using the binary representation of the exponent. Each step halves the remaining exponent, reducing multiplication count from `O(exp)` to `O(log exp)`. A modular variant applies `% mod` after multiplications to keep values bounded.
+
 Compute `base^exp` efficiently.
 
 ```js
@@ -3930,6 +4231,8 @@ Time: O(log exp)
 ---
 
 ## 29.6 Modular Exponentiation with BigInt
+
+Modular exponentiation combines exponentiation by squaring with a modulus and `BigInt` arithmetic so intermediate values remain exact even beyond `Number`'s safe integer range. Keep all operands as `BigInt` (for example `1n`), because JavaScript does not allow mixing `Number` and `BigInt` in arithmetic.
 
 ```js
 function modPow(base, exp, mod) {
@@ -3956,6 +4259,8 @@ function modPow(base, exp, mod) {
 
 # 30. Monotonic Stack and Queue
 
+Monotonic stacks and queues maintain candidates in sorted order while processing a sequence. They turn many 'nearest greater/smaller' and sliding-window extrema problems into linear time because each element is inserted and removed only a constant number of times.
+
 A monotonic structure keeps values in increasing or decreasing order.
 
 These patterns often reduce O(n²) "find next greater/smaller" problems to O(n).
@@ -3963,6 +4268,8 @@ These patterns often reduce O(n²) "find next greater/smaller" problems to O(n).
 ---
 
 ## 30.1 Next Greater Element
+
+Next-greater-element problems ask for the first later value that exceeds the current value. A decreasing monotonic stack stores unresolved indexes/values; when a larger value arrives, it resolves stack entries until monotonic order is restored. Each item is pushed and popped at most once, so the scan is `O(n)`.
 
 ```js
 function nextGreater(nums) {
@@ -3993,6 +4300,8 @@ Time: O(n)
 
 ## 30.2 Daily Temperatures Pattern
 
+Daily Temperatures is a next-greater-element problem. A decreasing stack of unresolved indexes waits until a warmer temperature appears; then the index difference gives the waiting days. Store indexes rather than only temperatures because the output needs distance.
+
 Same principle:
 
 > Pop all previous positions whose answer has just been found.
@@ -4000,6 +4309,8 @@ Same principle:
 ---
 
 ## 30.3 Sliding Window Maximum
+
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
 
 Use a deque that stores useful indices in decreasing value order.
 
@@ -4041,7 +4352,11 @@ Time: O(n)
 
 # 31. String-Matching Algorithms
 
+String-matching algorithms search for one or more patterns inside text. Compare them by preprocessing cost, search complexity, memory, collision behavior, alphabet assumptions, and whether the same pattern or same text will be queried repeatedly.
+
 ## 31.1 Naive Matching
+
+Naive pattern matching tries the pattern at every possible text start and compares characters until mismatch. Worst-case time is `O(nm)`, but it is simple and often adequate for small inputs; KMP/Z avoid repeated comparisons when larger guarantees are needed.
 
 Try the pattern at every starting position.
 
@@ -4060,6 +4375,8 @@ where:
 
 ## 31.2 KMP
 
+Knuth-Morris-Pratt (KMP) searches for a pattern without rechecking characters that are already known to match. It preprocesses the pattern into a prefix/failure table, then uses that table to decide how far the pattern can shift after a mismatch. Preprocessing plus search runs in `O(m + n)` for pattern length `m` and text length `n`.
+
 KMP avoids rechecking characters by preprocessing the pattern.
 
 It builds an LPS array:
@@ -4067,6 +4384,8 @@ It builds an LPS array:
 > Longest Proper Prefix which is also Suffix.
 
 ### Build LPS
+
+The KMP LPS (longest proper prefix that is also a suffix) table records how much of the pattern can still be reused after a mismatch. While building it, a mismatch falls back to a shorter previously computed border instead of restarting from zero, which keeps preprocessing linear.
 
 ```js
 function buildLPS(pattern) {
@@ -4093,6 +4412,8 @@ function buildLPS(pattern) {
 ```
 
 ### Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```js
 function kmpSearch(text, pattern) {
@@ -4127,6 +4448,8 @@ Time: O(n + m)
 ---
 
 ## 31.3 Rabin-Karp
+
+Rabin-Karp compares rolling hash values for the pattern and each same-length text window. Updating the rolling hash can be constant-time per shift, making the average scan efficient and especially useful when searching many patterns or repeated windows. Because different strings can share a hash, a hash match should be verified when correctness cannot tolerate collisions.
 
 Rabin-Karp compares rolling hashes.
 
@@ -4180,6 +4503,8 @@ Typical complexity:
 ---
 
 ## 32.1 Range Sum Segment Tree
+
+A segment tree recursively stores an aggregate for intervals of the array. For range sums, each node stores the sum of its segment; a query skips disjoint segments, returns fully covered segments, and splits partial overlaps. Point updates and range queries are typically `O(log n)` after `O(n)` construction.
 
 ```js
 class SegmentTree {
@@ -4268,6 +4593,8 @@ It is simpler than a segment tree for prefix-sum-style operations.
 
 ## 33.1 Implementation
 
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
+
 ```js
 class FenwickTree {
   constructor(n) {
@@ -4305,7 +4632,11 @@ class FenwickTree {
 
 # 34. Advanced Graph Algorithms
 
+Advanced graph problems are defined less by their story and more by graph properties: edge weights, direction, cycles, connectivity, negative edges, or repeated connectivity changes. Verify those properties first because they determine whether shortest path, MST, SCC, bridge/articulation, flow, or specialized traversal algorithms are valid.
+
 ## 34.1 Bellman-Ford
+
+Bellman-Ford finds single-source shortest paths even when some edges are negative. Relax every edge up to `V-1` times because a simple shortest path uses at most `V-1` edges; one additional successful relaxation indicates a reachable negative cycle. Complexity is `O(VE)`.
 
 Use when negative edge weights may exist.
 
@@ -4323,6 +4654,8 @@ O(VE)
 ---
 
 ## 34.2 Floyd-Warshall
+
+Floyd-Warshall computes all-pairs shortest paths by progressively allowing each vertex as an intermediate point. Its core transition is `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`. It uses `O(V³)` time and `O(V²)` distance storage and can handle negative edges, but not negative cycles when meaningful finite shortest paths are required.
 
 All-pairs shortest paths.
 
@@ -4347,6 +4680,8 @@ Good for smaller graphs.
 ---
 
 ## 34.3 Minimum Spanning Tree
+
+A minimum spanning tree (MST) connects all vertices of a connected, weighted, undirected graph with minimum total edge weight and no cycles. Kruskal's algorithm grows the MST by globally smallest safe edges; Prim's grows outward from the current tree. If the graph is disconnected, the corresponding result is a minimum spanning forest rather than one spanning tree.
 
 Goal:
 
@@ -4384,6 +4719,8 @@ function kruskal(n, edges) {
 
 ## 34.4 Prim
 
+Prim's algorithm builds a minimum spanning tree by repeatedly adding the cheapest edge that connects the current tree to a new vertex. A min-priority queue efficiently selects the next candidate edge. With an adjacency list and binary heap, the common complexity is `O(E log V)`; the graph should be treated as weighted and undirected for the standard MST problem.
+
 Grow an MST from a starting node by repeatedly choosing the cheapest edge connecting the tree to an unvisited node.
 
 Usually implemented with a min heap.
@@ -4409,7 +4746,11 @@ Use cases:
 
 ## 34.6 Bridges and Articulation Points
 
+Bridges and articulation points identify single edges/vertices whose removal increases connectivity components. A DFS uses discovery times and low-link values to determine whether a subtree has an alternate route back to an ancestor. The algorithm is `O(V + E)` with an adjacency list.
+
 ### Bridge
+
+A **bridge** is an edge whose removal increases the number of connected components in an undirected graph. In DFS low-link analysis, a tree edge `(u,v)` is a bridge when `low[v] > disc[u]`, meaning the child's subtree has no back edge reaching `u` or an ancestor.
 
 An edge whose removal increases connected components.
 
@@ -4430,7 +4771,11 @@ Learn after mastering:
 
 # 35. Advanced Dynamic Programming
 
+Advanced DP expands the same fundamentals—state, transition, base cases, evaluation order—into multidimensional, interval, tree, bitmask, digit, or optimization-heavy states. The first task is always to prove what one state represents and why transitions cover all valid choices exactly as intended.
+
 ## 35.1 Interval DP
+
+Interval DP defines a state over a contiguous range, commonly `dp[left][right]`, and combines answers from smaller subintervals. It appears in problems such as matrix-chain multiplication, optimal parenthesization, or bursting balloons. The challenge is choosing the interval length/order so every dependency has already been computed.
 
 State represents a range:
 
@@ -4448,6 +4793,8 @@ Typical problems:
 ---
 
 ## 35.2 Tree DP
+
+Tree DP computes a state for each node from states of its children (or from a rerooted parent/child relationship). A DFS usually establishes the processing order. Clearly define what each state means—for example, 'best answer in this subtree if the node is chosen'—because correctness depends on combining child states consistently.
 
 State is calculated from child subtrees.
 
@@ -4533,11 +4880,15 @@ After solving a DP problem:
 
 # 36. Common Interview Patterns
 
+Interview patterns are recognition shortcuts, not substitutes for reasoning. For each clue, confirm the necessary preconditions, state the invariant or state definition, and explain why the optimized approach eliminates the brute-force bottleneck.
+
 Learning patterns is more useful than memorizing isolated solutions.
 
 ---
 
 ## 36.1 Frequency Counter
+
+A frequency-counter pattern summarizes input as value → count and then compares or queries those counts instead of repeatedly scanning the original data. It trades `O(n)` extra storage in the worst case for expected constant-time frequency lookup.
 
 Clues:
 
@@ -4557,6 +4908,8 @@ Set
 
 ## 36.2 Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Clues:
 
 - sorted array,
@@ -4568,6 +4921,8 @@ Clues:
 ---
 
 ## 36.3 Sliding Window
+
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
 
 Clues:
 
@@ -4581,6 +4936,8 @@ Clues:
 
 ## 36.4 Fast and Slow Pointer
 
+Fast/slow pointers move through the same structure at different rates. The technique works when relative speed reveals structure—for example, the middle of a linked list or a cycle. State the loop condition carefully because it controls where the slow pointer ends on even-length inputs.
+
 Clues:
 
 - linked-list cycle,
@@ -4590,6 +4947,8 @@ Clues:
 ---
 
 ## 36.5 Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Clues:
 
@@ -4601,6 +4960,8 @@ Clues:
 ---
 
 ## 36.6 DFS/BFS
+
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
 
 Clues:
 
@@ -4614,6 +4975,8 @@ Clues:
 
 ## 36.7 Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Clues:
 
 - all combinations,
@@ -4624,6 +4987,8 @@ Clues:
 ---
 
 ## 36.8 Heap / Top K
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 Clues:
 
@@ -4637,6 +5002,8 @@ Clues:
 
 ## 36.9 Monotonic Stack
 
+A monotonic stack keeps its elements in increasing or decreasing order by removing values that can no longer be useful. Each element is pushed and popped at most once, so many nearest-greater/nearest-smaller problems become `O(n)`. The crucial design decision is whether the stack stores values or indexes and which comparison preserves the needed candidate boundary.
+
 Clues:
 
 - next greater,
@@ -4649,6 +5016,8 @@ Clues:
 
 ## 36.10 Prefix Sum
 
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
+
 Clues:
 
 - many range sum queries,
@@ -4660,6 +5029,8 @@ Clues:
 
 ## 36.11 Union-Find
 
+Union-Find, also called Disjoint Set Union (DSU), maintains a collection of non-overlapping groups under two main operations: `find` identifies a representative and `union` merges groups. Path compression plus union by rank/size makes a long sequence of operations effectively near-constant time in practice. It is useful for dynamic connectivity, cycle detection in undirected graphs, Kruskal's MST, and component grouping.
+
 Clues:
 
 - dynamically connect groups,
@@ -4670,6 +5041,8 @@ Clues:
 ---
 
 ## 36.12 Dynamic Programming
+
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
 
 Clues:
 
@@ -4683,7 +5056,11 @@ Clues:
 
 # 37. JavaScript-Specific DSA Pitfalls
 
+JavaScript has several behaviors that matter directly in DSA: numeric values use IEEE-754 `Number`, default array sorting is string-based, front-of-array operations can shift elements, object keys differ from `Map` keys, and deep recursion may exceed the call stack. Choose APIs with those semantics in mind.
+
 ## 37.1 Numeric Sort
+
+JavaScript's `Array.prototype.sort()` compares string forms by default. Supply a comparator for numeric order: `(a, b) => a - b` ascending or `b - a` descending. `sort()` mutates the array, so copy first if the original order must be preserved.
 
 Wrong:
 
@@ -4701,6 +5078,8 @@ nums.sort((a, b) => a - b);
 
 ## 37.2 `shift()` Performance
 
+`shift()` removes the first array element, which may require reindexing/moving the remaining elements and is therefore linear in array length in typical engines. Repeated `shift()` calls can turn a queue algorithm quadratic; use a head index or a dedicated deque/queue structure instead.
+
 Repeated queue operations with `shift()` can be inefficient.
 
 Prefer head index.
@@ -4708,6 +5087,8 @@ Prefer head index.
 ---
 
 ## 37.3 Deep Recursion
+
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
 
 JavaScript may throw:
 
@@ -4723,6 +5104,8 @@ For deep DFS:
 ---
 
 ## 37.4 `Number` Precision
+
+JavaScript `Number` exactly represents integers only up to `Number.MAX_SAFE_INTEGER` (`2^53 - 1`). Sums/products beyond the safe range may silently lose integer precision. Use `BigInt` when exact large-integer arithmetic is required, while remembering it cannot be mixed directly with `Number`.
 
 Large integers may lose precision.
 
@@ -4760,6 +5143,8 @@ Use objects when appropriate, but understand the difference.
 
 ## 37.7 Copying Arrays
 
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
+
 Shallow copy:
 
 ```js
@@ -4777,6 +5162,8 @@ This is still only a shallow copy at the nested-element level.
 ---
 
 ## 37.8 Matrix Initialization Bug
+
+Using `Array(rows).fill(sameArray)` repeats the **same inner-array reference**, so changing one row changes every row. Create each row independently, for example with `Array.from({length: rows}, () => Array(cols).fill(0))`.
 
 Wrong:
 
@@ -4799,6 +5186,8 @@ const matrix = Array.from(
 
 ## 37.9 String Immutability
 
+An immutable string cannot be modified in place after creation. Operations that appear to change it actually create a new string, which matters in loops because repeated concatenation can allocate many temporary objects. For many edits, collect pieces in a mutable buffer/list and build the final string once.
+
 Repeated string concatenation may be less suitable for some heavy construction scenarios.
 
 Collect pieces and `join("")` when appropriate.
@@ -4806,6 +5195,8 @@ Collect pieces and `join("")` when appropriate.
 ---
 
 ## 37.10 `Math.max(...largeArray)`
+
+Spreading a very large array into `Math.max` passes every element as a function argument and can exceed engine argument limits or allocate heavily. For large data, scan with a loop/reducer instead; the asymptotic time remains `O(n)` without the huge argument list.
 
 Spreading a huge array can exceed argument limits.
 
@@ -4823,7 +5214,11 @@ for (const value of nums) {
 
 # 38. Reusable JavaScript Templates
 
+Templates reduce boilerplate for patterns you already understand, but they should not be memorized as unexplained code. For each template, know the invariant, parameter meaning, return value, mutation behavior, and the exact condition that changes its boundaries or state.
+
 ## 38.1 Frequency Map
+
+A frequency map stores `value → count`. Scan the input once, incrementing the count for each value; later frequency queries are average `O(1)` with a hash map. This pattern is useful for duplicates, anagrams, counting categories, majority/frequency problems, and many sliding-window algorithms.
 
 ```js
 function frequencyMap(values) {
@@ -4840,6 +5235,8 @@ function frequencyMap(values) {
 ---
 
 ## 38.2 Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```js
 function binarySearch(nums, target) {
@@ -4866,6 +5263,8 @@ function binarySearch(nums, target) {
 
 ## 38.3 Sliding Window
 
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
+
 ```js
 function slidingWindow(nums) {
   let left = 0;
@@ -4887,6 +5286,8 @@ function slidingWindow(nums) {
 
 ## 38.4 DFS Tree
 
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
+
 ```js
 function dfs(node) {
   if (!node) return;
@@ -4899,6 +5300,8 @@ function dfs(node) {
 ---
 
 ## 38.5 DFS Graph
+
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
 
 ```js
 function dfs(graph, start) {
@@ -4923,6 +5326,8 @@ function dfs(graph, start) {
 ---
 
 ## 38.6 BFS
+
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
 
 ```js
 function bfs(graph, start) {
@@ -4950,6 +5355,8 @@ function bfs(graph, start) {
 
 ## 38.7 Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 ```js
 function backtrack(path, choices) {
   if (/* complete */) {
@@ -4973,6 +5380,8 @@ function backtrack(path, choices) {
 
 ## 38.8 Memoization
 
+Memoization caches a function's result by state so repeated calls return immediately. In Python, a dictionary or `functools.cache/lru_cache` can be used when arguments are hashable. Include all state-changing parameters in the cache key.
+
 ```js
 function solve(state, memo = new Map()) {
   const key = JSON.stringify(state);
@@ -4994,6 +5403,8 @@ For performance-critical problems, avoid expensive `JSON.stringify()` when a com
 ---
 
 ## 38.9 Topological Sort
+
+A topological ordering places every prerequisite before the items that depend on it. It exists only for a **directed acyclic graph (DAG)**. Common implementations use Kahn's algorithm with indegrees and a queue, or DFS with postorder; if all vertices cannot be ordered, the dependency graph contains a cycle.
 
 ```js
 function topo(n, edges) {
@@ -5033,6 +5444,8 @@ function topo(n, edges) {
 
 # 39. DSA Learning Roadmap
 
+A learning roadmap should progress from basic containers and complexity to reusable patterns, trees/graphs, and advanced techniques. Advance when you can derive and explain a solution without copying, not merely when you have completed a fixed number of exercises.
+
 A good sequence matters.
 
 ## Phase 1 — Fundamentals
@@ -5057,6 +5470,8 @@ Goal:
 
 ## Phase 2 — Core Patterns
 
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
+
 Learn:
 
 - frequency counting,
@@ -5070,6 +5485,8 @@ These patterns solve a very large number of interview questions.
 ---
 
 ## Phase 3 — Linear Data Structures
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Learn:
 
@@ -5090,6 +5507,8 @@ Solve:
 
 ## Phase 4 — Recursion and Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Learn:
 
 - recursion tree,
@@ -5103,6 +5522,8 @@ Learn:
 ---
 
 ## Phase 5 — Trees
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Learn:
 
@@ -5119,6 +5540,8 @@ Learn:
 
 ## Phase 6 — Heap and Trie
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 Learn:
 
 - min/max heap,
@@ -5129,6 +5552,8 @@ Learn:
 ---
 
 ## Phase 7 — Graphs
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 Learn:
 
@@ -5165,6 +5590,8 @@ Learn in this order:
 
 ## Phase 9 — Advanced Topics
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 Learn:
 
 - monotonic stack,
@@ -5180,7 +5607,11 @@ Learn:
 
 # 40. Practice Strategy
 
+Effective practice alternates focused topic work with mixed problems. Focused sets build a pattern; mixed sets test whether you can recognize that pattern without a chapter label. Re-solve mistakes after a delay so recall and reasoning—not short-term memory—drive the solution.
+
 ## 40.1 Use Difficulty Progression
+
+Difficulty should rise after the underlying pattern is stable. Start with one-variable versions, then add constraints, combined structures, or tighter space bounds; jumping to hard mixed problems too early can turn practice into solution memorization rather than skill building.
 
 For every topic:
 
@@ -5226,6 +5657,8 @@ After reading a solution:
 
 ## 40.4 Maintain a Mistake Log
 
+Record the mistaken assumption, the first failing example, the corrected invariant, and a trigger that should remind you next time. Reviewing this log is more valuable than only recording solved problem names because it targets repeatable reasoning errors.
+
 For every failed problem, record:
 
 ```txt
@@ -5268,7 +5701,11 @@ If you can explain the solution clearly, you likely understand it.
 
 # 41. Complexity Cheat Sheet
 
+Use a complexity cheat sheet to recall typical costs, then verify the exact implementation being used. 'Hash lookup is `O(1)`' means average/expected behavior under normal hashing assumptions; a tree or language-specific container may have different guarantees.
+
 ## Arrays
+
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
 
 | Operation | Complexity |
 |---|---:|
@@ -5283,6 +5720,8 @@ If you can explain the solution clearly, you likely understand it.
 ---
 
 ## Hash Map / Set
+
+Hash-based structures trade extra memory for fast average-case membership, lookup, insertion, and deletion. They are especially useful for frequency tables, duplicate detection, complement lookup, caching, and visited-state tracking. Their ordering guarantees and worst-case behavior depend on the language and implementation, so do not assume sorted iteration unless the API explicitly provides it.
 
 Typical expected behavior:
 
@@ -5307,6 +5746,8 @@ Typical expected behavior:
 
 ## Stack
 
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
+
 | Operation | Complexity |
 |---|---:|
 | Push | O(1) amortized |
@@ -5316,6 +5757,8 @@ Typical expected behavior:
 ---
 
 ## Queue
+
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
 
 With a proper head-index/circular-buffer implementation:
 
@@ -5329,6 +5772,8 @@ With a proper head-index/circular-buffer implementation:
 
 ## Heap
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 | Operation | Complexity |
 |---|---:|
 | Peek | O(1) |
@@ -5338,6 +5783,8 @@ With a proper head-index/circular-buffer implementation:
 ---
 
 ## BST
+
+BST operation cost is `O(h)` for tree height `h`. Balanced height gives `O(log n)`, while a skewed tree can make search/insert/delete `O(n)`. Inorder traversal remains `O(n)` and yields sorted keys.
 
 Balanced:
 
@@ -5371,6 +5818,8 @@ Adjacency list:
 ---
 
 ## Sorting
+
+Sorting all values is often the simplest selection baseline. It is appropriate when ordered output is useful elsewhere or input size is moderate; it does unnecessary work when only one rank is needed and no other sorted-order benefit exists.
 
 | Algorithm | Complexity |
 |---|---:|
@@ -5463,9 +5912,13 @@ You should also be able to explain:
 
 # 44. Mini Projects for DSA Practice
 
+Mini projects connect abstract structures to persistent state and user-visible behavior. For each project, identify the dominant operations first, choose the data structure based on those operations, and document what would become slower or harder if a different structure were used.
+
 Projects make DSA feel practical.
 
 ## 44.1 Autocomplete Search
+
+Autocomplete is naturally modeled as prefix lookup. A trie can retrieve the node representing a prefix in `O(prefix length)`, after which suggestions can be enumerated or ranked; a sorted-list + binary-search approach can be simpler for mostly static data.
 
 Use:
 
@@ -5500,6 +5953,8 @@ Features:
 
 ## 44.3 Task Scheduler
 
+A scheduler often needs efficient priority selection plus state for queued/completed work. A priority queue handles the next highest/lowest-priority task, while maps can support task lookup/cancellation. Define tie-breaking and deadline semantics so scheduling is deterministic.
+
 Use:
 
 - priority queue,
@@ -5516,6 +5971,8 @@ Features:
 
 ## 44.4 Browser History Simulator
 
+Browser history is a stack-like navigation problem, often modeled with separate back and forward stacks. Visiting a new page clears forward history; Back moves the current page to the forward stack, and Forward reverses that transfer. Each navigation can be constant-time.
+
 Use:
 
 - stack,
@@ -5530,6 +5987,8 @@ Features:
 ---
 
 ## 44.5 Social Network Suggestions
+
+Friend relationships form a graph. Suggestions can come from two-hop neighborhoods, mutual-friend counts, or graph-ranking algorithms; use a set to exclude the user and existing friends and to deduplicate candidates. The exact algorithm depends on scale and recommendation quality requirements.
 
 Use:
 
@@ -5546,6 +6005,8 @@ Features:
 ---
 
 ## 44.6 Cache
+
+A basic cache maps keys to previously computed/fetched values so repeated requests can avoid expensive work. Define capacity, eviction, freshness/TTL, and invalidation; without those policies a cache can consume unbounded memory or return stale data.
 
 Implement:
 
@@ -5567,6 +6028,8 @@ put()  -> O(1)
 
 ## 44.7 Search Engine Word Index
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Use:
 
 - Map,
@@ -5585,7 +6048,11 @@ Features:
 
 # 45. Final Revision Notes
 
+Final revision should prioritize recall and discrimination between similar patterns. Re-derive key invariants, compare alternatives, write templates from memory, and revisit mistakes—especially problems where your first approach had the wrong complexity or hidden precondition.
+
 ## 45.1 Core Principle
+
+The core principle is to choose a technique because of the **required operations and constraints**, not because its name appeared in a similar-looking problem. State the invariant or recurrence in your own words before using the template.
 
 DSA is not about memorizing 500 solutions.
 
@@ -5630,6 +6097,8 @@ Then add advanced topics.
 
 # Appendix A — Detailed Scenario Guide
 
+Use this section to practice translating problem wording into required operations and constraints. The mapping is a starting hypothesis: confirm the technique's preconditions and explain the invariant before committing to it.
+
 This section connects real scenarios with the appropriate DSA idea.
 
 ## Scenario 1: Detect duplicate transaction IDs
@@ -5652,6 +6121,8 @@ Membership lookup is the core operation.
 
 ## Scenario 2: Count API calls per client
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 Requirement:
 
 > Calculate how many requests each client ID made.
@@ -5665,6 +6136,8 @@ Map<ClientId, Count>
 ---
 
 ## Scenario 3: Last 100 application logs
+
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
 
 Requirement:
 
@@ -5680,6 +6153,8 @@ Queue / circular buffer
 
 ## Scenario 4: Undo editor actions
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 Requirement:
 
 > Undo most recent action first.
@@ -5693,6 +6168,8 @@ Stack
 ---
 
 ## Scenario 5: Customer support tickets
+
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
 
 Requirement:
 
@@ -5714,6 +6191,8 @@ Priority Queue
 
 ## Scenario 6: Employee reporting hierarchy
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 Requirement:
 
 > Find all employees under a manager.
@@ -5727,6 +6206,8 @@ Tree
 ---
 
 ## Scenario 7: Road navigation
+
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
 
 Requirement:
 
@@ -5742,6 +6223,8 @@ Weighted Graph + Dijkstra
 
 ## Scenario 8: Course prerequisites
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 Requirement:
 
 > Find an order in which courses can be completed.
@@ -5755,6 +6238,8 @@ Directed Graph + Topological Sort
 ---
 
 ## Scenario 9: Search autocomplete
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Requirement:
 
@@ -5770,6 +6255,8 @@ Trie
 
 ## Scenario 10: Top 10 most active users
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 Use:
 
 ```txt
@@ -5782,6 +6269,8 @@ Heap for Top K
 
 ## Scenario 11: Maximum activity during any 5-minute window
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 Use:
 
 ```txt
@@ -5791,6 +6280,8 @@ Sliding Window
 ---
 
 ## Scenario 12: Thousands of range sum queries
+
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
 
 Use:
 
@@ -5807,6 +6298,8 @@ Fenwick Tree / Segment Tree
 ---
 
 ## Scenario 13: Merge overlapping bookings
+
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
 
 Sort intervals then merge.
 
@@ -5843,6 +6336,8 @@ Sort + Greedy / Interval Processing
 
 ## Scenario 14: Shortest number of moves in a game
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 If each move has equal cost:
 
 ```txt
@@ -5859,6 +6354,8 @@ Dijkstra
 
 ## Scenario 15: Find clusters of users
 
+This scenario is a recognition exercise. Translate the story into required operations—lookup, ordering, range processing, connectivity, priority, or dependency handling—then justify why the suggested structure makes those operations efficient.
+
 If users are connected by relationships:
 
 ```txt
@@ -5869,9 +6366,13 @@ DFS / BFS / DSU
 
 # Appendix B — Classic Problems by Topic
 
+Classic problems are useful because each isolates a reusable idea. Study them by recording the brute-force bottleneck, the optimized invariant, the required data structure, and the small change in constraints that would make a different approach necessary.
+
 Use this as a practice checklist.
 
 ## Arrays
+
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
 
 - Two Sum
 - Best Time to Buy and Sell Stock
@@ -5883,6 +6384,8 @@ Use this as a practice checklist.
 
 ## Strings
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 - Valid Anagram
 - Valid Palindrome
 - Longest Common Prefix
@@ -5891,6 +6394,8 @@ Use this as a practice checklist.
 - Minimum Window Substring
 
 ## Linked Lists
+
+A linked list stores values in nodes connected by references rather than by contiguous indexed positions. This makes pointer rewiring cheap once the relevant node is known, but random access is slow because traversal normally starts from the head. Linked-list problems therefore focus heavily on pointer movement, insertion/removal, reversal, cycle detection, and fast/slow-pointer techniques.
 
 - Reverse Linked List
 - Middle of Linked List
@@ -5902,6 +6407,8 @@ Use this as a practice checklist.
 
 ## Stack
 
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
+
 - Valid Parentheses
 - Min Stack
 - Daily Temperatures
@@ -5911,12 +6418,16 @@ Use this as a practice checklist.
 
 ## Queue / BFS
 
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
+
 - Number of Islands
 - Rotting Oranges
 - Shortest Path in Binary Matrix
 - Binary Tree Level Order Traversal
 
 ## Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 - Binary Search
 - Search Insert Position
@@ -5939,6 +6450,8 @@ Use this as a practice checklist.
 
 ## Heap
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 - Kth Largest
 - Top K Frequent Elements
 - Merge K Sorted Lists
@@ -5946,6 +6459,8 @@ Use this as a practice checklist.
 - Task Scheduler
 
 ## Graphs
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 - Number of Islands
 - Clone Graph
@@ -5958,6 +6473,8 @@ Use this as a practice checklist.
 
 ## Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 - Subsets
 - Permutations
 - Combination Sum
@@ -5968,6 +6485,8 @@ Use this as a practice checklist.
 - Sudoku Solver
 
 ## Dynamic Programming
+
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
 
 - Climbing Stairs
 - House Robber
@@ -6074,7 +6593,11 @@ This is an excellent example of combining multiple data structures.
 
 # Appendix D — Advanced Binary Search Examples
 
+Binary search applies when a search space is ordered or when a yes/no feasibility condition changes monotonically. Each iteration discards roughly half of the remaining candidates, giving `O(log n)` iterations. Correct boundary handling is the main difficulty: define exactly what `left`, `right`, and `mid` mean and decide whether the interval is closed or half-open.
+
 ## Search Rotated Sorted Array
+
+A rotated sorted array still has at least one sorted half around each midpoint. Compare the midpoint with one boundary to identify that sorted half, then decide whether the target lies inside its value range. With distinct values this gives `O(log n)`; many duplicates can make the decision ambiguous and degrade performance.
 
 ```js
 function searchRotated(nums, target) {
@@ -6117,11 +6640,17 @@ At least one half is sorted.
 
 # Appendix E — Advanced Interval Patterns
 
+These topics extend the core toolkit for problems with stronger performance, query, or modeling requirements. Study them after the foundational data structures and patterns are comfortable so the additional invariants and implementation complexity remain understandable.
+
 ## Merge Intervals
+
+To merge overlapping intervals, first sort by start coordinate. Keep the last merged interval; if the next interval overlaps under the chosen endpoint convention, extend the end, otherwise start a new merged interval. Sorting dominates at `O(n log n)`; the scan itself is `O(n)`.
 
 Covered earlier.
 
 ## Insert Interval
+
+Insertion must preserve the data structure's invariant. For an ordered tree, compare the new key at each node and descend to the appropriate child until an empty position is found; for duplicate keys, follow the policy defined by the problem. Runtime is proportional to the structure's height.
 
 Strategy:
 
@@ -6323,7 +6852,11 @@ Requires a proper deque.
 
 # Appendix M — Common Mistakes by Topic
 
+DSA bugs are often caused by incorrect boundaries, stale state, missing visited checks, wrong base cases, or an invariant that was never made explicit. Debug by reducing the input, tracing state changes line by line, and checking the first point where the program diverges from the expected invariant.
+
 ## Arrays
+
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
 
 - forgetting empty input,
 - off-by-one indexing,
@@ -6331,12 +6864,16 @@ Requires a proper deque.
 
 ## Binary Search
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 - infinite loop,
 - incorrect boundaries,
 - wrong inequality,
 - not defining what left/right represent.
 
 ## Sliding Window
+
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
 
 - using it when negative values break monotonic behavior,
 - forgetting to remove outgoing state,
@@ -6350,11 +6887,15 @@ Requires a proper deque.
 
 ## Graphs
 
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
+
 - forgetting visited tracking,
 - treating directed edges as undirected,
 - not processing disconnected components.
 
 ## Dijkstra
+
+Dijkstra's algorithm computes single-source shortest paths when edge weights are non-negative. Maintain tentative distances and repeatedly process the smallest-distance candidate from a min-priority queue; ignore stale queue entries whose distance no longer matches the best known value. Typical adjacency-list complexity is `O((V+E) log V)`.
 
 - using it with negative edges,
 - not skipping stale heap entries.
@@ -6368,6 +6909,8 @@ Requires a proper deque.
 
 ## Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 - forgetting to undo a choice,
 - storing `current` without copying it,
 - failing to skip duplicates when required.
@@ -6376,11 +6919,15 @@ Requires a proper deque.
 
 # Appendix N — How to Derive an Optimized Solution
 
+Optimization should follow a reproducible path: build a correct baseline, identify the repeated expensive operation, decide what information could be reused/precomputed, choose a structure that makes that operation cheaper, and prove the new state update preserves correctness.
+
 Suppose brute force is O(n²).
 
 Ask:
 
 ### Question 1
+
+Before checking an answer, write the expected complexity/pattern and one sentence explaining why. The purpose of the question is to test reasoning from operations and constraints, not recognition of a memorized code shape.
 
 Am I repeatedly searching for an item?
 
@@ -6392,6 +6939,8 @@ Set / Map
 
 ### Question 2
 
+Before checking an answer, write the expected complexity/pattern and one sentence explaining why. The purpose of the question is to test reasoning from operations and constraints, not recognition of a memorized code shape.
+
 Is the input sorted or can I sort it?
 
 Use:
@@ -6401,6 +6950,8 @@ Two pointers / Binary search
 ```
 
 ### Question 3
+
+Before checking an answer, write the expected complexity/pattern and one sentence explaining why. The purpose of the question is to test reasoning from operations and constraints, not recognition of a memorized code shape.
 
 Am I recalculating a range sum?
 
@@ -6412,6 +6963,8 @@ Prefix sum
 
 ### Question 4
 
+Before checking an answer, write the expected complexity/pattern and one sentence explaining why. The purpose of the question is to test reasoning from operations and constraints, not recognition of a memorized code shape.
+
 Am I evaluating overlapping contiguous ranges?
 
 Use:
@@ -6422,6 +6975,8 @@ Sliding window
 
 ### Question 5
 
+Before checking an answer, write the expected complexity/pattern and one sentence explaining why. The purpose of the question is to test reasoning from operations and constraints, not recognition of a memorized code shape.
+
 Am I repeatedly finding next greater/smaller?
 
 Use:
@@ -6431,6 +6986,8 @@ Monotonic stack
 ```
 
 ### Question 6
+
+Before checking an answer, write the expected complexity/pattern and one sentence explaining why. The purpose of the question is to test reasoning from operations and constraints, not recognition of a memorized code shape.
 
 Am I recursively solving the same state?
 
@@ -6482,7 +7039,11 @@ This demonstrates understanding instead of memorization.
 
 # Appendix P — 12-Week Suggested Study Plan
 
+Use this plan as a sequence of skill dependencies rather than a rigid calendar. Spend extra time where you cannot yet explain the invariant, implement without copying, or analyze complexity; mastery is more important than keeping pace with a date label.
+
 ## Week 1
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 - JavaScript DSA syntax
 - Big O
@@ -6491,11 +7052,15 @@ This demonstrates understanding instead of memorization.
 
 ## Week 2
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 - Hash Map
 - Set
 - Two Pointers
 
 ## Week 3
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 - Sliding Window
 - Prefix Sum
@@ -6503,16 +7068,22 @@ This demonstrates understanding instead of memorization.
 
 ## Week 4
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 - Linked Lists
 - Stack
 - Queue
 
 ## Week 5
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 - Recursion
 - Backtracking
 
 ## Week 6
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 - Trees
 - BST
@@ -6520,17 +7091,23 @@ This demonstrates understanding instead of memorization.
 
 ## Week 7
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 - Heap
 - Trie
 - Intervals
 
 ## Week 8
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 - Graph BFS/DFS
 - Components
 - Topological Sort
 
 ## Week 9
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 - DSU
 - Dijkstra
@@ -6539,11 +7116,15 @@ This demonstrates understanding instead of memorization.
 
 ## Week 10
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 - 1D DP
 - Grid DP
 - Knapsack
 
 ## Week 11
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 - LCS
 - LIS
@@ -6564,6 +7145,8 @@ Repeat difficult topics after the initial 12 weeks.
 
 # Appendix Q — Mastery Levels
 
+Treat this section as an evidence-based self-check. Mark an item complete only when you can explain it in simple language, implement or apply it without copying, analyze its trade-offs, and recognize cases where it should not be used.
+
 ## Level 1 — Beginner
 
 You can:
@@ -6574,6 +7157,8 @@ You can:
 - understand Big O basics.
 
 ## Level 2 — Foundation
+
+This mastery level groups skills that should be demonstrated through explanation and implementation, not just recognized by name. Use the bullets below as exit criteria: move on when you can solve representative problems and justify the complexity without relying on notes.
 
 You can:
 
@@ -6586,6 +7171,8 @@ You can:
 
 ## Level 3 — Intermediate
 
+This mastery level groups skills that should be demonstrated through explanation and implementation, not just recognized by name. Use the bullets below as exit criteria: move on when you can solve representative problems and justify the complexity without relying on notes.
+
 You can:
 
 - solve tree DFS/BFS,
@@ -6596,6 +7183,8 @@ You can:
 
 ## Level 4 — Strong
 
+This mastery level groups skills that should be demonstrated through explanation and implementation, not just recognized by name. Use the bullets below as exit criteria: move on when you can solve representative problems and justify the complexity without relying on notes.
+
 You can:
 
 - solve topological sort,
@@ -6605,6 +7194,8 @@ You can:
 - monotonic stack.
 
 ## Level 5 — Advanced
+
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
 
 You can:
 
@@ -6629,6 +7220,8 @@ You can:
 
 # Appendix R — Final Master Checklist
 
+Treat this section as an evidence-based self-check. Mark an item complete only when you can explain it in simple language, implement or apply it without copying, analyze its trade-offs, and recognize cases where it should not be used.
+
 Mark a topic complete only when you can:
 
 - explain it,
@@ -6638,6 +7231,8 @@ Mark a topic complete only when you can:
 - solve multiple related problems.
 
 ## Fundamentals
+
+Use this checklist group as a self-test. For every item, be able to explain the core invariant or idea, implement the essential operation, state its complexity, and recognize at least one appropriate use case.
 
 - [ ] JavaScript syntax for DSA
 - [ ] Big O
@@ -6658,6 +7253,8 @@ Mark a topic complete only when you can:
 
 ## Linear Structures
 
+Use this checklist group as a self-test. For every item, be able to explain the core invariant or idea, implement the essential operation, state its complexity, and recognize at least one appropriate use case.
+
 - [ ] Linked list
 - [ ] Fast/slow pointers
 - [ ] Stack
@@ -6668,6 +7265,8 @@ Mark a topic complete only when you can:
 
 ## Recursion
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 - [ ] Recursion basics
 - [ ] Backtracking
 - [ ] Subsets
@@ -6675,6 +7274,8 @@ Mark a topic complete only when you can:
 - [ ] Combinations
 
 ## Trees
+
+For tree revision, make sure you can explain recursive and iterative traversal, BFS level order, BST ordering, height/depth, balanced versus skewed shapes, and how recursion depth affects space. Practice both returning computed values and mutating/building tree structures.
 
 - [ ] Binary tree
 - [ ] DFS traversals
@@ -6686,6 +7287,8 @@ Mark a topic complete only when you can:
 
 ## Specialized Structures
 
+Use this checklist group as a self-test. For every item, be able to explain the core invariant or idea, implement the essential operation, state its complexity, and recognize at least one appropriate use case.
+
 - [ ] Heap
 - [ ] Priority queue
 - [ ] Trie
@@ -6694,6 +7297,8 @@ Mark a topic complete only when you can:
 - [ ] Segment tree
 
 ## Graphs
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 - [ ] Graph representation
 - [ ] BFS
@@ -6710,6 +7315,8 @@ Mark a topic complete only when you can:
 - [ ] Bridges/articulation concepts
 
 ## Dynamic Programming
+
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
 
 - [ ] Memoization
 - [ ] Tabulation
@@ -6728,6 +7335,8 @@ Mark a topic complete only when you can:
 
 ## Strings
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 - [ ] Frequency patterns
 - [ ] Sliding window strings
 - [ ] Trie
@@ -6736,6 +7345,8 @@ Mark a topic complete only when you can:
 - [ ] Rabin-Karp concept
 
 ## Mathematics / Bits
+
+Use this checklist group as a self-test. For every item, be able to explain the core invariant or idea, implement the essential operation, state its complexity, and recognize at least one appropriate use case.
 
 - [ ] GCD
 - [ ] LCM
@@ -6781,6 +7392,8 @@ That is the point where DSA changes from memorization into engineering problem s
 
 
 # Appendix S — Additional Linked List Types
+
+Linked-list variants change the available links and therefore the cost or convenience of operations. Singly, doubly, circular, and sentinel-based lists should be compared by pointer structure, traversal direction, boundary handling, memory overhead, and the operations they simplify.
 
 ## Doubly Linked List
 
@@ -6877,6 +7490,8 @@ Always be careful with termination conditions because `next` may never become `n
 ---
 
 # Appendix T — Additional Sorting and Selection Algorithms
+
+Sorting rearranges values according to an ordering rule so later operations can exploit structure. Learn not only the code but also stability, in-place behavior, best/average/worst complexity, comparator requirements, and when a language's built-in sort is preferable to a manual algorithm.
 
 ## Heap Sort
 
@@ -7037,7 +7652,11 @@ Use heap instead when:
 
 # Appendix U — Tree Types You Should Know
 
+Tree names encode structural guarantees—binary, search-ordered, balanced, heap-ordered, prefix-oriented, multiway, and so on. Learn each tree by its invariant first, because that invariant determines operation complexity and which algorithms are valid.
+
 ## Full Binary Tree
+
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
 
 Every node has either:
 
@@ -7046,15 +7665,21 @@ Every node has either:
 
 ## Complete Binary Tree
 
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
+
 All levels are full except possibly the last, and the last is filled from left to right.
 
 Binary heaps use this shape.
 
 ## Perfect Binary Tree
 
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
+
 Every internal node has two children and all leaves are at the same depth.
 
 ## Balanced Binary Tree
+
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
 
 Height remains approximately logarithmic rather than degenerating into a chain.
 
@@ -7112,7 +7737,11 @@ These are important system-design-adjacent data structures even though they are 
 
 # Appendix V — Graph Representation and Cycle Detection
 
+Graph representation affects both memory and traversal cost, while cycle detection depends on graph direction. Use adjacency lists for most sparse graphs, matrices for dense/all-pairs access, and choose the cycle algorithm only after deciding whether edges are directed or undirected.
+
 ## Adjacency Matrix
+
+An adjacency matrix uses a `V × V` table where one cell records whether or with what weight an edge connects two vertices. Edge existence is `O(1)` to check, but memory is `O(V²)` even for sparse graphs. It is useful for dense graphs or algorithms that naturally work with all vertex pairs.
 
 ```js
 const matrix = Array.from(
@@ -7140,6 +7769,8 @@ Useful when:
 
 ## Edge List
 
+An **edge list** stores a graph as a list of edges rather than grouping edges by vertex. In `[from, to, weight]`, the first two values identify the endpoints and the third is the edge weight. It is compact and convenient when an algorithm mainly processes edges—such as Kruskal or Bellman–Ford—but it is inefficient when you frequently need all neighbors of one vertex.
+
 ```js
 const edges = [
   [0, 1, 5],
@@ -7156,6 +7787,8 @@ Useful for:
 ---
 
 ## Undirected Graph Cycle Detection with DFS
+
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
 
 ```js
 function hasUndirectedCycle(graph) {
@@ -7189,6 +7822,8 @@ function hasUndirectedCycle(graph) {
 ---
 
 ## Directed Graph Cycle Detection
+
+A directed cycle exists when DFS reaches a vertex that is already on the **current recursion path**. The three-state array distinguishes an unvisited vertex (`0`), a vertex currently being explored (`1`), and a fully processed vertex (`2`). `hasDirectedCycle(graph)` receives an adjacency-list graph and returns `true` as soon as a back-edge to state `1` is found; otherwise it returns `false`. The traversal is `O(V + E)` time and `O(V)` auxiliary space for the state array plus the DFS call stack.
 
 Use three states:
 
@@ -7277,7 +7912,11 @@ Useful in:
 
 # Appendix W — Full Shortest-Path Reference
 
+Shortest-path algorithms are not interchangeable. Choose based on edge weights and graph structure: BFS for unweighted/equal-weight edges, Dijkstra for non-negative weights, Bellman-Ford when negative edges matter, DAG relaxation for acyclic directed graphs, and Floyd-Warshall for all-pairs problems at smaller `V`.
+
 ## Bellman-Ford Implementation
+
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
 
 ```js
 function bellmanFord(n, edges, source) {
@@ -7322,6 +7961,8 @@ function bellmanFord(n, edges, source) {
 
 ## Floyd-Warshall Implementation
 
+Floyd-Warshall computes all-pairs shortest paths by progressively allowing each vertex as an intermediate point. Its core transition is `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`. It uses `O(V³)` time and `O(V²)` distance storage and can handle negative edges, but not negative cycles when meaningful finite shortest paths are required.
+
 ```js
 function floydWarshall(matrix) {
   const n = matrix.length;
@@ -7365,6 +8006,8 @@ O(V + E)
 
 # Appendix X — Divide and Conquer
 
+Divide and conquer splits a problem into smaller independent subproblems, solves them recursively, and combines their results. Merge sort is a classic example: divide the array, sort each half, then merge the sorted halves. It differs from dynamic programming because divide-and-conquer subproblems usually do not overlap heavily.
+
 Divide and conquer:
 
 1. divide a problem into smaller independent subproblems,
@@ -7383,17 +8026,25 @@ Examples:
 
 ## Divide and Conquer vs Dynamic Programming
 
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
+
 ### Divide and Conquer
+
+Divide and conquer splits a problem into smaller independent subproblems, solves them recursively, and combines their results. Merge sort is a classic example: divide the array, sort each half, then merge the sorted halves. It differs from dynamic programming because divide-and-conquer subproblems usually do not overlap heavily.
 
 Subproblems are usually mostly independent.
 
 ### Dynamic Programming
+
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
 
 Subproblems overlap, so solved results are cached/reused.
 
 ---
 
 ## Recurrence Example
+
+A **recurrence** expresses the running time of a recursive algorithm in terms of smaller inputs. For merge sort, `2T(n/2)` represents sorting two halves and `O(n)` represents merging them. There are about `log₂ n` levels and `O(n)` work per level, so the total running time is `O(n log n)`.
 
 Merge sort:
 
@@ -7412,6 +8063,8 @@ Understanding recurrences helps explain recursive algorithm complexity.
 ---
 
 # Appendix Y — Amortized Analysis in Practice
+
+Amortized analysis spreads the cost of occasional expensive operations over a long sequence of operations. For example, a dynamic array resize may cost `O(n)`, but because resizing is infrequent, repeated append operations can still have `O(1)` amortized cost. Amortized complexity is a sequence-level guarantee; it does not mean every individual operation is constant-time.
 
 Sometimes one operation looks expensive but the cost is spread across many operations.
 
@@ -7438,9 +8091,13 @@ Other places amortized thinking appears:
 
 # Appendix Z — Final DSA Decision Tree
 
+A decision tree narrows the search for an algorithm by asking about structure: sortedness, contiguity, graph relationships, repeated states, priority, prefix/range operations, or monotonic feasibility. Treat the result as a candidate and verify its preconditions before coding.
+
 When you see a new problem, walk through this checklist.
 
 ## 1. Is it a lookup/counting problem?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Think:
 
@@ -7450,6 +8107,8 @@ Map / Set
 
 ## 2. Is the input sorted?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Think:
 
 ```txt
@@ -7458,6 +8117,8 @@ Binary search
 ```
 
 ## 3. Is the answer about a contiguous subarray or substring?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Think:
 
@@ -7469,6 +8130,8 @@ Kadane
 
 ## 4. Is it asking for next/previous greater or smaller?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Think:
 
 ```txt
@@ -7476,6 +8139,8 @@ Monotonic stack
 ```
 
 ## 5. Is it asking for top K or repeated min/max?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Think:
 
@@ -7485,6 +8150,8 @@ Heap
 
 ## 6. Is it hierarchy?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Think:
 
 ```txt
@@ -7492,6 +8159,8 @@ Tree DFS/BFS
 ```
 
 ## 7. Is it relationships, routes, dependencies, connectivity?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Think:
 
@@ -7506,6 +8175,8 @@ MST
 
 ## 8. Does it ask for every possible configuration?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Think:
 
 ```txt
@@ -7514,6 +8185,8 @@ Backtracking
 
 ## 9. Does brute-force recursion repeat states?
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 Think:
 
 ```txt
@@ -7521,6 +8194,8 @@ Memoization / DP
 ```
 
 ## 10. Are there many static range queries?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Think:
 
@@ -7531,6 +8206,8 @@ Sparse table
 
 ## 11. Are there updates plus range queries?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Think:
 
 ```txt
@@ -7539,6 +8216,8 @@ Segment tree
 ```
 
 ## 12. Is the input tiny but choices are exponential?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Think:
 
@@ -7551,6 +8230,8 @@ Bitmask DP
 ---
 
 # Final Advice for Mastery
+
+Treat this section as an evidence-based self-check. Mark an item complete only when you can explain it in simple language, implement or apply it without copying, analyze its trade-offs, and recognize cases where it should not be used.
 
 A learner should progress from:
 
@@ -7570,13 +8251,19 @@ For every new algorithm, build four layers of understanding:
 
 ### Layer 1 — Intuition
 
+This layer describes one dimension of mastery. Do not treat it as a vocabulary list: connect the idea to a manual dry run, a clean implementation, and an explanation of why the algorithm is correct.
+
 Explain it without code.
 
 ### Layer 2 — Mechanics
 
+This layer describes one dimension of mastery. Do not treat it as a vocabulary list: connect the idea to a manual dry run, a clean implementation, and an explanation of why the algorithm is correct.
+
 Trace it manually on a small example.
 
 ### Layer 3 — Implementation
+
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
 
 Write it from memory in JavaScript.
 

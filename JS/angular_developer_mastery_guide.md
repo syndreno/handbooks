@@ -1,8 +1,19 @@
 # Angular Developer Mastery Guide
+## How to use this guide
+
+This file is both a **learning roadmap** and a **production reference**. If you are new to Angular, read the phases in order and build a small feature after every few phases. If you already work with Angular, use the phase headings as a gap checklist and spend most of your time on the areas where you cannot yet explain the trade-offs.
+
+For each important topic, use this learning loop:
+
+```text
+Meaning → Problem it solves → Small example → Real feature → Failure case → Test → Trade-off
+```
+
+Do not measure progress by the number of APIs you recognize. A better test is whether you can explain why a particular Angular primitive is appropriate for a particular responsibility.
 
 > **Goal:** Become a production-ready, senior-level Angular developer who can design, build, test, optimize, secure, deploy, debug, review, and maintain large Angular applications.
 >
-> **Current baseline:** Angular **v22** ecosystem, verified August 2026.
+> **Current baseline:** Angular **v22** ecosystem, verified **14 August 2026** against the official Angular documentation and release material.
 >
 > This roadmap teaches modern Angular first: standalone architecture, Signals, modern template control flow, zoneless change detection, Signal Forms, RxJS interoperability, functional APIs, SSR/hydration, and modern testing. It also covers legacy concepts such as NgModules because real enterprise applications may still use them.
 
@@ -107,6 +118,29 @@ Those are the questions this roadmap prepares you to handle.
 ---
 
 # 2. Phase 0 - Development Environment
+Your development environment is the toolchain that turns TypeScript and Angular source code into a running application. Beginners often treat these tools as unrelated commands; in practice they form one pipeline:
+
+```text
+Editor → Node.js/npm → Angular CLI → compiler/build system → browser → DevTools
+                              ↓
+                            tests
+                              ↓
+                             Git
+```
+
+### What each tool is responsible for
+
+| Tool | Main job | Typical beginner mistake |
+|---|---|---|
+| Node.js | Runs CLI/build/test tooling | Confusing the Node version with the Angular version |
+| npm | Installs packages and runs scripts | Deleting the lock file without understanding why |
+| Angular CLI | Creates, serves, builds, tests, updates, and generates Angular code | Installing random global versions and creating version mismatches |
+| Git | Tracks source history and supports team workflows | Committing generated output or secrets |
+| DevTools | Shows what the browser actually loaded and executed | Debugging only with `console.log` |
+
+After installing the tools, verify versions before troubleshooting framework errors. Angular has explicit Node/TypeScript/RxJS compatibility ranges, so a project can fail even when every individual tool is installed successfully.
+
+**Practical rule:** prefer project-local dependencies and reproducible scripts. A teammate or CI runner should be able to clone the repository, install dependencies, and run the same commands with predictable results.
 
 Before learning Angular deeply, become comfortable with your development environment.
 
@@ -145,6 +179,8 @@ ng update
 ng add
 ng lint
 ```
+
+> **Important:** `ng lint` only works when the workspace has a lint builder/tool configured (for example, Angular ESLint). A freshly created project does not gain a linter merely because the CLI command exists.
 
 Useful generation examples:
 
@@ -777,6 +813,23 @@ A high-quality Angular codebase should use strong typing rather than suppressing
 ---
 
 # 6. Phase 4 - Angular Fundamentals
+Angular is an application framework: it gives you conventions and runtime systems for turning application state into UI, responding to user events, navigating between screens, calling APIs, and sharing logic safely.
+
+A useful beginner mental model is:
+
+```text
+State/data
+   ↓
+Component class  ←→  Template
+   ↓                  ↓
+Services/DI          DOM/events
+   ↓
+Router / HTTP / forms / other platform features
+```
+
+A **component** owns a piece of UI behavior, its **template** describes what should render, **dependency injection** supplies collaborators, and Angular's reactive/change-detection system keeps rendered output synchronized with state. Routing, forms, and HTTP then connect that component model to real application workflows.
+
+When learning fundamentals, resist the urge to add a global store, elaborate architecture, or third-party UI library immediately. First be able to build a small standalone feature with a component, input/output, service, route, form, and API call. That gives later architecture concepts something concrete to improve.
 
 Start with Angular's mental model.
 
@@ -1007,6 +1060,34 @@ A senior developer should know when lifecycle hooks indicate necessary framework
 ---
 
 # 8. Phase 6 - Templates and Modern Control Flow
+An Angular template is HTML plus Angular-specific binding syntax. Its job is to **describe UI from state**, not to become a second business-logic language.
+
+### Four binding questions
+
+| Need | Syntax | Direction |
+|---|---|---|
+| Show a value as text | `{{ value }}` | component → view |
+| Set an element/component property | `[property]="value"` | component → view |
+| Respond to an event | `(event)="handler()"` | view → component |
+| Coordinate editable state | forms / `model()` patterns | both directions when appropriate |
+
+Keep expensive calculations, multi-step business decisions, and complex transformations out of the template. Move them into computed state, a component method with appropriate cost characteristics, a pipe, or a service depending on the responsibility.
+
+### Expected behavior example
+
+If `title = 'Invoices'`, then:
+
+```html
+<h1>{{ title }}</h1>
+```
+
+renders conceptually as:
+
+```html
+<h1>Invoices</h1>
+```
+
+The browser never sees the interpolation syntax as a final UI value; Angular evaluates it and updates the DOM when the relevant state changes.
 
 Master template syntax.
 
@@ -1285,6 +1366,28 @@ Do not assume it replaces every `HttpClient` + RxJS use case.
 ---
 
 # 10. Phase 8 - Dependency Injection
+Dependency Injection (DI) separates **using a dependency** from **constructing and locating it**. Instead of every component creating its own API client, logger, configuration object, or feature service, the component asks Angular's injector for the dependency it needs.
+
+Use this mental model:
+
+```text
+Consumer asks for token
+        ↓
+Injector searches providers
+        ↓
+Provider says how to obtain value
+        ↓
+Angular returns/reuses an instance according to scope
+```
+
+The important pieces are:
+
+- **token** — what is being requested (often a class or `InjectionToken`)
+- **provider** — recipe/value used to satisfy the token
+- **injector** — registry that resolves dependencies
+- **injection context** — a place where Angular permits `inject()`
+
+DI improves testability and substitution, but it is not a reason to make every helper injectable. Pure functions and ordinary classes are often simpler when they have no framework-managed dependencies or lifecycle needs.
 
 Dependency Injection is one of Angular's most important architectural systems.
 
@@ -1364,6 +1467,23 @@ Dependencies should reflect real architectural relationships.
 ---
 
 # 11. Phase 9 - Services and Application Logic
+A service is a class or value used to move **non-view responsibilities** out of components and make them reusable or independently testable. The word “service” does not mean “put all logic here”; a good service still has a clear responsibility.
+
+### A practical separation
+
+```text
+Component/page
+   ↓ user intent
+Facade/orchestrator (optional)
+   ↓
+Domain/business service     Data-access/API service
+   ↓                          ↓
+Pure rules/models           HttpClient / storage
+```
+
+For a small feature, one service may reasonably handle several of these jobs. As complexity grows, split them when doing so gives a real benefit: clearer ownership, easier testing, reuse, or safer boundaries.
+
+**When not to create a service:** if logic is a small pure transformation used in one place, a normal function may be easier. If state belongs only to one component, keeping it local is usually clearer than creating an application-wide singleton.
 
 Services should represent reusable non-view responsibilities.
 
@@ -1748,6 +1868,34 @@ two-way binding
 ---
 
 # 14. Phase 12 - HTTP and API Integration
+`HttpClient` is Angular's first-party HTTP API. It creates typed request/response **descriptions for TypeScript**, returns Observables, and integrates with Angular's dependency-injection and testing systems.
+
+A typical request lifecycle is:
+
+```text
+Component action
+   ↓
+Data-access service
+   ↓
+HttpClient request
+   ↓
+Interceptors
+   ↓
+Network/API
+   ↓
+Response / error
+   ↓
+Mapping + UI state
+```
+
+### Important beginner facts
+
+- Calling `http.get<User>(...)` tells TypeScript what shape you **expect**; it does not runtime-validate arbitrary JSON from the server.
+- HttpClient requests are Observable-based. Avoid accidental duplicate subscriptions when the same request should happen only once.
+- Put transport details such as URLs and DTO mapping in a data-access layer rather than scattering them through templates/components.
+- Treat loading, empty, success, validation, and failure states as part of the feature design—not as afterthoughts.
+
+For high-risk mutations (payments, posting, order creation), coordinate retry/idempotency behavior with the backend instead of solving it only in an interceptor.
 
 ## HttpClient
 
@@ -2103,6 +2251,18 @@ switch:             latest--
 ---
 
 # 16. Phase 14 - Signals vs RxJS
+The easiest way to choose between Signals and RxJS is to identify the **shape of the problem**, not which API is newer.
+
+| Question | Signals are often a fit | RxJS is often a fit |
+|---|---|---|
+| What is the latest synchronous value? | Yes | Possible, but often more machinery |
+| Does the template derive values from other local state? | Excellent | Possible |
+| Is this a stream of events over time? | Limited | Excellent |
+| Do I need cancellation/concurrency operators? | Not the main purpose | Excellent |
+| Do I need debounce/switch/merge semantics? | Not the main purpose | Excellent |
+| Do I need a simple writable UI state holder? | Excellent | Usually more than needed |
+
+A feature can legitimately use both: an RxJS pipeline may handle a debounced/cancellable search request, while Signals hold the current query, selected row, and derived display state. The architecture is successful when conversions happen at clear boundaries rather than everywhere.
 
 A senior Angular developer should not argue "Signals replace RxJS" or "RxJS should do everything."
 
@@ -2299,6 +2459,22 @@ Do not introduce a global store merely because the application has API calls.
 ---
 
 # 18. Phase 16 - Component Architecture
+Component architecture answers two questions: **where should a responsibility live, and what should a component know about?** A maintainable UI is not created by maximizing the number of components; it is created by giving each component a meaningful boundary.
+
+A useful decision process is:
+
+```text
+Does this code primarily render/handle one UI responsibility?
+  → component
+Does it coordinate a page/feature workflow?
+  → page/container/facade
+Is it reusable non-view business/data behavior?
+  → service or pure module
+Is it shared state with several consumers?
+  → feature state/store, only if needed
+```
+
+Prefer inputs that describe data and outputs that describe **user intent**. For example, `approveRequested` communicates intent better than an output named `buttonClicked`. Keep low-level UI components unaware of route details, API URLs, and application-wide services unless those dependencies are genuinely part of their responsibility.
 
 ## Smart/container vs presentational thinking
 
@@ -2390,6 +2566,16 @@ Use naming/boundaries appropriate for your team. Do not cargo-cult folder struct
 ---
 
 # 19. Phase 17 - Styling and UI Engineering
+Styling in Angular is still web-platform styling. Angular adds component-scoped style mechanisms and integration points, but CSS layout, cascade, specificity, accessibility, responsiveness, and browser behavior remain fundamental.
+
+### Choose the right layer
+
+- **global styles** — reset, typography, design tokens, app-wide utilities
+- **component styles** — styles owned by one component's markup
+- **design system/library** — reusable components and interaction patterns
+- **inline/dynamic binding** — state-dependent values that genuinely come from component state
+
+Avoid using TypeScript to solve a problem that CSS already solves well. For example, media queries are normally better than listening to resize events just to change layout. Similarly, do not depend on generated/private class names inside a third-party component library; prefer documented theming/customization APIs.
 
 Angular does not remove the need for strong CSS engineering.
 
@@ -2465,6 +2651,27 @@ Do not build UI only at your own monitor width.
 ---
 
 # 20. Phase 18 - Accessibility
+Accessibility means people can perceive, understand, navigate, and operate the application with different devices and abilities. It is not a final QA checkbox; many accessibility decisions are made when you choose HTML elements and interaction patterns.
+
+Use this order of preference:
+
+```text
+Native semantic HTML
+        ↓
+Correct label/name/state
+        ↓
+Keyboard and focus behavior
+        ↓
+ARIA only where native semantics are insufficient
+        ↓
+Assistive-technology testing
+```
+
+### Real-world example
+
+A custom clickable `<div>` requires you to recreate keyboard behavior, focusability, role, disabled state, and accessible naming. A native `<button>` already provides most of that behavior correctly. This is why “use native elements first” is both an accessibility and maintainability rule.
+
+Test at least keyboard-only flow, zoom/reflow, visible focus, form errors, and screen-reader naming on critical features.
 
 Accessibility is part of engineering quality.
 
@@ -2673,7 +2880,7 @@ Defer noncritical UI.
 
 ## Signals and change detection
 
-Modern signal-based Angular can update more granularly.
+Modern signal-based Angular can update more granularly. Angular v22 also uses **OnPush as the default change-detection strategy**, so new code should be written with explicit reactive notifications and immutable/state-oriented thinking rather than assumptions inherited from older eager-checking applications.
 
 Understand how reactive reads connect state to rendering.
 
@@ -2767,6 +2974,16 @@ Use:
 ---
 
 # 23. Phase 21 - SSR, SSG and Hydration
+Rendering strategy is a product/architecture choice about **where and when HTML is produced**. Do not enable SSR simply because it sounds more advanced.
+
+| Strategy | HTML produced | Common fit |
+|---|---|---|
+| CSR | Primarily in browser | authenticated internal apps, highly interactive dashboards |
+| SSR | per request on server | dynamic public pages needing fast initial HTML/SEO |
+| SSG/prerender | ahead of time | mostly stable marketing/docs/catalog pages |
+| Hybrid | route-specific mix | applications with both public and authenticated areas |
+
+Hydration is the bridge between server-rendered HTML and a live Angular application in the browser. Because code can execute in server and browser environments, separate browser-only APIs behind platform-aware code and test both direct navigation and client-side navigation. A page that works only after clicking to it but crashes on refresh is a classic sign of an SSR/platform assumption problem.
 
 Modern Angular supports multiple rendering strategies.
 
@@ -2867,7 +3084,7 @@ Study its relationship with deferrable UI and interactive islands/sections.
 
 # 24. Phase 22 - Testing
 
-A professional Angular developer writes tests that protect behavior without making refactoring impossible.
+A professional Angular developer writes tests that protect behavior without making refactoring impossible. In the Angular v22 CLI baseline used by this guide, **Vitest is the default unit-test runner for new projects**; Karma remains relevant when maintaining older workspaces.
 
 ## Testing pyramid/strategy
 
@@ -3002,6 +3219,27 @@ Tests should be:
 ---
 
 # 25. Phase 23 - Error Handling and Observability
+Error handling decides **what the application does when something fails**; observability decides **how developers discover and understand that failure in production**. They are related but different responsibilities.
+
+A useful flow is:
+
+```text
+Failure occurs
+   ↓
+Classify / normalize
+   ↓
+Recover, retry, redirect, or stop
+   ↓
+Show safe user-facing message
+   ↓
+Record diagnostic context
+   ↓
+Alert/trace/measure if operationally important
+```
+
+Do not convert every error into the same generic toast. A validation error may belong next to a field, an expired session may require re-authentication, a network outage may be retryable, and a programming error may require telemetry plus a safe fallback UI.
+
+Logs answer “what happened?”, metrics answer “how often/how much?”, and traces help follow work across distributed systems. Correlation/trace IDs are especially useful when frontend and backend teams must investigate the same failed request.
 
 Production applications fail.
 
@@ -3217,6 +3455,16 @@ Do not use microfrontends simply because the application is large.
 ---
 
 # 27. Phase 25 - Clean Code and Coding Standards
+Clean code is code that another developer can **understand, change, test, and review safely**. It is not a contest for the fewest lines or the most abstractions.
+
+Before extracting another helper/service/base class, ask:
+
+1. Does this name express a business or technical responsibility clearly?
+2. Does the abstraction remove meaningful duplication or complexity?
+3. Can I test the important behavior through a stable public API?
+4. Will a future developer know where to make a change?
+
+Angular-specific clean code also means keeping templates declarative, keeping reactive state understandable, using narrow component/service APIs, and avoiding hidden side effects. Prefer consistency with the team's established conventions over personal cleverness.
 
 ## Naming
 
@@ -3364,6 +3612,17 @@ Use consistent:
 ---
 
 # 28. Phase 26 - Git and Team Development
+Git knowledge becomes an Angular skill when several developers must safely change the same application. The goal is not memorizing every command; it is understanding **history, branches, diffs, integration, and recovery**.
+
+### Safe mental model
+
+```text
+Working tree → staging area → local commit history → shared remote
+```
+
+Before running destructive commands such as `reset --hard` or force-pushing, know exactly which layer you are changing and whether commits are already shared with teammates.
+
+For feature work, make commits that are small enough to review but complete enough to explain. Keep generated build output, local environment files, secrets, and editor-specific noise out of source control. A good pull request makes the reviewer's job easier by explaining behavior and risk, not just linking a ticket.
 
 Learn:
 
@@ -3439,6 +3698,23 @@ Do not focus only on formatting.
 ---
 
 # 29. Phase 27 - Build, Deployment and CI/CD
+A production deployment is more than `ng build`. It is a reproducible process that converts source code into an artifact, verifies it, publishes it, configures the hosting environment, and gives the team a safe way to roll forward or roll back.
+
+Separate these concepts:
+
+```text
+Source code
+  ↓ build
+Static/browser artifact (or SSR server artifact)
+  ↓ deploy
+Hosting environment
+  ↓ runtime requests
+Browser + APIs
+```
+
+Frontend configuration that is compiled into JavaScript is visible to users; never use it as a secret store. For runtime-configurable deployments, design an explicit configuration-loading mechanism rather than assuming every value must be baked into the bundle.
+
+CI should reproduce the same build/test commands developers run locally and should fail before deployment when type checking, tests, linting, or required quality gates fail.
 
 ## Production builds
 
@@ -3523,6 +3799,34 @@ Know how source maps help debugging and why production source-map exposure shoul
 ---
 
 # 30. Phase 28 - Browser and Frontend Debugging
+Debugging is a hypothesis-driven process. Do not start by changing code randomly. First identify **which layer is failing**.
+
+```text
+Wrong UI?
+  ↓ inspect state + DOM + CSS
+Request missing/wrong?
+  ↓ Network panel
+Exception?
+  ↓ Console + source-mapped stack + breakpoint
+Slow interaction?
+  ↓ Performance profile
+Memory grows?
+  ↓ Memory tools
+Angular-specific behavior?
+  ↓ Angular DevTools
+```
+
+### A repeatable workflow
+
+1. Reproduce the problem reliably.
+2. Reduce it to the smallest failing path.
+3. Observe actual inputs/state/network output.
+4. Form one hypothesis.
+5. Use a breakpoint/profile/request inspection to test it.
+6. Fix the cause, not merely the symptom.
+7. Add a regression test when practical.
+
+Learn to use conditional breakpoints and request initiators; they often reveal more than adding dozens of logs.
 
 Master DevTools.
 
@@ -3592,6 +3896,19 @@ Inspect:
 ---
 
 # 31. Phase 29 - Legacy Angular Knowledge
+Legacy knowledge is not about preferring old APIs. It is about being able to **read, debug, upgrade, and safely modernize** applications that were built under older Angular defaults.
+
+When you encounter an older pattern, classify it:
+
+```text
+Still supported and acceptable
+Deprecated but functioning
+Removed in current Angular
+Project-specific convention
+Third-party library constraint
+```
+
+Then decide whether migration produces real value. Replacing `@Input()` with a newer input API, for example, may be useful during feature work or a planned modernization, but a blind repository-wide rewrite can create risk without changing user value. Version upgrades, behavior changes, architecture refactors, and style cleanups are easier to validate when they are not all mixed into one giant change.
 
 Modern Angular developers often inherit older applications.
 
@@ -3748,6 +4065,18 @@ You do not need to memorize compiler internals, but understanding compilation he
 ---
 
 # 33. Phase 31 - Design Patterns
+A design pattern is a reusable **problem-solving idea**, not mandatory folder structure or boilerplate. Learn the forces that make a pattern useful before copying its shape.
+
+For each pattern, ask:
+
+```text
+What problem becomes painful without it?
+What dependency does it introduce?
+Does it make testing/change easier?
+Can a simpler function/service/component solve the same problem?
+```
+
+Patterns often become valuable when a feature has multiple implementations, complex orchestration, unstable external APIs, or many consumers. In small code, an extra facade/repository/factory can make navigation harder rather than easier. Start simple and introduce a pattern when it clarifies a real boundary.
 
 Do not force patterns. Learn the problem each pattern solves.
 
@@ -3824,6 +4153,22 @@ Prefer composing services/components rather than building deep class hierarchies
 ---
 
 # 34. Phase 32 - Backend Knowledge for Angular Developers
+Frontend and backend responsibilities meet at the API contract. Even if you never implement the server, you need enough backend knowledge to reason about latency, authentication, authorization, validation, pagination, retries, caching, and error responses.
+
+### Contract thinking
+
+An Angular type such as:
+
+```typescript
+interface InvoiceDto {
+  id: string;
+  amount: number;
+}
+```
+
+is a compile-time expectation. The network can still return missing fields, different types, HTML error pages, expired-session responses, or a newer/older contract. Production-quality clients therefore combine TypeScript types with defensive parsing/validation where the trust boundary requires it.
+
+Understand which guarantees belong to the server. Authorization, transaction integrity, unique constraints, and authoritative validation cannot be enforced only in Angular because browser code is controlled by the user.
 
 You do not need to become a backend specialist, but you should understand the API you consume.
 
@@ -4728,6 +5073,19 @@ Measure first.
 ---
 
 # 40. Recommended Learning Order
+The order below is dependency-based: each stage gives the next stage concepts to build on. You do not need to “finish” one topic forever before moving on; use a spiral approach where you revisit earlier topics with more difficult projects.
+
+### Milestones instead of memorization
+
+```text
+Foundation milestone     → build a static interactive page
+Angular core milestone   → build a routed CRUD feature
+Reactive milestone       → add search/loading/error/cancellation
+Production milestone     → add tests, auth, a11y, performance work
+Senior milestone         → justify architecture and review trade-offs
+```
+
+Move forward when you can build and explain a small feature without copying every step from a tutorial. Return to a topic when a real project exposes a gap.
 
 If you want the shortest correct sequence, follow this:
 
@@ -4810,6 +5168,9 @@ Use official documentation as your primary source.
 ---
 
 # Final Mastery Rule
+A useful final self-test is to take one ordinary feature—such as “list invoices, filter them, open a detail page, edit a form, submit an approval”—and explain the entire path from browser event to state change to API request to error handling to test coverage. Senior skill appears in those connections.
+
+When two solutions both work, compare them using explicit constraints: team familiarity, bundle/runtime cost, failure modes, testability, accessibility, deployment model, and expected future change. That is more valuable than choosing technology because it is newer or more sophisticated.
 
 Do not judge your Angular skill by how many APIs you can remember.
 

@@ -1,4 +1,6 @@
 # Mastering jQuery — Beginner to Advanced Master Guide
+> **Current baseline (August 2026):** jQuery **4.0.x** is the current supported major line. jQuery 3.x remains important for maintaining older applications, but new examples should avoid APIs removed or changed in jQuery 4.
+
 
 > **Purpose of this file:**  
 > This is not only a cheat sheet. It is designed so that a complete beginner can open any topic, understand what it means, see why it is useful, read the syntax, study a realistic example, learn common mistakes, and then practice it.
@@ -2281,6 +2283,8 @@ You set the value programmatically and then want the same change logic to run.
 ---
 
 # 26. Forms
+Forms are where DOM selection, events, values, validation, and AJAX meet. Use jQuery to improve interaction and collect data, but remember that server-side validation remains authoritative because browser code can be bypassed.
+
 
 Forms are one of the biggest real-world jQuery use cases.
 
@@ -2319,6 +2323,8 @@ const amount = $("#amount").val();
 ---
 
 # 27. Checkboxes, Radios, and Select Boxes
+These controls have state that is better read as **properties** than as static HTML attributes. For checked/selected/disabled state, prefer APIs such as `.prop()` and `.val()` rather than assuming the original markup still reflects current user interaction.
+
 
 ## Checkbox
 
@@ -2633,6 +2639,8 @@ Be consistent.
 ---
 
 # 31. Effects
+Effects such as show/hide/fade/slide change visibility over time. Use them to communicate state changes, not as decoration on every interaction. Respect reduced-motion preferences for significant animation and avoid long queues caused by repeated clicks.
+
 
 jQuery includes simple visual effects.
 
@@ -2707,6 +2715,8 @@ $("#toggleFilters").on("click", function () {
 ---
 
 # 32. Custom Animations
+`.animate()` interpolates supported numeric CSS properties over time. Use CSS transitions/animations for many modern UI effects; use jQuery animation when maintaining an existing jQuery interaction where its queue/control APIs are genuinely useful.
+
 
 Use `.animate()` to animate numeric CSS properties.
 
@@ -2876,6 +2886,8 @@ How long to wait before request can time out.
 ---
 
 # 36. `$.get()`, `$.post()`, and `$.getJSON()`
+These are convenience wrappers around common AJAX requests. They reduce configuration for simple calls, while `$.ajax()` is better when you need precise headers, methods, timeout, content type, or other options.
+
 
 These are shortcuts.
 
@@ -2968,6 +2980,8 @@ must be converted into JSON text before sending in a raw JSON request body.
 ---
 
 # 38. Receiving JSON
+JSON responses become JavaScript values after successful parsing. Do not assume the payload has the shape you expected: handle missing fields, nulls, business errors, and incompatible server responses explicitly.
+
 
 If API returns JSON:
 
@@ -3053,6 +3067,8 @@ The browser needs to generate the correct multipart boundary automatically.
 ---
 
 # 40. AJAX Loading, Success, Error, and Always States
+A network feature is not complete when only the success callback works. Design a small state machine: idle → loading → success/empty or error, and always restore disabled buttons/spinners in cleanup logic.
+
 
 A good AJAX UI should handle all major states.
 
@@ -3107,6 +3123,8 @@ $("#saveBtn").on("click", function () {
 ---
 
 # 41. Aborting AJAX Requests
+Abort a request when its result is no longer relevant—for example an older typeahead search after the user has typed a newer query. Aborting reduces wasted work and helps prevent stale responses from overwriting newer UI state.
+
 
 Very useful for live search.
 
@@ -3369,6 +3387,8 @@ jQuery `.map()` returns a jQuery-like collection.
 ---
 
 # 47. Filtering Elements
+Filtering narrows an existing jQuery collection based on selectors, functions, or relationships. Use it when you already have a meaningful scoped collection; avoid repeatedly scanning the entire document for every small operation.
+
 
 ## `.filter()`
 
@@ -3639,6 +3659,8 @@ When learning any plugin, understand:
 ---
 
 # 52. Writing Your Own Plugin
+A jQuery plugin packages reusable behavior behind a method on `$.fn`. A good plugin supports chaining, keeps per-element state isolated, avoids global variables, documents options/events, and provides cleanup when it attaches listeners or external resources.
+
 
 A simple custom plugin:
 
@@ -3822,6 +3844,8 @@ A central state object is easier to reason about.
 ---
 
 # 55. Working with Tables
+Tables are common in legacy/admin jQuery applications. Separate data operations from DOM operations: filter/sort/page the data deliberately, then render/update the smallest necessary DOM region. Use semantic table markup for accessibility.
+
 
 Tables are a major jQuery use case in enterprise applications.
 
@@ -3891,6 +3915,8 @@ const ids =
 ---
 
 # 56. Dynamic Line Items
+Dynamic line items combine cloning/creation, delegated events, validation, calculation, and stable row identity. Avoid relying only on visual row indexes because removing/reordering rows can make server-side mapping ambiguous.
+
 
 Very common in invoice/order forms.
 
@@ -4137,6 +4163,8 @@ $("#vendorSearch")
 ---
 
 # 58. Pagination
+Pagination limits how many records are rendered or transferred at once. Client-side pagination is reasonable for small already-loaded datasets; server-side pagination is usually required when result sets are large or filters/sorts must be authoritative.
+
 
 Suppose backend returns:
 
@@ -4192,6 +4220,8 @@ Use delegation because pagination buttons may be re-rendered.
 ---
 
 # 59. Dependent Dropdowns
+A dependent dropdown loads or filters one set of options from another selection—for example country → state. Clear stale child values immediately, show loading/error state, and protect against race conditions when the parent selection changes quickly.
+
 
 Example:
 
@@ -4719,6 +4749,8 @@ $("#toggleMenu").on(
 ---
 
 # 65. Error Handling
+Handle errors at the layer that can make a useful decision. Show safe user-facing messages, log diagnostic context separately, and do not swallow exceptions merely to keep the console clean.
+
 
 Do not only handle success.
 
@@ -5073,6 +5105,8 @@ $(element).val();
 ---
 
 # 68. jQuery to Vanilla JavaScript Mapping
+Use this mapping to understand the browser APIs beneath jQuery and to modernize code incrementally. Do not mechanically replace every jQuery call if a stable legacy feature gains no value from the rewrite; focus on maintainability, bundle needs, and team direction.
+
 
 Understanding equivalents makes you a stronger developer.
 
@@ -5469,6 +5503,8 @@ If you can understand this example clearly, you have learned a large part of rea
 ---
 
 # 70. Recommended Project Structure
+Even a jQuery application benefits from separating feature modules, API code, validation, utilities, and initialization. Avoid one enormous `main.js` whose selectors and global variables implicitly depend on page load order.
+
 
 Avoid one giant JavaScript file.
 
@@ -5834,6 +5870,8 @@ Requirements:
 ---
 
 # 74. Mastery Checklist
+Check an item only if you can explain it, write a small example, and debug a failure case. Recognition is not mastery.
+
 
 ## Fundamentals
 
@@ -5966,6 +6004,8 @@ Requirements:
 ---
 
 # 75. Quick Reference
+This section is for recall after learning the concepts. Confirm jQuery 4 compatibility before copying older snippets from the web.
+
 
 ## Select
 
@@ -6080,6 +6120,8 @@ $.getJSON()
 ---
 
 # 76. Final Learning Roadmap
+Learn jQuery in layers: selection/traversal → DOM changes → events/delegation → forms → AJAX → reusable modules/plugins → legacy maintenance and modernization. Build one small CRUD/admin page to connect the layers.
+
 
 Use this order.
 
@@ -6188,6 +6230,8 @@ A developer who deeply understands these patterns can learn unfamiliar jQuery me
 ---
 
 # Recommended Revision Method
+For revision, pick a real DOM task and solve it first with jQuery, then explain the equivalent browser API and the trade-off. This keeps knowledge practical instead of turning the method list into memorization.
+
 
 For every topic, ask yourself:
 

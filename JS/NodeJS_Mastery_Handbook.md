@@ -1,4 +1,6 @@
 # Node.js Mastery Handbook
+> **Version context (August 2026):** Node.js **26** is the Current release line, while **24 (Krypton)** and **22 (Jod)** are supported LTS lines. For production, prefer a supported LTS line unless you have a reason to adopt Current and can absorb faster change.
+
 ## Beginner to Advanced — A Single-File Learning & Reference Guide
 
 > **Purpose:** This handbook is designed to take a learner from “What is Node.js?” to building, testing, securing, debugging, optimizing, and deploying production-grade Node.js applications.
@@ -477,6 +479,8 @@ or:
 ---
 
 # 6. Your First Node.js Program
+A Node program is simply JavaScript executed by the Node runtime instead of a browser. Start by learning how a file is launched, where output goes, how exit codes work, and how errors surface before introducing frameworks.
+
 
 Create:
 
@@ -894,6 +898,8 @@ Use `??` when `0`, `false`, and empty strings can be valid values.
 ---
 
 # 12. CommonJS Modules
+CommonJS is Node's older module system built around `require()` and `module.exports`. You still need it for legacy packages/projects and interoperability, but understand its loading/resolution model before mixing it with ESM.
+
 
 Traditional Node.js module system.
 
@@ -935,6 +941,8 @@ does **not** replace `module.exports` as people sometimes expect.
 ---
 
 # 13. ECMAScript Modules
+ESM is the JavaScript-standard module system using `import`/`export`. In Node, module interpretation depends on file extensions and package configuration, so learn how `package.json` `type`, `.mjs`, and `.cjs` interact.
+
 
 Modern standard module system.
 
@@ -1460,6 +1468,8 @@ Do not hide programming errors with blanket `try/catch` blocks.
 ---
 
 # 23. AbortController and Cancellation
+`AbortController` provides a standard cancellation signal for cooperating async APIs. Use it when work becomes irrelevant—timeouts, disconnected clients, superseded requests, or shutdown—so the process does not waste resources on results nobody needs.
+
 
 Cancellation is important for:
 
@@ -1544,6 +1554,8 @@ For durable enterprise workflows, consider a message broker.
 ---
 
 # 25. Buffers
+A `Buffer` is Node's byte-oriented type for binary data. Use it for files, sockets, encodings, compression, crypto, and protocols; do not treat arbitrary binary data as text without specifying/understanding the encoding.
+
 
 A Buffer represents binary data.
 
@@ -1726,6 +1738,8 @@ may become possible.
 ---
 
 # 28. OS Module
+The `node:os` module exposes runtime information about the host operating system such as CPU, memory, platform, and temporary directories. Use it for diagnostics and portable tooling, not to hard-code environment assumptions that belong in configuration.
+
 
 ```js
 import os from 'node:os';
@@ -1754,6 +1768,8 @@ console.log(os.tmpdir());
 ---
 
 # 29. URL and URLSearchParams
+Use the standard `URL`/`URLSearchParams` APIs to parse and construct URLs rather than concatenating strings manually. They handle encoding and make query-parameter intent explicit.
+
 
 Parse URLs with the `URL` class.
 
@@ -1825,6 +1841,8 @@ Use cases:
 ---
 
 # 31. Readable Streams
+A readable stream produces data over time instead of requiring the entire value in memory first. Files, HTTP bodies, and process input are common examples. Prefer pipeline/async iteration patterns that respect backpressure.
+
 
 Example:
 
@@ -1853,6 +1871,8 @@ Better abstraction when possible: use `pipeline()`.
 ---
 
 # 32. Writable Streams
+A writable stream consumes chunks over time. Writing can apply backpressure when the destination cannot keep up, so production code must not assume every `.write()` can continue indefinitely without waiting.
+
 
 ```js
 import fs from 'node:fs';
@@ -1876,6 +1896,8 @@ drain
 ---
 
 # 33. Transform and Duplex Streams
+A duplex stream can read and write; a transform stream is a duplex stream whose output is derived from its input. Compression, encryption, parsing, and transcoding are common transform use cases.
+
 
 ## Duplex
 
@@ -1943,6 +1965,8 @@ Using `pipeline()` usually helps you handle stream flow safely.
 ---
 
 # 35. Pipelines
+`pipeline()` connects streams and coordinates completion/error propagation. Prefer it to manually wiring several `.pipe()` calls when you need reliable cleanup and one place to observe failure.
+
 
 ```js
 import { pipeline } from 'node:stream/promises';
@@ -2055,6 +2079,8 @@ Use the correct transport-level status.
 ---
 
 # 38. Creating a REST API Without a Framework
+Building one API with core `node:http` reveals what frameworks normally provide: routing, body parsing, validation, middleware composition, error handling, and response helpers. Treat this as a learning exercise unless your production requirements truly justify maintaining those layers yourself.
+
 
 ```js
 import http from 'node:http';
@@ -2209,6 +2235,8 @@ Learn core Node HTTP first, then Express becomes easier to understand.
 ---
 
 # 42. Routing
+Routing maps an HTTP method and path to the code that handles that request. Keep route matching, validation/auth middleware, and business logic distinguishable so route files do not become large controllers.
+
 
 ```js
 app.get('/users', getUsers);
@@ -2299,6 +2327,8 @@ If middleware neither sends a response nor calls `next()`, the request may hang.
 ---
 
 # 44. Controllers, Services, and Repositories
+These layers separate HTTP concerns, business rules, and persistence. The labels are optional; the important goal is dependency direction: domain/business code should not need to know Express request objects or database-driver details.
+
 
 Avoid putting everything inside routes.
 
@@ -2638,6 +2668,8 @@ const sql = 'SELECT * FROM users WHERE email = $1';
 ---
 
 # 51. MySQL Example
+Use a maintained MySQL driver with connection pooling, parameterized queries, explicit transaction boundaries, and environment-based credentials. Never build SQL by concatenating untrusted values.
+
 
 Typical library:
 
@@ -2680,6 +2712,8 @@ console.log(result.insertId);
 ---
 
 # 52. PostgreSQL Example
+Use pooled connections and parameterized queries. PostgreSQL-specific features are valuable, but keep your application's data-access contract clear so SQL and transport details do not leak into every route.
+
 
 Typical package:
 
@@ -2717,6 +2751,8 @@ during controlled shutdown where appropriate.
 ---
 
 # 53. MongoDB Example
+MongoDB stores documents rather than relational rows. Model documents around access patterns, validate untrusted data, create indexes deliberately, and remember that flexible schema does not mean “no schema.”
+
 
 Install:
 
@@ -2862,6 +2898,8 @@ Pool sizing is a system-level decision.
 ---
 
 # 57. Database Performance
+Database performance is usually dominated by query shape, indexes, result size, locking/transactions, and network round trips—not by tiny JavaScript optimizations. Measure slow queries and inspect database execution plans before guessing.
+
 
 Learn to recognize:
 
@@ -2897,6 +2935,8 @@ Better approaches:
 ---
 
 # 58. Authentication Fundamentals
+Authentication establishes who/what is making a request. A production design also needs credential storage, session/token lifecycle, revocation/logout, rate limiting, MFA/SSO considerations, and secure recovery—not merely a login endpoint.
+
 
 Authentication asks:
 
@@ -3068,6 +3108,8 @@ Do not issue access tokens valid for years merely to avoid refresh-token design.
 ---
 
 # 63. Authorization and RBAC
+Authorization enforces what an authenticated identity may do. RBAC maps permissions through roles, but many systems also need ownership/resource checks. Enforce authorization at the protected operation/data boundary, not only by hiding routes or UI.
+
 
 RBAC = Role-Based Access Control.
 
@@ -3786,6 +3828,8 @@ terminates immediately and can interrupt pending work.
 ---
 
 # 83. Signals and Graceful Shutdown
+Process signals such as `SIGTERM` are how orchestrators/operating systems ask a service to stop. Graceful shutdown should stop accepting new work, finish or bound in-flight work, close servers/pools/queues, then exit with clear logs/metrics.
+
 
 Production servers should shut down cleanly.
 
@@ -4710,6 +4754,8 @@ A repository should not care about HTTP.
 ---
 
 # 106. Hexagonal / Ports and Adapters
+Hexagonal architecture keeps business logic behind ports (interfaces/contracts) while adapters connect HTTP, databases, queues, or external APIs. Use it when isolation/substitution has real value; for small services, excessive ports can add ceremony without benefit.
+
 
 Core business logic defines interfaces (“ports”).
 
@@ -4735,6 +4781,8 @@ Useful when:
 ---
 
 # 107. Dependency Injection
+Dependency injection means supplying collaborators from outside a module/class/function. Node does not require a DI container—constructor/function parameters and factory functions are often enough to make dependencies explicit and tests easy.
+
 
 Instead of creating dependencies internally:
 
@@ -4830,6 +4878,8 @@ Do not choose microservices simply because a project is “enterprise.”
 ---
 
 # 109. Microservice Communication
+Microservices communicate through synchronous calls (HTTP/gRPC) and/or asynchronous messaging. Choose based on latency, coupling, delivery guarantees, failure recovery, ordering, and operational complexity—not because one protocol is fashionable.
+
 
 ## Synchronous
 
@@ -5024,6 +5074,8 @@ This can reduce cascading failures.
 ---
 
 # 114. Dockerizing Node.js
+A good Node container is reproducible, small, non-root where practical, health-aware, and configured with external secrets/configuration. Use multi-stage builds when they reduce unnecessary build tooling in the runtime image.
+
 
 Example Dockerfile:
 
@@ -5068,6 +5120,8 @@ coverage
 ---
 
 # 115. Production Deployment
+Production deployment includes process lifecycle, TLS/proxying, configuration/secrets, logs/metrics, health checks, resource limits, graceful shutdown, backups where relevant, and rollback—not only copying code to a server.
+
 
 Possible deployment platforms:
 
@@ -5240,6 +5294,8 @@ Never put production secrets directly in source-controlled pipeline files.
 ---
 
 # 120. Node.js CLI Applications
+CLI programs need argument parsing, useful exit codes, stdout/stderr discipline, cancellation/signals, validation, and clear help text. Keep core logic separate from terminal I/O so it remains testable.
+
 
 Node is excellent for command-line tools.
 
@@ -5532,6 +5588,8 @@ Organize utilities by domain/responsibility.
 ---
 
 # 124. Production Checklist
+Use evidence for every checkbox: a passing test, measured limit, dashboard, configured policy, or runbook step. Production readiness is a set of verified behaviors, not a feeling.
+
 
 Before production, review:
 
@@ -6209,6 +6267,8 @@ health endpoint
 ---
 
 # 129. Cheat Sheet
+This is a recall aid. Use the full sections for lifecycle, error, stream, security, and concurrency concepts where one-line syntax can hide important behavior.
+
 
 ## Create project
 
@@ -6392,6 +6452,8 @@ Important reference topics:
 ---
 
 # Appendix A — A Clean REST API Example Structure
+Use this as an example of dependency boundaries rather than a mandatory directory tree. Start simpler and add layers when complexity, testing, or team ownership justifies them.
+
 
 ```text
 src/
@@ -6441,6 +6503,8 @@ Database
 ---
 
 # Appendix B — Example Error Response Standard
+A consistent error contract lets clients distinguish validation, auth, business, and server failures without parsing human text. Keep internal stack traces/secrets out of public responses and include a correlation identifier when useful.
+
 
 ```json
 {
@@ -6594,6 +6658,8 @@ This concept matters for:
 ---
 
 # Appendix E — Example Retry Helper
+Retry only operations that are safe to repeat or protected by idempotency. Add backoff/jitter and a maximum attempt/time budget; retries without limits can amplify outages.
+
 
 A simplified educational example:
 
@@ -6771,6 +6837,8 @@ Thinking in this way is what separates “code that runs” from production engi
 ---
 
 # Appendix H — Node.js Mastery Checklist
+A checked concept means you can explain its runtime behavior, identify a production failure mode, and build a minimal example without relying on a framework to hide the mechanism.
+
 
 ## JavaScript
 

@@ -4,8 +4,9 @@
 >
 > Designed for learners, developers, DevOps engineers, cloud engineers, solution architects, system administrators, and interview/certification preparation.
 >
-> **Last reviewed:** August 2026  
-> **Learning principle:** Do not memorize AWS as a list of services. Learn the problems each service solves, the trade-offs, and how services combine into architectures.
+> **Last reviewed and accuracy-checked:** 17 August 2026  
+> **Learning principle:** Do not memorize AWS as a list of services. Learn the problems each service solves, the trade-offs, and how services combine into architectures.  
+> **Accuracy note:** Service names, availability, quotas, pricing, runtime support, and console screens can change. Time-sensitive decisions should always be checked against the linked AWS documentation.
 
 ---
 
@@ -115,6 +116,41 @@ Better, but still not architecture.
 
 This is the level to target.
 
+## A practical way to study each service
+
+For every important service, use the following learning sequence instead of memorizing a definition:
+
+1. **Problem** — What problem existed before this service?
+2. **Service boundary** — What does AWS manage and what do you still manage?
+3. **Core resources** — What objects do you actually create?
+4. **Request/data path** — What happens when traffic or data enters the service?
+5. **Security** — Which identity, resource policy, network control, and encryption decisions matter?
+6. **Failure behavior** — What happens if a component, AZ, dependency, or request fails?
+7. **Scaling** — What scales automatically and what has a quota or capacity limit?
+8. **Cost** — What creates charges even when traffic is low?
+9. **Alternatives** — What would you use instead, and why?
+10. **Proof** — Build a small lab, observe it, break it, and clean it up.
+
+### Read architecture diagrams as data paths
+
+When you see:
+
+```text
+Client → CloudFront → ALB → ECS → RDS
+```
+
+do not read it as a list of products. Ask what happens at every arrow:
+
+- Which protocol is used?
+- Which DNS name is resolved?
+- Which security control allows the connection?
+- Which IAM role authorizes service-to-service API calls?
+- Is the traffic public, private, or service-to-service?
+- What happens when the destination is unhealthy?
+- Where are logs and metrics produced?
+
+This habit turns service knowledge into architecture skill.
+
 ---
 
 # 2. Cloud Computing Foundations
@@ -134,6 +170,23 @@ Cloud:
 ```text
 Request resources through API/console → use them → scale them → release them
 ```
+
+### Beginner mental model
+
+Cloud computing changes infrastructure from a **capital purchase and long provisioning cycle** into resources that can be requested through APIs. You still own architecture decisions; you simply stop owning most of the physical data-center work.
+
+A useful distinction is **resource provisioning vs application deployment**:
+
+```text
+Provisioning: create VPC, database, queue, bucket
+Deployment:   release application code/configuration into those resources
+```
+
+Cloud platforms make both highly automatable, but they are not the same activity.
+
+### Real-world example
+
+A retail application preparing for a festival sale could temporarily add compute capacity, queue workers, and database read capacity, then reduce them when demand returns to normal. In a traditional environment, obtaining that capacity might require hardware purchasing months in advance.
 
 ## 2.2 Why companies use cloud
 
@@ -158,6 +211,22 @@ Cloud does **not** automatically mean:
 - well designed.
 
 Those results depend on architecture and operations.
+
+### The trade-off behind the benefits
+
+The cloud mainly buys **speed, elasticity, managed operations, and access to specialized services**. The trade-off is that poorly governed usage can create cost, security, and complexity problems quickly because resources are easy to create.
+
+For example:
+
+```text
+Easy to create 100 resources
+        ↓
+Also easy to forget 20 of them
+        ↓
+Idle cost + attack surface + operational clutter
+```
+
+Good cloud engineering therefore combines self-service with guardrails, tagging, budgets, least privilege, observability, and automated cleanup.
 
 ## 2.3 IaaS, PaaS, SaaS, and serverless
 
@@ -226,6 +295,14 @@ Example:
 - An EC2 instance resized from `t3.medium` to `m7i.large` = vertical scaling.
 - An Auto Scaling Group adding 5 more instances = horizontal scaling.
 - Lambda automatically increasing concurrent executions = elasticity.
+
+### Do not confuse the terms
+
+A system may be **scalable but not elastic**. For example, an application may support ten servers, but an operator must manually add them. It scales, but it is not automatically elastic.
+
+Likewise, an automatically scaling service can still hit a downstream bottleneck. Scaling Lambda consumers does not help if every invocation opens a connection to a database that can accept only a limited number of connections.
+
+**Design question:** identify the first resource that saturates when load doubles. That resource, not the most visible one, defines practical scalability.
 
 ## 2.5 Vertical vs horizontal scaling
 
@@ -340,6 +417,30 @@ consumer checks whether PAY123 was already processed
 
 Retries without idempotency are dangerous.
 
+### CAP in plain language
+
+The CAP theorem is often oversimplified. The useful operational idea is that when a network partition prevents distributed nodes from communicating, a system must make trade-offs between continuing to serve requests and preserving a single immediately consistent view of data.
+
+Do not use CAP as a shortcut for choosing a database. Real systems also depend on:
+
+- latency targets,
+- failure domains,
+- transaction boundaries,
+- replication design,
+- read/write patterns,
+- recovery behavior,
+- and application-level conflict rules.
+
+### Retry design rule
+
+A retry should normally have four parts:
+
+```text
+timeout → limited retries → exponential backoff + jitter → idempotency
+```
+
+Without a timeout, a call can hang. Without a retry limit, a failure can become a retry storm. Without jitter, thousands of clients may retry at the same instant. Without idempotency, retries may duplicate business effects.
+
 ---
 
 # 3. AWS Global Infrastructure
@@ -367,6 +468,21 @@ Choose a Region based on:
 - disaster-recovery strategy
 
 Do not select a Region merely because a tutorial uses it.
+
+### Region selection checklist
+
+Choose a Region deliberately. For a production workload, record the decision using at least these questions:
+
+| Question | Why it matters |
+|---|---|
+| Where are users? | Latency and user experience |
+| Where may data legally reside? | Residency/compliance |
+| Is every required service/feature available? | Architecture feasibility |
+| Are dependent SaaS/on-prem systems nearby? | Network latency and transfer |
+| What is the cost profile? | Service and transfer pricing differ |
+| What is the DR plan? | Determines secondary-Region strategy |
+
+A Region decision should be treated as an architecture choice, not a console default.
 
 ## 3.2 Availability Zone (AZ)
 
@@ -397,6 +513,20 @@ AWS Region
 
 Used by services such as CloudFront and Route 53 to bring content/network functionality closer to users.
 
+### What happens at the edge?
+
+Edge infrastructure is used to bring selected network and content functions closer to users. A common example is CloudFront: a user may retrieve cached content from a nearby edge location while the application origin remains in one or more AWS Regions.
+
+```text
+User in another country
+   ↓
+Nearby CloudFront edge
+   ↓ cache miss only
+Regional origin such as ALB or S3
+```
+
+Do not confuse an **edge location** with an **Availability Zone**. AZs host regional workload resources; edge locations primarily support edge-delivery and network services.
+
 ## 3.4 Regional vs global services
 
 Many AWS services are regional, but some have global or globally managed aspects.
@@ -406,6 +536,20 @@ Always ask:
 > If I create this resource in Region A, does it automatically exist in Region B?
 
 Usually, no.
+
+### Why scope matters
+
+Service scope affects failover, IAM policies, logging, quotas, and deployment automation. Before using any service, identify the scope of the specific resource you create—not just the marketing label of the service.
+
+Examples of questions to ask:
+
+- Does the resource have a Region in its ARN?
+- Is its API endpoint regional?
+- Does replication to another Region happen automatically or require configuration?
+- Are quotas per Region or account-wide?
+- Where are logs and encryption keys created?
+
+A “global” control plane does not necessarily mean your data is automatically replicated globally.
 
 ## 3.5 Resource identifiers
 
@@ -428,6 +572,26 @@ ARNs appear in:
 - logging
 - cross-service permissions
 - resource policies
+
+### Reading an ARN
+
+An ARN is useful because policies need an unambiguous resource identity.
+
+```text
+arn:aws:service:region:account-id:resource
+```
+
+Not every service fills every field. S3 bucket ARNs, for example, do not use the same Region/account fields as many regional resource ARNs.
+
+When writing IAM policies, check whether an action operates on:
+
+- the bucket ARN,
+- object ARNs under the bucket,
+- a table/index ARN,
+- a queue/topic ARN,
+- or `*` because the API does not support resource-level permissions.
+
+A common beginner mistake is using a correct action with the wrong ARN shape.
 
 ---
 
@@ -468,11 +632,24 @@ Treat it as a break-glass identity.
 
 Recommended principles:
 
-- enable MFA
+- register and maintain MFA for the root user; AWS requires root-user MFA for AWS accounts
 - do not use root for everyday work
 - do not create root access keys
 - securely store recovery information
 - use IAM Identity Center / roles for human access
+
+### Root-user operational rule
+
+The root user has account-level capabilities that cannot always be delegated. That is exactly why it should not be a normal administrator login.
+
+Use a documented break-glass process:
+
+```text
+Normal administration → federated role / IAM Identity Center
+Exceptional root-only task → approved root access → complete task → review logs
+```
+
+Protect the email account and recovery path associated with root access as carefully as the root password itself. Root access keys should not be created for normal automation; workloads should use roles and temporary credentials.
 
 ## 4.3 Shared Responsibility Model
 
@@ -563,6 +740,23 @@ AWS charges can come from:
 - managed service capacity
 
 A small-looking architecture can become expensive due to hidden traffic or logging patterns.
+
+### Think in cost dimensions
+
+When estimating cost, break the architecture into measurable dimensions rather than guessing a monthly total:
+
+```text
+compute hours/requests
++ stored GB
++ IOPS/throughput
++ API/request count
++ data transfer
++ managed gateways/endpoints
++ observability volume
++ backup/snapshot growth
+```
+
+Then identify **fixed-ish** costs (for example, continuously provisioned components) and **usage-driven** costs (requests, transfer, execution duration). This makes cost surprises easier to diagnose.
 
 ## 4.5 Budget protection for learners
 
@@ -669,6 +863,26 @@ Important fields:
 - `Condition`
 - sometimes `Principal` in resource-based policies
 
+### How a policy statement is read
+
+Read a statement as a sentence:
+
+```text
+Effect   Action        Resource                         Condition
+Allow    s3:GetObject  arn:aws:s3:::company-reports/*  only when ...
+```
+
+Important points:
+
+- `Action` is an AWS API permission, not a UI button name.
+- `Resource` must use the ARN format supported by that action.
+- `Condition` can restrict access by context such as source network, tags, encryption, principal properties, or other supported condition keys.
+- Resource policies also identify a `Principal` because the policy is attached to the resource rather than the caller.
+
+### Testing a policy
+
+When a permission fails, do not immediately add `*`. Check CloudTrail, IAM Access Analyzer/policy tools, the exact API action, the resource ARN, and whether another policy layer applies.
+
 ## 5.3 Least privilege
 
 Grant only what is required.
@@ -688,6 +902,24 @@ Application needs to read invoices
 → only for invoices bucket/prefix
 ```
 
+### Practical least-privilege workflow
+
+Least privilege is usually iterative:
+
+1. Define the task the identity must perform.
+2. List the required API operations.
+3. Restrict resource ARNs where the service supports it.
+4. Add conditions when they express a real boundary.
+5. Test both allowed and forbidden operations.
+6. Review observed permissions over time and remove unused access.
+
+Avoid the opposite extremes:
+
+- **Too broad:** `Action: "*"`, `Resource: "*"` for convenience.
+- **Too brittle:** dozens of conditions nobody understands, causing teams to bypass controls.
+
+Good permissions are minimal **and maintainable**.
+
 ## 5.4 Explicit deny
 
 IAM evaluation is simplified as:
@@ -699,6 +931,27 @@ An applicable Allow can grant access
         ↓
 Applicable explicit Deny overrides Allow
 ```
+
+### Evaluation mental model
+
+An `Allow` is only useful if no applicable higher-level or explicit deny blocks it. Common policy layers include:
+
+- identity policies,
+- resource policies,
+- permissions boundaries,
+- session policies,
+- organization SCPs,
+- and service-specific policy systems such as KMS key policies.
+
+When `AccessDenied` occurs, ask two different questions:
+
+```text
+Do I have an applicable Allow?
+AND
+Is any applicable policy explicitly denying the request?
+```
+
+This is why attaching a broader administrator policy does not necessarily fix an SCP or resource-policy denial.
 
 ## 5.5 Identity-based vs resource-based policies
 
@@ -721,6 +974,22 @@ Examples:
 - KMS key policy
 - SNS topic policy
 
+### Choosing which policy to use
+
+Use an identity policy when you are describing **what a role/user may do**. Use a resource policy when the service supports one and you need to describe **who may access that resource**, especially across accounts.
+
+Cross-account example:
+
+```text
+Account A role
+   ↓ allowed by its identity policy
+Account B S3 bucket
+   ↓ trusts/permits Account A principal in bucket policy
+Object access
+```
+
+Cross-account authorization often requires both sides to be correct. Also remember that KMS encryption can introduce a separate key-policy permission check.
+
 ## 5.6 Permission boundaries
 
 A permissions boundary defines the maximum permissions an IAM identity can receive through identity policies.
@@ -735,6 +1004,20 @@ BUT developers must never create admin-level roles.
 ```
 
 A permissions boundary can cap those roles.
+
+### Boundary vs policy
+
+A permissions boundary is not a permission grant. Think of it as a ceiling:
+
+```text
+Identity policy says: may do A, B, C
+Boundary allows only: A, B
+Effective identity-policy permissions: A, B
+```
+
+Use boundaries when a platform team delegates role creation but wants to guarantee that delegated administrators cannot exceed an approved permission envelope.
+
+Common mistake: attaching a boundary and expecting it to grant access. The identity still needs an applicable `Allow`.
 
 ## 5.7 Service Control Policies (SCPs)
 
@@ -752,6 +1035,22 @@ SCP says: Deny s3:DeleteBucket
 Result: Denied
 ```
 
+### Where SCPs fit
+
+SCPs define the maximum available permissions for accounts/organizational units in AWS Organizations. They are useful for non-negotiable guardrails such as preventing use of disallowed Regions or blocking dangerous account-level operations.
+
+```text
+Organization SCP boundary
+        ↓
+Account IAM/resource policies
+        ↓
+Effective permission
+```
+
+Use SCPs for broad governance, not for every application permission. Application teams still need normal IAM policies.
+
+**Common mistake:** troubleshooting an account-level deny only inside IAM and forgetting that an SCP may be the real control.
+
 ## 5.8 Temporary credentials and STS
 
 AWS Security Token Service (STS) issues temporary credentials.
@@ -767,6 +1066,29 @@ Temporary Access Key + Secret + Session Token
 ```
 
 Temporary credentials reduce the risk of long-lived secrets.
+
+### What STS credentials contain
+
+Temporary credentials normally include:
+
+- an access key ID,
+- a secret access key,
+- a session token,
+- and an expiration time.
+
+Applications running on AWS compute should retrieve temporary credentials through the platform's role mechanism rather than storing credentials in files.
+
+### Cross-account role example
+
+```text
+CI role in Tooling account
+   ↓ sts:AssumeRole
+Deployment role in Production account
+   ↓
+CloudFormation/ECS deployment
+```
+
+The target role's **trust policy** controls who may assume it; its **permissions policies** control what the assumed role can do afterward.
 
 ## 5.9 IAM best-practice mental model
 
@@ -870,6 +1192,21 @@ Organizations helps with:
 - organization-wide service integrations
 - centralized account management
 
+### What Organizations does not do
+
+Organizations gives you the account hierarchy and governance framework, but it does not automatically create a secure landing zone by itself. You still need decisions about:
+
+- centralized identity,
+- logging,
+- security tooling,
+- network topology,
+- account vending,
+- baseline IaC,
+- backup,
+- and incident access.
+
+Use Organizations as the **administrative skeleton** on which those controls are built.
+
 ## 6.3 Organizational Unit (OU)
 
 An OU is a logical grouping of accounts.
@@ -896,6 +1233,22 @@ Concepts:
 
 A permission set becomes account-specific role access for users/groups.
 
+### Permission-set flow
+
+A beginner-friendly way to understand workforce access is:
+
+```text
+Person/group in identity source
+   ↓ assignment
+Permission set
+   ↓ provisioned role in target account
+Temporary session credentials
+```
+
+A permission set defines the access package; account assignments decide which people/groups receive that package in which accounts.
+
+Prefer this model over creating a separate IAM user for each employee in each AWS account.
+
 ## 6.5 Control Tower
 
 Control Tower helps establish a governed multi-account landing zone using prescriptive AWS practices.
@@ -907,6 +1260,20 @@ Concepts:
 - Account Factory
 - drift detection
 - centralized governance
+
+### When Control Tower helps
+
+Control Tower is most useful when an organization wants a repeatable, governed multi-account baseline rather than assembling every landing-zone control manually.
+
+Use it to accelerate:
+
+- governed account creation,
+- preventive/detective/proactive controls where supported,
+- centralized logging/audit patterns,
+- account lifecycle management,
+- and standardized landing-zone practices.
+
+Do not treat Control Tower as a substitute for architecture ownership. Teams still need to understand the underlying Organizations, IAM, logging, networking, and account design.
 
 ## 6.6 Enterprise scenario
 
@@ -951,6 +1318,28 @@ Example CIDR:
 
 The VPC is then divided into subnets.
 
+### What a VPC contains
+
+A VPC is the network boundary in which you design IP ranges, subnets, routing, gateways, endpoints, and network interfaces. It does not itself make workloads private or secure.
+
+A secure VPC depends on how the pieces combine:
+
+```text
+CIDR
+ ↓
+Subnets per AZ
+ ↓
+Route tables
+ ↓
+IGW / NAT / endpoints / TGW / VPN
+ ↓
+Security groups + NACLs
+ ↓
+Workload ENIs
+```
+
+Start VPC design with an IP-address plan that leaves room for growth and avoids overlap with networks you may later connect.
+
 ## 7.2 CIDR basics
 
 `10.0.0.0/16` means a large address range.
@@ -975,6 +1364,20 @@ Learn subnetting. It matters for:
 - peering
 - hybrid connectivity
 - avoiding overlapping IP ranges
+
+### Quick subnet intuition
+
+For IPv4, a smaller prefix number represents a larger range. For example, a `/16` contains far more addresses than a `/24`.
+
+Do not allocate every address on day one. Leave space for:
+
+- more AZs,
+- container/pod growth,
+- load balancers and managed services,
+- future application tiers,
+- and hybrid-network integration.
+
+Overlapping CIDRs become painful when VPCs, on-prem networks, partners, or acquisitions later need private routing between each other.
 
 ## 7.3 Public vs private subnet
 
@@ -1012,6 +1415,21 @@ An EC2 instance generally needs:
 - NACL permission
 - service listening correctly
 
+### Public reachability requires multiple conditions
+
+An IGW attachment alone does not make an instance reachable from the internet. For typical IPv4 internet access, verify the whole path:
+
+```text
+public address
++ subnet route to IGW
++ security-group rule
++ NACL path
++ OS firewall
++ application listening on correct interface/port
+```
+
+For inbound services, prefer a public load balancer in front of private application instances when that architecture fits. This reduces direct exposure of individual servers.
+
 ## 7.5 NAT Gateway
 
 Use a NAT gateway when private resources need outbound connectivity without accepting unsolicited inbound internet connections.
@@ -1042,6 +1460,14 @@ Cost warning:
 
 Use VPC endpoints where appropriate to reduce unnecessary NAT traversal for AWS services.
 
+### High-availability and cost design
+
+A NAT gateway is zonal. A common resilient design places a NAT gateway in each AZ and routes private subnets to the NAT in the same AZ, avoiding a single zonal dependency and unnecessary cross-AZ traffic.
+
+For learner labs, one NAT gateway may be cheaper, but document that it is a cost-saving compromise rather than the ideal production design.
+
+Before sending all private traffic through NAT, check whether AWS-service traffic can use gateway/interface VPC endpoints instead.
+
 ## 7.6 Route tables
 
 A route table tells traffic where to go.
@@ -1062,6 +1488,14 @@ Examples:
 - VPC peering connection
 
 Longest-prefix match is important in routing decisions.
+
+### Route troubleshooting example
+
+Suppose an instance at `10.0.11.20` must reach an on-prem host through a transit gateway. The route table needs a destination covering the on-prem CIDR and a target pointing to the correct attachment/path.
+
+When multiple routes match, the most specific prefix normally wins. Therefore a `/24` route can take precedence over a broader `/16` route.
+
+Troubleshooting rule: inspect the route table associated with the **actual subnet**, not the table you expected it to use.
 
 ## 7.7 Security groups
 
@@ -1102,6 +1536,12 @@ Key characteristics:
 
 Use NACLs as coarse subnet-level controls, not as a replacement for correct security group design.
 
+### Why statelessness matters
+
+Because NACLs are stateless, you must permit both directions of a permitted flow. Return traffic may use ephemeral ports, so overly restrictive rules can cause confusing one-way connectivity failures.
+
+Use NACLs when you have a clear subnet-level requirement, such as a broad deny/guardrail. For most application-to-application access, security groups are easier to reason about because they are stateful and can reference other security groups.
+
 ## 7.9 Security Group vs NACL
 
 | Feature | Security Group | NACL |
@@ -1140,6 +1580,15 @@ Benefits:
 - possible cost optimization
 - private connectivity
 
+### Gateway vs interface mental model
+
+Two common endpoint patterns are:
+
+- **Gateway endpoints** — route-table based connectivity for supported services such as S3 and DynamoDB.
+- **Interface endpoints** — create private IP-based endpoints in subnets using AWS PrivateLink for many supported services.
+
+Interface endpoints can have per-hour and data-processing costs, so “private” does not automatically mean “cheaper.” Choose them for security/network architecture needs and compare the complete cost path.
+
 ## 7.11 VPC peering
 
 Connect two VPCs privately.
@@ -1156,6 +1605,17 @@ A ↔ B ↔ C
 ```
 
 does **not** automatically mean A can route to C.
+
+### When peering stops scaling well
+
+Peering is simple for a small number of VPCs, but every relationship is point-to-point and routing is non-transitive.
+
+```text
+3 VPCs  → manageable mesh
+30 VPCs → many connections/routes to coordinate
+```
+
+When the environment grows, compare Transit Gateway, Cloud WAN, PrivateLink, or VPC Lattice depending on whether you need network routing, service sharing, or application/service connectivity.
 
 ## 7.12 Transit Gateway
 
@@ -1211,6 +1671,19 @@ Contains attributes such as:
 - MAC address
 - optional public addressing relationships
 
+### Why ENIs appear everywhere
+
+Many AWS networking features ultimately attach or create ENIs. When troubleshooting an unexpected IP address or security group, identify the ENI and its owner/resource.
+
+An ENI can carry:
+
+- one or more private IP addresses,
+- security groups,
+- network identity attributes,
+- and attachment information.
+
+This makes the ENI a useful troubleshooting bridge between the abstract service and the actual VPC network path.
+
 ## 7.15 VPC Flow Logs
 
 Capture metadata about IP traffic flows.
@@ -1223,6 +1696,14 @@ Useful for:
 - network troubleshooting
 
 Flow Logs are not full packet capture.
+
+### What Flow Logs can and cannot tell you
+
+Flow Logs record network-flow metadata such as source, destination, protocol, ports, and accept/reject information. They are excellent for questions like:
+
+> “Was traffic to port 443 rejected at the VPC networking layer?”
+
+They do **not** show the HTTP request body, SQL query, or TLS payload. Use application logs, traces, packet-level tooling, or service logs for those layers.
 
 ## 7.16 Networking troubleshooting order
 
@@ -1287,6 +1768,20 @@ An EC2 instance is defined by choices such as:
 - user data
 - purchasing model
 
+### What you are really choosing
+
+Launching “an EC2 server” is several architecture decisions bundled together:
+
+```text
+AMI + instance family/size + subnet + SG + IAM role + EBS + purchase model + bootstrap
+```
+
+For production, make these choices reproducible with launch templates and IaC rather than hand-configuring instances in the console.
+
+### When EC2 is a strong choice
+
+EC2 is appropriate when you need operating-system control, custom agents/kernel-level behavior, legacy application compatibility, specialized hardware, or a host model that does not fit a more managed platform.
+
 ## 8.2 Amazon Machine Image (AMI)
 
 An AMI is a template used to launch EC2 instances.
@@ -1304,6 +1799,22 @@ Use cases:
 - repeatable server provisioning
 - disaster recovery
 - Auto Scaling launch templates
+
+### Golden-image workflow
+
+A controlled AMI pipeline can reduce configuration drift:
+
+```text
+Base image
+  ↓ patch + harden + install agents
+Image build/test
+  ↓
+Versioned AMI
+  ↓
+Launch Template / Auto Scaling
+```
+
+Do not bake secrets, environment-specific credentials, or mutable business data into the AMI. Keep the image reusable and inject environment configuration securely at deployment/runtime.
 
 ## 8.3 Instance families
 
@@ -1353,6 +1864,21 @@ Important:
 - Instance store is ephemeral.
 - Terminated instances cannot simply be restarted.
 
+### Stop vs terminate
+
+Stopping an EBS-backed instance preserves the instance resource and attached EBS data according to configuration, while termination deletes the instance and may delete volumes whose `DeleteOnTermination` behavior is enabled.
+
+Before terminating a server, check:
+
+- persistent data location,
+- EBS delete settings,
+- snapshots/backups,
+- static addressing dependencies,
+- Auto Scaling behavior,
+- and whether the server was configured manually and is reproducible.
+
+Treat manually unique servers as technical debt because replacement becomes risky.
+
 ## 8.5 User data
 
 User data can bootstrap an instance.
@@ -1384,6 +1910,12 @@ Applications can retrieve metadata from the instance metadata service.
 Use modern secure metadata access practices such as IMDSv2 where appropriate.
 
 Never assume metadata exposure is harmless. SSRF vulnerabilities can become credential theft if applications are insecurely designed.
+
+### Why IMDSv2 matters
+
+Instance metadata can expose useful information and temporary role credentials to software running on the instance. IMDSv2 adds session-oriented request protection and should be preferred/enforced where compatible.
+
+Application design still matters: an SSRF vulnerability that lets an attacker issue arbitrary requests from the instance can be dangerous. Combine secure application code, least-privilege instance roles, metadata protections, and network controls.
 
 ## 8.7 EC2 purchasing models
 
@@ -1439,6 +1971,14 @@ Examples:
 
 Learn them when dealing with HPC, low-latency clusters, or large distributed workloads.
 
+### Placement-group intuition
+
+- **Cluster** placement favors close network placement for very low-latency/high-throughput node-to-node workloads.
+- **Spread** placement separates a small number of critical instances across distinct underlying hardware.
+- **Partition** placement groups large distributed systems into partitions so correlated hardware failures are easier to isolate.
+
+Most ordinary web applications do not need a placement group. Use one only when the application's latency/failure-domain requirements justify the added placement constraints.
+
 ## 8.9 Elastic IP
 
 A static public IPv4 address that can be associated with supported AWS resources.
@@ -1471,6 +2011,17 @@ Benefits:
 - IAM-based access
 - session logging options
 - central control
+
+### Session Manager prerequisites
+
+The operational model usually requires:
+
+- a managed instance/compatible SSM agent environment,
+- an instance role with the required Systems Manager permissions,
+- network connectivity to Systems Manager endpoints, through internet/NAT or appropriate VPC endpoints,
+- and operator IAM permissions.
+
+This design can remove inbound port 22 from security groups, but it does not remove the need for host hardening, patching, authorization, and audit review.
 
 ## 8.11 EC2 use cases
 
@@ -1520,6 +2071,18 @@ Job queue
    ↓
 Compute environment
 ```
+
+### Batch vs always-on service
+
+Batch is designed for work that can be expressed as jobs rather than a continuously serving application.
+
+```text
+submit job → queue → scheduler → compute → result
+```
+
+Use it when many independent or dependency-linked jobs must be scheduled onto managed compute capacity. Do not use a batch scheduler to imitate a low-latency request/response API.
+
+Typical controls to learn: job definitions, queues, scheduling priority, compute environments, retries, timeouts, logs, and job dependencies.
 
 ---
 
@@ -1571,6 +2134,20 @@ Example rules:
 admin.example.com → admin target group
 ```
 
+### Request path
+
+An ALB evaluates listener rules and forwards an HTTP/HTTPS request to a target group.
+
+```text
+443 listener
+  ↓ host/path rule
+Target group
+  ↓ health-aware selection
+Healthy application target
+```
+
+Common mistakes include configuring a security group only on the instance, using the wrong health-check path, forgetting host headers/redirect behavior, or allowing the target from the whole internet instead of from the ALB security group.
+
 ## 9.3 Network Load Balancer (NLB)
 
 Layer 4 transport-level load balancing.
@@ -1582,6 +2159,12 @@ Good for:
 - preserving source characteristics depending on configuration
 - non-HTTP protocols
 
+### When Layer 4 is the clue
+
+Choose NLB when the requirement is centered on TCP/UDP/TLS transport behavior rather than HTTP-aware routing. Examples include non-HTTP protocols, high connection scale, or network designs that need NLB-specific addressing/features.
+
+If you need path-based routing, HTTP headers, redirects, or web-aware routing, ALB is usually the better fit.
+
 ## 9.4 Gateway Load Balancer
 
 Used for deploying/scaling network virtual appliances.
@@ -1592,6 +2175,22 @@ Examples:
 - intrusion inspection
 - third-party network appliances
 
+### The appliance pattern
+
+Gateway Load Balancer is not a normal application load balancer. It is designed to insert and scale compatible virtual network appliances into traffic paths.
+
+```text
+Workload traffic
+   ↓
+Gateway Load Balancer endpoint
+   ↓
+GWLB
+   ↓
+Firewall / inspection appliances
+```
+
+Use it for centralized inspection architectures when third-party/security appliances are an explicit requirement.
+
 ## 9.5 Target group
 
 A target group contains destinations such as:
@@ -1601,6 +2200,12 @@ A target group contains destinations such as:
 - Lambda in supported ALB scenarios
 
 The load balancer sends traffic only to healthy targets based on configured health checks.
+
+### Target group is more than a list
+
+A target group also carries routing/health behavior such as target type, protocol/port, health check configuration, and attributes that affect connection handling.
+
+During a deployment, watch target health transitions. A target that is “running” at the compute layer can still be “unhealthy” to the load balancer because the application port, path, dependencies, or security rules are wrong.
 
 ## 9.6 Health checks
 
@@ -1637,6 +2242,20 @@ min = 2
 desired = 4
 max = 10
 ```
+
+### Desired capacity is a control loop
+
+An ASG continuously tries to make actual capacity match desired capacity and health rules.
+
+```text
+instance fails health check
+   ↓
+ASG terminates/replaces
+   ↓
+desired capacity restored
+```
+
+For stateless web tiers, combine ASG with a launch template and load-balancer target group. Do not store unique state on an instance that can be replaced automatically.
 
 ## 9.8 Scaling policies
 
@@ -1773,6 +2392,30 @@ Key:
 2026/08/invoice-123.pdf
 ```
 
+### S3 request mental model
+
+Applications interact with S3 through object APIs rather than mounting a traditional block device.
+
+Common operations include:
+
+- `PutObject` — upload/replace an object,
+- `GetObject` — read an object,
+- `HeadObject` — retrieve metadata without the object body,
+- `DeleteObject` — remove an object/version according to configuration,
+- list operations — enumerate keys under supported request patterns.
+
+### Design questions
+
+For every bucket, decide:
+
+- who may read/write,
+- whether versioning is needed,
+- retention/lifecycle behavior,
+- encryption and key ownership,
+- replication/backup requirements,
+- access logging/auditing,
+- expected request and transfer patterns.
+
 ## 10.3 S3 is not a normal filesystem
 
 Do not assume:
@@ -1782,6 +2425,12 @@ Do not assume:
 - traditional folder semantics
 
 “Folders” in S3 interfaces are based on key prefixes.
+
+### Why this changes application design
+
+Object storage is ideal when the unit of work is an object such as an image, PDF, backup, log object, or data-lake file. It is a poor substitute when an application expects low-latency random block writes, POSIX file locking, or an ordinary shared filesystem.
+
+Choose the storage interface the application actually expects rather than forcing every storage problem into S3.
 
 ## 10.4 S3 storage classes
 
@@ -1852,6 +2501,20 @@ KMS adds key-control and audit capabilities but can introduce:
 - key-policy complexity
 - service quotas
 
+### Encryption choice is also an authorization choice
+
+When using KMS-backed encryption, access may depend on both S3 permission and KMS authorization.
+
+```text
+Allowed s3:GetObject
+        +
+Allowed KMS decrypt path
+        ↓
+Readable encrypted object
+```
+
+This is a common source of `AccessDenied` errors. Also consider key rotation/governance, cross-account access, replication, and the request volume that will call KMS.
+
 ## 10.8 S3 access control
 
 Use layers such as:
@@ -1893,6 +2556,22 @@ Authorized user downloads object
 
 This avoids making the bucket public.
 
+### Security properties
+
+A presigned URL delegates a specific S3 operation for a limited time using the permissions of the signer. Treat the URL itself as a temporary credential: anyone who obtains it may be able to use it until it expires or otherwise becomes invalid.
+
+Good design:
+
+```text
+Authenticated user
+ → backend checks authorization
+ → backend signs only required object/action
+ → short expiration
+ → client uploads/downloads directly to S3
+```
+
+Do not use a long-lived presigned URL as a replacement for an authorization model.
+
 ## 10.10 S3 replication
 
 Can replicate objects for scenarios such as:
@@ -1903,6 +2582,12 @@ Can replicate objects for scenarios such as:
 - data locality
 
 Replication configurations commonly depend on versioning and permissions.
+
+### Replication is not automatically a backup
+
+Replication can protect availability/locality goals, but a replicated delete or unwanted change may also propagate depending on configuration. For recovery, combine replication decisions with versioning, retention, backup, Object Lock where justified, and tested restore procedures.
+
+Before enabling cross-Region or cross-account replication, verify encryption/key permissions and understand transfer/storage cost.
 
 ## 10.11 S3 event notifications
 
@@ -1949,6 +2634,22 @@ Important concepts:
 - encryption
 
 EBS volumes are generally tied to an Availability Zone.
+
+### EBS sizing is multi-dimensional
+
+Do not choose a volume based only on GB. Depending on volume type, performance is also constrained by IOPS and throughput, and the EC2 instance itself has EBS bandwidth limits.
+
+Troubleshooting disk performance therefore checks both sides:
+
+```text
+EBS volume capability
+AND
+EC2 instance EBS capability
+AND
+application I/O pattern
+```
+
+Use CloudWatch and OS-level metrics to distinguish capacity, IOPS, throughput, latency, and queueing problems.
 
 ## 10.13 EBS snapshots
 
@@ -2008,6 +2709,14 @@ Use cases:
 - home directories
 - container workloads needing shared file storage
 
+### Shared-filesystem behavior
+
+EFS is useful when multiple Linux-oriented clients need concurrent access to the same file hierarchy without you operating NFS servers yourself.
+
+Before choosing EFS, confirm the application truly needs shared file semantics. If the workload can use immutable objects, S3 may be simpler and cheaper. If it needs a single-host block device, EBS is a better match.
+
+Also review throughput mode/performance behavior, mount-target placement, security groups, encryption, backup, and lifecycle settings.
+
 ## 10.16 Amazon FSx
 
 Managed file system families for workloads requiring specific filesystem technologies.
@@ -2018,6 +2727,12 @@ Use cases may include:
 - high-performance computing
 - enterprise NAS-style workloads
 - specialized filesystem compatibility
+
+### Why FSx is a family, not one filesystem
+
+FSx provides managed implementations for specific filesystem technologies and workload requirements. Select the exact FSx offering based on protocol compatibility, Windows/Linux integration, performance model, data-access pattern, and application expectations.
+
+Do not choose “FSx” generically. First identify whether the workload needs a Windows file server style, Lustre/HPC behavior, NetApp ONTAP compatibility, OpenZFS behavior, or another supported family.
 
 ## 10.17 Storage selection table
 
@@ -2044,6 +2759,22 @@ Choose a relational database when your data benefits from:
 - transactions
 - relational integrity
 - mature ecosystem
+
+### When relational structure is valuable
+
+Use a relational database when your business logic benefits from transactions, constraints, joins, and a schema that expresses relationships explicitly.
+
+Example order transaction:
+
+```text
+create order
++ create order lines
++ update payment state
++ reserve inventory reference
+= one consistent business operation where appropriate
+```
+
+Relational databases are not “old technology.” They remain an excellent default for many business applications because consistency rules and ad-hoc SQL are powerful.
 
 ## 11.2 Amazon RDS
 
@@ -2201,6 +2932,14 @@ Many Lambda executions
        RDS
 ```
 
+### What problem RDS Proxy solves
+
+Highly elastic clients can create connection storms. RDS Proxy maintains/manages a pool of database connections so application scaling does not translate directly into the same number of new database connections.
+
+It can improve connection management and failover behavior in supported configurations, but it does not repair inefficient queries, missing indexes, bad transactions, or an undersized database.
+
+Think of it as **connection-management infrastructure**, not a database performance cure-all.
+
 ## 11.9 Amazon Aurora
 
 Aurora is a managed relational engine compatible with MySQL/PostgreSQL ecosystems.
@@ -2285,6 +3024,23 @@ Core concepts:
 - TTL
 - global tables
 
+### The most important DynamoDB skill: access-pattern design
+
+Do not start by creating columns. Start by writing the queries the application must execute.
+
+Example requirements:
+
+```text
+Get customer by ID
+List orders for customer newest-first
+Find order by order ID
+List open orders for fulfillment
+```
+
+Then design partition/sort keys and indexes that serve those requests efficiently.
+
+DynamoDB trades familiar relational joins for predictable key-oriented access at scale. If the product team expects arbitrary reporting queries tomorrow, keep an analytics/search path separate rather than scanning the operational table.
+
 ## 12.3 Primary key
 
 ### Simple primary key
@@ -2361,6 +3117,21 @@ GSI SK: created_at
 
 Indexes have cost and design implications.
 
+### GSI trade-offs
+
+A GSI is another maintained access path, so it has storage and write/capacity implications. Add an index because a real query requires it, not because “indexes are good.”
+
+Before creating one, define:
+
+- GSI partition and optional sort key,
+- projected attributes,
+- expected cardinality and hot-key risk,
+- read/write pattern,
+- consistency expectations,
+- cost/capacity impact.
+
+A poorly chosen low-cardinality key can concentrate traffic even though the table itself is large.
+
 ## 12.7 DynamoDB Streams
 
 Streams capture item-level changes for event-driven processing.
@@ -2377,6 +3148,19 @@ Lambda
 send notification / update search index
 ```
 
+### Stream consumers must tolerate repetition
+
+A stream-based consumer can be retried. Design downstream actions to be idempotent and monitor failures/lag.
+
+Good use cases include:
+
+- maintaining a search index,
+- creating audit/event projections,
+- triggering derived-data updates,
+- and propagating changes to another system.
+
+Avoid putting slow, fragile side effects directly into a critical request path when they can be handled asynchronously.
+
 ## 12.8 TTL
 
 Automatically expires items based on configured time-to-live attributes.
@@ -2389,6 +3173,26 @@ Use cases:
 - short-lived workflow state
 
 Do not treat TTL expiration timing as a precise scheduler.
+
+### TTL is lifecycle cleanup, not an alarm clock
+
+TTL marks items for background expiration. Deletion is not guaranteed at the exact second in the TTL attribute.
+
+Good:
+
+```text
+session expires around business lifetime
+→ TTL cleans old records automatically
+```
+
+Bad:
+
+```text
+"At exactly 10:00:00 execute payment"
+→ TTL is not a precise scheduler
+```
+
+Use EventBridge Scheduler or another workflow/scheduling mechanism when exact scheduled execution matters.
 
 ## 12.9 Global tables
 
@@ -2463,11 +3267,52 @@ Caching challenges:
 - cache stampede
 - memory sizing
 
+### Engines and role in an architecture
+
+Amazon ElastiCache supports managed in-memory caching engines including Valkey, Redis OSS, and Memcached. Select based on the data structures, persistence/replication behavior, clustering, protocol compatibility, and operational needs of the application.
+
+A cache should normally be treated as **derived/reconstructable state** unless you have deliberately chosen a durable in-memory database product for primary data.
+
+Cache-aside pattern:
+
+```text
+App → cache lookup
+  hit  → return
+  miss → DB → populate cache → return
+```
+
+Always define expiration and invalidation behavior before adding a cache; otherwise stale-data bugs can be harder than the original performance problem.
+
+### ElastiCache vs Amazon MemoryDB
+
+These services can look similar because both can use Valkey/Redis-compatible access patterns, but their intent differs:
+
+- **ElastiCache** is primarily a managed cache/data-store layer used to accelerate applications.
+- **Amazon MemoryDB** is a durable in-memory database designed to hold primary application data with in-memory performance and Multi-AZ durability.
+
+If losing the cache and rebuilding it from the system of record is acceptable, think cache first. If the in-memory store itself must be the durable system of record, evaluate MemoryDB.
+
 ## 12.12 DocumentDB
 
 Managed document database designed for document-oriented workloads with MongoDB-compatible API characteristics.
 
 Evaluate actual compatibility requirements before migration; “compatible API” is not always identical behavior for every MongoDB feature.
+
+### Compatibility warning
+
+Amazon DocumentDB provides MongoDB-compatible APIs for supported workloads, but compatibility is not the same as running every MongoDB feature unchanged.
+
+Before migrating, inventory:
+
+- drivers and versions,
+- query operators,
+- index behavior,
+- transactions/features used,
+- operational tooling,
+- backup/restore expectations,
+- and performance characteristics.
+
+Run a representative compatibility/performance test rather than relying only on API branding.
 
 ## 12.13 Neptune
 
@@ -2480,9 +3325,29 @@ Examples:
 - recommendation relationships
 - knowledge graphs
 
+### When graph is the natural model
+
+A graph database is valuable when the relationship itself is central to the query.
+
+Example:
+
+```text
+Person → owns → Account
+Account → paid → Merchant
+Merchant → connected-to → RiskEntity
+```
+
+Questions such as “find suspicious paths within N relationships” can fit a graph model better than repeated relational joins. Do not choose a graph database for ordinary CRUD data that has no meaningful graph traversal requirement.
+
 ## 12.14 Keyspaces
 
 Managed Apache Cassandra-compatible database for Cassandra-style workloads.
+
+### When to consider it
+
+Amazon Keyspaces is intended for workloads that need Apache Cassandra-compatible APIs/data models without operating Cassandra clusters directly.
+
+A good candidate already has Cassandra-style access patterns or ecosystem requirements. A poor candidate is a new application choosing Cassandra semantics only because it expects “big data.” First compare DynamoDB, relational databases, and other managed stores against the actual access patterns.
 
 ## 12.15 Time-series databases
 
@@ -2493,6 +3358,22 @@ Examples:
 - IoT metrics
 - application telemetry
 - industrial measurements
+
+### AWS options and a 2026 availability note
+
+Time-series workloads organize data around time-stamped measurements, retention windows, and time-based aggregation.
+
+Amazon Timestream includes Timestream for InfluxDB for managed InfluxDB-compatible workloads. AWS closed **new-customer access to Amazon Timestream for LiveAnalytics effective June 20, 2025**; existing eligible customers can continue using it. AWS recommends new customers evaluate Timestream for InfluxDB for similar time-series needs.
+
+Use time-series storage when queries look like:
+
+```text
+average CPU by host every 5 minutes
+sensor temperature over 30 days
+requests/second by service over time
+```
+
+For new designs, verify current service availability and engine choices before committing to an architecture.
 
 ## 12.16 Database selection shortcut
 
@@ -2550,6 +3431,21 @@ Handler
 Result / side effect
 ```
 
+### Initialization vs invocation
+
+Code outside the handler may run during execution-environment initialization and can be reused by later invocations in the same environment.
+
+```python
+# initialized when environment starts
+client = create_client()
+
+def lambda_handler(event, context):
+    # runs for each invocation
+    return process(event, client)
+```
+
+This is useful for reusing SDK clients or expensive setup, but never assume an execution environment will live forever. Lambda may create or remove environments at any time. Persistent state belongs in an external durable store.
+
 ## 13.3 Handler
 
 Example Python:
@@ -2562,6 +3458,14 @@ def lambda_handler(event, context):
         "body": f"Hello {name}"
     }
 ```
+
+### Inputs and output
+
+The handler receives an `event` whose shape depends on the event source and a `context` object containing invocation/runtime metadata.
+
+For an API integration, the return structure may be interpreted as an HTTP-style response. For an asynchronous event or queue consumer, the useful output may instead be a side effect such as writing to a database or publishing another message.
+
+Always inspect the documented event schema of the real trigger. Do not assume every event has the same keys as a tutorial example.
 
 ## 13.4 Cold vs warm start
 
@@ -2642,6 +3546,20 @@ Always design for:
 - dead-letter handling
 - idempotency
 
+### Retry behavior belongs to the event source
+
+Synchronous invocation, asynchronous Lambda invocation, SQS event-source mappings, stream event sources, and other integrations have different failure/retry semantics.
+
+Therefore document, per function:
+
+- who retries,
+- how long an event can remain retriable,
+- how poison events are isolated,
+- where failure records/messages go,
+- and how duplicates are made safe.
+
+A generic `try/except` inside the function is not a complete retry strategy.
+
 ## 13.9 Lambda + SQS
 
 Excellent worker pattern:
@@ -2664,6 +3582,19 @@ Benefits:
 - retry model
 - DLQ support
 
+### Partial-batch thinking
+
+When Lambda processes a batch of SQS messages, one bad message should not force unnecessary repeated side effects for already-successful messages. Learn the supported partial-batch failure pattern and make each record independently idempotent.
+
+Tune together:
+
+- SQS visibility timeout,
+- Lambda timeout,
+- batch size/window,
+- maximum concurrency/downstream capacity,
+- redrive policy/DLQ,
+- and alarm on oldest-message age.
+
 ## 13.10 Lambda environment variables
 
 Use for non-secret configuration.
@@ -2675,6 +3606,18 @@ For secrets:
 - IAM-based access
 
 Do not store production secrets in source.
+
+### Configuration hierarchy
+
+A useful separation is:
+
+```text
+ordinary configuration → environment variables / config service
+sensitive secret       → Secrets Manager / secure parameter store
+AWS permission         → IAM role, not a stored access key
+```
+
+Environment variables can still appear in operational tooling and configuration views, so do not treat them as a secret vault merely because they are outside source code.
 
 ## 13.11 Lambda in a VPC
 
@@ -2688,6 +3631,20 @@ Use when Lambda must reach:
 
 Consider egress requirements and VPC endpoints/NAT design.
 
+### Common connectivity mistake
+
+Attaching a function to private subnets does not magically give it internet access. If it needs outbound internet access, the selected subnets require an appropriate egress path such as NAT. If it only needs AWS services, VPC endpoints may avoid that path for supported services.
+
+For private RDS access, check:
+
+```text
+Lambda subnet/ENI path
++ route/NACL
++ Lambda security group
++ DB security group allows Lambda SG
++ DNS/port/TLS/authentication
+```
+
 ## 13.12 Lambda layers and dependencies
 
 Layers can share common code/dependencies, but be mindful of:
@@ -2698,6 +3655,16 @@ Layers can share common code/dependencies, but be mindful of:
 - runtime compatibility
 
 Container image packaging is another option for supported Lambda workloads.
+
+### Package strategy
+
+Choose a packaging approach based on maintainability, not just what works once:
+
+- direct ZIP dependencies for small functions,
+- layers for intentionally shared/versioned dependencies,
+- container images for larger/custom packaging requirements.
+
+Keep runtime versions and native dependencies compatible. A library built for your laptop may fail in Lambda if it contains platform-specific binaries.
 
 ## 13.13 When to use Lambda
 
@@ -2784,6 +3751,22 @@ Lambda
   ↓
 DynamoDB
 ```
+
+### What API Gateway is responsible for
+
+API Gateway sits at the API boundary; business logic usually lives behind it.
+
+```text
+client
+ ↓ DNS/TLS
+API Gateway
+ ↓ auth/throttle/route/transform
+Lambda or HTTP service
+```
+
+Use it when you want a managed API front door with authorization, request routing, throttling, observability, stages/custom domains, and supported integrations.
+
+Do not move every business rule into gateway mappings. Keep domain logic in maintainable application code/services.
 
 ## 14.2 HTTP API vs REST API
 
@@ -2901,6 +3884,18 @@ A DLQ is not a trash bin.
 
 Monitor it and define a redrive/remediation process.
 
+### A DLQ needs an operating procedure
+
+Define:
+
+1. an alarm when messages arrive,
+2. a way to inspect the failure safely,
+3. a fix or quarantine process,
+4. a controlled redrive/replay method,
+5. idempotency so replay is safe.
+
+A DLQ that nobody monitors only delays data loss or business failure; it does not solve it.
+
 ## 14.8 Queue depth scaling
 
 For worker systems, CPU may be a poor scaling metric.
@@ -2912,6 +3907,16 @@ number_of_messages / number_of_workers
 ```
 
 or oldest-message age.
+
+### Backlog-per-worker metric
+
+A useful target metric for queue workers is approximate backlog per worker:
+
+```text
+visible messages / active consumers
+```
+
+Combine it with **oldest message age**. A large queue may be normal during a burst if age stays low; a smaller queue with rapidly increasing age may indicate the workers are falling behind.
 
 ---
 
@@ -2979,11 +3984,35 @@ Think:
 
 Useful for point-to-point event integrations with filtering/transformation/enrichment capabilities.
 
+### When Pipes simplifies architecture
+
+EventBridge Pipes can connect supported sources to targets with optional filtering, transformation, and enrichment so you do not create a Lambda function only to move/reshape events.
+
+Use Pipes when the flow is fundamentally point-to-point:
+
+```text
+source → filter → optional enrichment → target
+```
+
+Use an event bus when many producers/consumers need broader event routing and rules. Use Step Functions when the problem is multi-step workflow orchestration.
+
 ## 14.12 EventBridge Scheduler
 
 Managed scheduling for one-time and recurring invocation patterns.
 
 Prefer it over running a permanent EC2 cron server just to call an API once per hour.
+
+### Scheduler vs “keep a server running cron”
+
+Use EventBridge Scheduler for managed one-time or recurring invocations of supported targets when the business requirement is a schedule.
+
+Examples:
+
+- run a reconciliation every night,
+- invoke a workflow at a future timestamp,
+- trigger periodic cleanup.
+
+Keep schedule semantics separate from TTL or queue visibility timeouts; those features solve different problems.
 
 ---
 
@@ -3017,6 +4046,18 @@ Good for:
 - service orchestration
 
 Avoid building an unreadable maze of Lambda functions that call each other directly if an explicit workflow better represents the process.
+
+### Orchestration mental model
+
+Step Functions makes workflow state explicit:
+
+```text
+validate → call service → wait/retry → branch → compensate → finish
+```
+
+It is useful when a process has multiple states, retries/timeouts, parallel branches, human/external waits, or compensating actions that would otherwise be hidden across application code and queues.
+
+Avoid using a state machine for a trivial one-step call when ordinary code is clearer and cheaper.
 
 ## 14.14 Synchronous vs asynchronous design
 
@@ -3131,6 +4172,22 @@ Core concepts:
 - launch/compute choice
 - service discovery/networking
 
+### ECS mental model
+
+ECS schedules containers according to task definitions and service/job requirements.
+
+```text
+container image in ECR
+   ↓
+task definition
+   ↓
+ECS task/service
+   ↓
+Fargate or EC2 capacity
+```
+
+ECS is a strong default when you want managed container orchestration on AWS without needing Kubernetes APIs/ecosystem compatibility.
+
 ## 15.4 Task definition
 
 Blueprint for containers.
@@ -3146,6 +4203,22 @@ Includes:
 - logging
 - task role
 - volumes
+
+### What a task definition describes
+
+A task definition is a versioned blueprint for running one or more containers. It can define items such as:
+
+- container image,
+- CPU/memory,
+- ports,
+- environment/configuration,
+- secrets references,
+- logging,
+- volumes,
+- health behavior,
+- task/execution roles.
+
+Register a new revision for deployable changes rather than editing running containers manually.
 
 ## 15.5 Task vs service
 
@@ -3231,6 +4304,12 @@ Do not choose EKS merely because Kubernetes is popular.
 
 For a small app, EKS may add unnecessary complexity.
 
+### What AWS manages and what you still own
+
+EKS manages the Kubernetes control plane, but your team still owns significant cluster/application responsibilities: worker/compute strategy, Kubernetes configuration, workloads, add-ons, RBAC/IAM integration, upgrades, observability, network policies, security posture, and cost.
+
+Choose EKS when Kubernetes is a requirement or creates enough organizational value to justify that operational surface.
+
 ## 15.10 Kubernetes mental model
 
 ```text
@@ -3268,6 +4347,22 @@ Depending on current supported features:
 
 Always verify regional/current feature support.
 
+### Compute-choice questions
+
+Depending on current EKS capabilities and your design, compute may include managed node-based approaches, serverless Fargate for supported pod patterns, and newer managed/automated options.
+
+Do not memorize a static list. Compare:
+
+- control vs automation,
+- workload compatibility,
+- startup/scaling behavior,
+- daemon/privileged requirements,
+- GPU/special hardware,
+- cost model,
+- and operational ownership.
+
+Verify current EKS compute offerings before production design because capabilities evolve quickly.
+
 ## 15.12 ECS vs EKS
 
 | Question | ECS | EKS |
@@ -3293,6 +4388,19 @@ Need Kubernetes
 Need host/OS control
 → EC2
 ```
+
+### Decision framework
+
+| Requirement | Lambda | Fargate | EC2 |
+|---|---|---|---|
+| Event-driven short execution | Excellent | Possible | Possible |
+| Long-running container | Poor fit | Excellent | Excellent |
+| OS/host control | No | Limited | Full |
+| Scale-to-zero style event model | Strong | Workload-dependent | Manual/ASG design |
+| Custom kernel/host agents | No | No | Yes |
+| Lowest infrastructure management | Highest abstraction | High | Lowest abstraction |
+
+Do not choose by popularity. Choose the least operationally complex compute model that still satisfies runtime, networking, performance, and cost requirements.
 
 ## 15.14 Scenario: microservices
 
@@ -3331,6 +4439,12 @@ Route 53 provides DNS-related capabilities including:
 - routing
 - health checks
 
+### DNS is a control path, not the application itself
+
+Route 53 resolves names and can participate in traffic-routing/failover policies, but it does not prove the application is healthy unless you design health evaluation correctly.
+
+DNS also has caching. When changing records, clients/resolvers may continue using cached answers until TTL behavior permits refresh. Plan migrations and failovers with DNS caching in mind.
+
 ## 16.2 Hosted zone
 
 A hosted zone contains DNS records for a domain.
@@ -3342,6 +4456,12 @@ Internet-facing DNS.
 ### Private hosted zone
 
 DNS resolution inside associated VPC environments.
+
+### Public vs private resolution
+
+A public hosted zone answers through public DNS for internet-visible names. A private hosted zone makes records resolvable inside associated VPC environments according to Route 53 private DNS behavior.
+
+The same domain can participate in split-horizon designs, but such designs require careful documentation because the answer can differ depending on where the query originates.
 
 ## 16.3 Common DNS record types
 
@@ -3419,6 +4539,20 @@ Benefits:
 - integration with WAF
 - controlled origin access
 
+### Cache behavior in one request
+
+```text
+viewer request
+ ↓
+edge cache lookup
+ ├─ hit  → return cached response
+ └─ miss → request origin → cache according to policy → return
+```
+
+Design CloudFront around cacheability. Static versioned assets can use long TTLs; personalized/authenticated responses may need different cache keys or no caching.
+
+Also consider origin access control, TLS, WAF, signed URLs/cookies where needed, logging, and invalidation/deployment strategy.
+
 ## 16.6 Cache key
 
 What makes two requests “the same” for caching?
@@ -3466,6 +4600,12 @@ CloudFront
    ↓ authorized origin access
 Private S3 bucket
 ```
+
+### Why keep the bucket private?
+
+The preferred pattern is usually to let CloudFront access the bucket through a controlled origin-access mechanism while blocking direct public bucket access.
+
+This gives you one public delivery layer where you can apply TLS, caching, WAF/security controls, and domain configuration without exposing the storage origin directly.
 
 ## 16.9 AWS Global Accelerator
 
@@ -3635,6 +4775,18 @@ Do not:
 git commit .env.production
 ```
 
+### Secret lifecycle
+
+A secret is not only a value; it has a lifecycle:
+
+```text
+create → restrict access → retrieve at runtime → rotate → audit → retire
+```
+
+Use Secrets Manager when you need managed secret storage and features such as controlled retrieval and rotation workflows. Give each workload permission only to the specific secrets it needs.
+
+Avoid copying a managed secret into an environment file, AMI, container image, or source repository, because that recreates the long-lived-secret problem elsewhere.
+
 ## 17.6 Systems Manager Parameter Store
 
 Useful for:
@@ -3663,6 +4815,22 @@ Examples:
 
 Use managed renewal where available.
 
+### Where ACM fits
+
+ACM manages certificates used by supported AWS-integrated services. A common pattern is:
+
+```text
+DNS name
+ ↓
+ACM certificate
+ ↓
+CloudFront / ALB / API Gateway
+ ↓ HTTPS
+application
+```
+
+Certificate Region requirements vary by integrated service, so verify the service-specific documentation when a certificate appears “missing” from a selector.
+
 ## 17.8 AWS WAF
 
 Web Application Firewall.
@@ -3684,6 +4852,15 @@ WAF does not replace secure application coding.
 DDoS protection capabilities.
 
 Understand the distinction between baseline AWS protections and advanced service offerings when designing high-risk internet applications.
+
+### Shield vs WAF
+
+Do not treat them as interchangeable:
+
+- **Shield** focuses on DDoS protection capabilities.
+- **WAF** lets you inspect/filter supported web requests using rules.
+
+A public web architecture can use both, alongside resilient network/application design, throttling, authentication, and observability.
 
 ## 17.10 GuardDuty
 
@@ -3710,6 +4887,18 @@ Use as part of:
 - container image scanning
 - EC2/serverless assessment where supported
 
+### What to do with findings
+
+Inspector findings are useful only when connected to a remediation workflow. Prioritize by exploitable exposure and business criticality rather than raw finding count.
+
+Operational loop:
+
+```text
+finding → ownership → validate exposure → patch/mitigate → verify closure
+```
+
+Track exceptions explicitly; do not leave high-risk findings open because “the scanner is noisy.”
+
 ## 17.12 Amazon Macie
 
 Helps discover and protect sensitive data in S3 using data-security analysis.
@@ -3719,6 +4908,12 @@ Useful for:
 - PII discovery
 - sensitive bucket review
 - data classification
+
+### Macie use case
+
+Macie helps discover and evaluate sensitive-data exposure patterns in S3. Use it as part of a data-security program, not as a replacement for correct bucket policies, encryption, classification, retention, and access governance.
+
+A finding should answer: **what data, in which bucket/object context, exposed to whom, and what remediation is required?**
 
 ## 17.13 Security Hub
 
@@ -3737,6 +4932,21 @@ Security Hub
 Central security operations
 ```
 
+### Central findings model
+
+Security Hub aggregates/normalizes findings from supported AWS and partner security sources and evaluates security controls/standards where enabled.
+
+For a multi-account organization, define:
+
+- delegated administration,
+- enabled Regions/standards,
+- finding ownership,
+- suppression criteria,
+- ticket/automation integration,
+- and response SLAs.
+
+A dashboard without an operating process is not a security program.
+
 ## 17.14 IAM Access Analyzer
 
 Helps identify unintended external/public access and can assist with permission analysis.
@@ -3746,6 +4956,15 @@ Use cases:
 - detect bucket/resource sharing outside trusted boundary
 - refine policies
 - analyze access
+
+### Two useful questions
+
+Use Access Analyzer capabilities to help answer:
+
+1. **Is a resource shared outside the intended trust boundary?**
+2. **Can this policy be validated/refined based on policy analysis and observed access?**
+
+It is especially useful for reviewing resource policies and external access, but still requires human understanding of what sharing is actually intended.
 
 ## 17.15 Cognito
 
@@ -3759,6 +4978,17 @@ Use cases:
 - tokens for APIs
 
 Do not confuse application users with IAM workforce identities.
+
+### Identity separation
+
+For customer-facing applications, Cognito can provide managed user-directory/authentication and federation capabilities. Keep two permission questions separate:
+
+```text
+Is this end user authenticated?
+What AWS/application actions is this identity allowed to perform?
+```
+
+Do not expose broad AWS credentials to frontend clients. Use the minimum identity/authorization mechanism required for the application design.
 
 ## 17.16 Security logging architecture
 
@@ -3850,6 +5080,19 @@ Core concepts:
 - Logs Insights
 - application/infrastructure monitoring features
 
+### CloudWatch is a family of observability capabilities
+
+Think in signals:
+
+```text
+metrics → numeric time series
+logs    → event/text records
+alarms  → evaluation + notification/action
+traces  → request path across components
+```
+
+The correct signal depends on the question. CPU utilization is a metric; an exception stack trace is a log; a slow request crossing five services is best understood with tracing.
+
 ## 18.2 Metrics
 
 Examples:
@@ -3861,6 +5104,20 @@ Examples:
 - SQS queue depth
 
 A metric is time-series numerical data.
+
+### Good metrics have operational meaning
+
+Prefer metrics that connect system behavior to user impact:
+
+- request rate,
+- error rate,
+- latency percentiles,
+- saturation/capacity,
+- queue age,
+- DB connections,
+- business throughput.
+
+Average latency can hide severe tail latency. For user-facing systems, P95/P99 often tells a more useful story than average alone.
 
 ## 18.3 CloudWatch alarms
 
@@ -3920,6 +5177,18 @@ Example questions:
 - Which Lambda exception is increasing?
 - What happened around deployment time?
 
+### Investigation workflow
+
+Use Logs Insights to answer focused questions across log groups instead of manually opening thousands of log lines.
+
+Example questions:
+
+- Which request IDs produced `ERROR` in the last 15 minutes?
+- Which endpoint has the highest count of 5xx responses?
+- Which function timeout messages correlate with a deployment?
+
+Keep structured fields in logs where practical; structured logs are much easier to filter and aggregate than free-form sentences.
+
 ## 18.6 Distributed tracing
 
 In microservices:
@@ -3968,6 +5237,21 @@ CloudTrail is primarily about **AWS account/API activity**, not your application
 | AWS API audit trail | CloudTrail |
 | Configuration history/compliance | AWS Config |
 
+### The easiest distinction
+
+- **CloudTrail:** “Who/what called which AWS API, from where, and when?”
+- **CloudWatch:** “How is my workload/service behaving over time?”
+
+Example:
+
+```text
+EC2 instance CPU 95%         → CloudWatch metric
+Someone changed SG rule      → CloudTrail event
+Application threw exception  → CloudWatch Logs
+```
+
+You often use them together during incident investigation.
+
 ## 18.9 AWS Config
 
 Tracks resource configuration and changes over time.
@@ -3986,6 +5270,20 @@ Question:
 
 Config history can help.
 
+### Config records configuration, not application health
+
+AWS Config can record supported resource configuration changes and evaluate them against rules/conformance expectations.
+
+Good question:
+
+> “Was this bucket public or unencrypted according to our required configuration?”
+
+Different question:
+
+> “Why is the application returning HTTP 500?”
+
+The second belongs to application observability, not Config.
+
 ## 18.10 Systems Manager
 
 Operational capabilities include:
@@ -3999,6 +5297,12 @@ Operational capabilities include:
 - fleet/node management
 
 Use it to reduce unmanaged SSH/RDP access patterns.
+
+### Systems Manager is broader than Session Manager
+
+Systems Manager includes capabilities for operating and managing fleets/configuration depending on the resource and feature. Common areas include secure shell-less sessions, command execution, patch/maintenance automation, inventory, parameter/configuration storage, and operational automation.
+
+Treat each feature's IAM and network access carefully because centralized operations tooling can become highly privileged.
 
 ## 18.11 CloudWatch agent
 
@@ -4146,6 +5450,12 @@ CloudFormation Stack
 S3 + IAM + Lambda + ...
 ```
 
+### Stack ownership matters
+
+A CloudFormation stack is the lifecycle boundary for a set of declared resources. If a resource belongs to a stack, prefer changing it through the template rather than making an undocumented console edit.
+
+When splitting stacks, consider deployment frequency, ownership, blast radius, cross-stack dependencies, and whether one team's release should force another team's infrastructure update.
+
 ## 19.3 Change sets
 
 Preview intended infrastructure changes before execution.
@@ -4158,6 +5468,18 @@ Template change
 → review
 → execute
 ```
+
+### Why review before apply
+
+A change set shows the infrastructure actions CloudFormation plans to perform from a template update. Use it to catch accidental replacement/deletion or unexpected resource changes before execution.
+
+Review especially carefully when changing:
+
+- resource names/identifiers,
+- networking,
+- databases/storage,
+- IAM policies,
+- properties that require replacement.
 
 ## 19.4 Drift
 
@@ -4177,6 +5499,19 @@ Good for:
 - organization logging
 - standard Config rules
 - shared governance
+
+### Multi-account/multi-Region use case
+
+StackSets let you deploy a common CloudFormation template across multiple target accounts and Regions.
+
+Typical governance examples:
+
+- baseline IAM/security roles,
+- logging resources,
+- Config/monitoring setup,
+- standardized network/supporting resources.
+
+Use them for centrally governed repeatability, but stage changes carefully because the blast radius can span many accounts.
 
 ## 19.6 AWS CDK
 
@@ -4208,6 +5543,12 @@ SecureWebApp construct
 ```
 
 and reuse it across teams.
+
+### Construct levels
+
+CDK uses reusable constructs to model infrastructure. Higher-level constructs can provide convenient defaults/patterns while lower-level constructs expose service resources more directly.
+
+The important engineering rule is to understand what infrastructure the construct synthesizes. Abstraction is helpful only when the team can still review IAM, networking, encryption, lifecycle, and cost implications in the generated CloudFormation.
 
 ## 19.8 Terraform
 
@@ -4266,6 +5607,19 @@ Static analysis
 Artifact
 ```
 
+### CI should answer “is this change safe to merge?”
+
+A useful CI pipeline creates fast feedback through:
+
+- dependency installation with reproducible lock files,
+- formatting/linting,
+- unit tests,
+- type/static analysis,
+- security/dependency scanning,
+- build/package creation.
+
+Keep CI deterministic. If the same commit produces different artifacts depending on the day or runner, debugging and rollback become harder.
+
 ## 20.2 CD
 
 Continuous Delivery/Deployment:
@@ -4281,6 +5635,13 @@ Approval?
    ↓
 Production
 ```
+
+### Delivery vs deployment
+
+- **Continuous delivery:** every successful change is kept deployable; production release may require approval.
+- **Continuous deployment:** qualifying changes are automatically released to production.
+
+Both require the same foundations: versioned artifacts, repeatable environments, automated tests, observability, and rollback/roll-forward procedures.
 
 ## 20.3 CodeBuild
 
@@ -4306,6 +5667,14 @@ artifacts:
   base-directory: dist
 ```
 
+### Build inputs and outputs
+
+CodeBuild executes build commands in a managed build environment. Inputs usually include source code plus build configuration; outputs may be deployable files, container images, test reports, or other artifacts.
+
+The build role should have only the permissions required for the build, for example reading dependencies/artifacts, writing the output artifact, and pushing to ECR if that build produces a container image.
+
+Do not give every build project an administrator role “because CI needs access.”
+
 ## 20.4 CodePipeline
 
 Orchestrates pipeline stages.
@@ -4328,6 +5697,18 @@ Approval
 Deploy production
 ```
 
+### Orchestration, not the compiler
+
+CodePipeline coordinates stages/actions; CodeBuild or other tools do the actual build/test work.
+
+A healthy pipeline promotes the **same immutable artifact** through environments:
+
+```text
+build once → test artifact → deploy staging → approve → deploy same artifact to prod
+```
+
+Rebuilding separately for production can create “works in staging, different binary in prod” drift.
+
 ## 20.5 CodeDeploy
 
 Automates deployments to supported compute targets.
@@ -4338,6 +5719,12 @@ Deployment strategies may include patterns such as:
 - blue/green
 
 depending on target.
+
+### Deployment target matters
+
+CodeDeploy behavior depends on the supported target platform and deployment mode. Learn the lifecycle hooks/traffic-shifting behavior for the target you actually use rather than memorizing one generic sequence.
+
+Regardless of tool, define health validation and rollback conditions before production deployment.
 
 ## 20.6 Blue/green
 
@@ -4377,6 +5764,20 @@ Observe:
 
 Then increase new-version traffic.
 
+### Canary is an experiment with a stop condition
+
+A safe canary rollout needs explicit success/failure metrics.
+
+Example:
+
+```text
+5% traffic for 10 minutes
+abort if 5xx > 1% OR P95 latency > 500 ms
+otherwise increase to 25%, then 100%
+```
+
+Without measurable rollback thresholds, “canary” can become only a slower risky deployment.
+
 ## 20.8 Rolling deployment
 
 Replace instances gradually.
@@ -4385,6 +5786,12 @@ Trade-off:
 
 - less duplicate capacity
 - mixed versions during rollout
+
+### Compatibility requirement
+
+Because old and new versions run together during a rolling update, they must be compatible with shared dependencies such as database schema, messages, and APIs during the transition.
+
+Use backward/forward-compatible migrations or staged schema changes rather than deploying a new binary that immediately requires an incompatible database change.
 
 ## 20.9 Immutable deployment
 
@@ -4477,6 +5884,16 @@ Use cases:
 - prepare lake data
 - catalog tables for Athena
 
+### Catalog vs ETL
+
+Glue is often mentioned as one product even though learners use different parts for different jobs:
+
+- **Data Catalog** — shared table/schema metadata.
+- **Crawlers** — discover supported dataset structure and populate/update catalog metadata.
+- **ETL/data integration jobs** — transform/move data.
+
+Do not run a crawler repeatedly against unstable data without understanding how schema changes will affect downstream Athena/analytics consumers.
+
 ## 21.4 Athena
 
 Serverless SQL query service for data in S3 and supported sources.
@@ -4525,6 +5942,20 @@ Use when:
 
 Not usually the primary OLTP database for application transactions.
 
+### Warehouse design questions
+
+Before choosing Redshift, estimate:
+
+- query concurrency and complexity,
+- data volume/growth,
+- ingestion pattern,
+- BI tool usage,
+- freshness requirement,
+- workload isolation,
+- and whether serverless or provisioned-style capacity fits current offerings/use case.
+
+A data warehouse works best when analytical workloads are modeled for analytics rather than copied directly from an OLTP schema with no transformation.
+
 ## 21.6 OLTP vs OLAP
 
 ### OLTP
@@ -4567,6 +5998,12 @@ Use for:
 
 Choose only when distributed data processing requirements justify the operational/model complexity.
 
+### EMR is for frameworks, not just “big files”
+
+Use EMR when you need distributed processing frameworks/ecosystems such as Spark and the workload benefits from their execution model.
+
+If the requirement is simply “run SQL against files in S3,” Athena may be much simpler. If the requirement is a managed warehouse, Redshift may fit better. Choose the processing model first, then the service.
+
 ## 21.8 Kinesis
 
 Streaming data services for real-time ingestion/processing patterns.
@@ -4585,6 +6022,17 @@ continuous stream
 not individual request-response
 ```
 
+### Separate stream ingestion from delivery
+
+Kinesis Data Streams is designed for real-time streaming records consumed by applications/processors. Amazon Data Firehose (formerly **Amazon Kinesis Data Firehose**) is a fully managed delivery service that sends streaming data to supported destinations such as S3, Redshift, OpenSearch Service, and others.
+
+Use the distinction:
+
+```text
+Need custom consumers/replay/shard-oriented streaming → Kinesis Data Streams
+Need managed delivery into analytics destinations      → Amazon Data Firehose
+```
+
 ## 21.9 OpenSearch Service
 
 Managed search/analytics engine.
@@ -4598,9 +6046,9 @@ Use for:
 
 Not a drop-in replacement for transactional relational databases.
 
-## 21.10 QuickSight
+## 21.10 Amazon Quick Sight (within Amazon Quick)
 
-Business intelligence/dashboarding.
+Amazon QuickSight evolved into **Amazon Quick**; the BI capability continues as **Amazon Quick Sight**. Use Quick Sight for interactive business intelligence, visualization, dashboarding, and embedded analytics scenarios.
 
 Pipeline example:
 
@@ -4611,6 +6059,12 @@ QuickSight
        ↓
 Business dashboards
 ```
+
+### What a BI layer should not do
+
+Use the BI layer for analysis and presentation, not as the primary transaction system. Prepare governed, well-modeled datasets through Athena, Redshift, relational sources, or other supported sources and give dashboard authors the minimum data access they need.
+
+For an existing handbook/tutorial that still says “QuickSight,” recognize it as the predecessor/current BI lineage, but follow the current Amazon Quick/Quick Sight documentation and console naming.
 
 ## 21.11 Data warehouse scenario
 
@@ -4648,6 +6102,22 @@ Managed ML platform
 Custom infrastructure / accelerators
 ```
 
+### Start with the least custom option that meets the requirement
+
+A practical progression is:
+
+```text
+purpose-built managed AI API
+        ↓ if insufficient
+managed foundation model in Bedrock
+        ↓ if insufficient
+custom ML lifecycle in SageMaker AI
+        ↓ if insufficient
+custom accelerator/EC2/EKS stack
+```
+
+Each step can increase control and customization, but also increases engineering, security, evaluation, and operational responsibility.
+
 ## 22.2 Amazon Bedrock
 
 Bedrock is a managed platform for building generative-AI applications with foundation models.
@@ -4666,6 +6136,23 @@ Core topics to learn:
 - model evaluation
 - provisioned/on-demand capacity concepts
 - security and private data access
+
+### Production GenAI requires more than a prompt
+
+A production Bedrock application typically needs decisions about:
+
+- model/provider and Region,
+- prompt/version management,
+- token/context budget,
+- grounding/retrieval,
+- guardrails/content controls,
+- tool/action permissions,
+- latency and fallback behavior,
+- evaluation datasets,
+- observability and cost limits,
+- data handling and privacy.
+
+Treat prompts, retrieval configuration, and model choice as versioned application components that should be tested before release.
 
 ## 22.3 Foundation model selection
 
@@ -4776,6 +6263,12 @@ Learn:
 - MLOps
 - monitoring
 - feature engineering
+
+### Naming note
+
+AWS renamed the original Amazon SageMaker service to **Amazon SageMaker AI on December 3, 2024**. Current AWS documentation may also discuss the broader next-generation Amazon SageMaker experience alongside SageMaker AI.
+
+For learning, focus on the ML lifecycle: prepare data, train/tune, register models, deploy inference, monitor quality/drift, and automate repeatable MLOps workflows.
 
 ## 22.7 Bedrock vs SageMaker AI
 
@@ -4893,6 +6386,21 @@ Before moving:
 - rollback
 - performance baseline
 
+### Build a dependency map before choosing a migration strategy
+
+For every application, document:
+
+```text
+users → DNS → app → DB
+               ├→ file share
+               ├→ SMTP
+               ├→ identity provider
+               ├→ partner API
+               └→ batch scheduler
+```
+
+A server can be easy to copy while one hidden dependency makes the cutover fail. Capture owners, ports/protocols, authentication, latency, data volume, maintenance windows, and rollback dependencies.
+
 ## 23.3 Database Migration Service
 
 AWS DMS supports database migration/replication use cases.
@@ -4911,11 +6419,32 @@ cutover
 
 Schema conversion may require separate planning/tools depending on engine change.
 
+### Migration phases
+
+A common online-migration approach is:
+
+1. provision target database,
+2. validate schema/compatibility,
+3. perform initial/full load,
+4. replicate ongoing changes,
+5. measure replication lag and validate data,
+6. freeze/cut over writes,
+7. verify application,
+8. keep rollback decision criteria.
+
+DMS moves/replicates data for supported scenarios; it does not automatically solve every schema, stored-procedure, query, or application compatibility change.
+
 ## 23.4 Application Migration Service
 
 Used for supported server migration scenarios into AWS.
 
 Understand it as part of rehosting, not automatic application modernization.
+
+### Rehost first, modernize deliberately
+
+Application Migration Service can help rehost supported servers into AWS. Rehosting can be a valid first phase when the business needs speed or data-center exit.
+
+Do not call the migration “modernized” merely because the VM now runs on EC2. After stabilization, evaluate managed databases, autoscaling, load balancing, containerization, serverless components, and operating-model improvements where they create value.
 
 ## 23.5 DataSync
 
@@ -4926,9 +6455,30 @@ Use for:
 - on-prem NAS → AWS
 - S3/EFS/FSx transfer patterns
 
+### Data-movement checklist
+
+Before a transfer, define:
+
+- source and destination,
+- file/object count and total bytes,
+- change rate during migration,
+- network path/bandwidth,
+- encryption and identity,
+- metadata/permission preservation requirements,
+- verification method,
+- cutover delta sync.
+
+The last 1% of a migration is often synchronization and validation, not the first bulk copy.
+
 ## 23.6 Snow Family / offline transfer
 
 For very large datasets or constrained connectivity, physical edge transfer appliances may be suitable depending on current AWS offerings.
+
+### When offline transfer is reasonable
+
+Offline/edge transfer is considered when network transfer time, bandwidth cost, unreliable connectivity, or edge-processing requirements make normal online transfer impractical.
+
+Always verify current Snow Family product availability and ordering options before planning, because AWS hardware transfer offerings can change over time.
 
 ## 23.7 Hybrid architecture
 
@@ -5011,6 +6561,12 @@ RPO = 15 minutes
 
 Means recovery data should generally not be more than 15 minutes behind target expectations.
 
+### RPO comes from the business
+
+An RPO of 5 minutes means the architecture and operating process should be designed so a recovery normally loses no more than about five minutes of committed business data under the defined disaster scenario.
+
+Do not set RPO after choosing a backup schedule. Start with business impact, then choose replication/backup mechanisms that can meet it.
+
 ## 24.3 RTO
 
 Recovery Time Objective:
@@ -5022,6 +6578,20 @@ Example:
 ```text
 RTO = 2 hours
 ```
+
+### Measure the whole recovery path
+
+RTO includes more than infrastructure launch time. It can include:
+
+- detection,
+- incident decision/approval,
+- data restore/promotion,
+- infrastructure startup,
+- DNS/traffic shift,
+- application validation,
+- dependent-system coordination.
+
+A runbook claiming “RTO 30 minutes” should be backed by a timed recovery exercise.
 
 ## 24.4 Backup fundamentals
 
@@ -5049,6 +6619,12 @@ recovery works
 Centralizes backup policies for supported AWS resources.
 
 Useful in multi-account governance.
+
+### Governance value
+
+AWS Backup can centralize backup plans, schedules, retention, vaulting, and supported cross-account/Region backup patterns. It is especially useful when many accounts/resources need consistent policy.
+
+Still test restoration for each critical workload. A green backup job only proves the backup operation completed; it does not prove the application can be recovered within its RTO.
 
 ## 24.6 DR strategies
 
@@ -5163,6 +6739,10 @@ Question:
 
 > Can the team safely operate and improve this system?
 
+### Practical evidence
+
+Look for version-controlled runbooks/IaC, safe deployment procedures, useful dashboards, incident reviews, and a backlog of operational improvements. “We know how it works” is not the same as repeatable operations.
+
 ## 25.2 Security
 
 Focus:
@@ -5177,6 +6757,10 @@ Focus:
 Question:
 
 > What is the blast radius if this component is compromised?
+
+### Practical evidence
+
+Look for centralized identity, MFA, least privilege, encryption, traceable administrative actions, vulnerability management, data classification, and tested incident response. Security controls should be measurable and automated where practical.
 
 ## 25.3 Reliability
 
@@ -5193,6 +6777,10 @@ Question:
 
 > What happens if this AZ, instance, database, or dependency fails?
 
+### Practical evidence
+
+Document failure modes and recovery behavior for instances, AZs, databases, queues, dependencies, Regions, and quota exhaustion. Reliability is demonstrated through tests and recovery exercises, not only architecture diagrams.
+
 ## 25.4 Performance Efficiency
 
 Focus:
@@ -5205,6 +6793,10 @@ Focus:
 Question:
 
 > Is the system using the right technology for its workload?
+
+### Practical evidence
+
+Use load tests, representative benchmarks, latency percentiles, saturation metrics, and service-specific performance guidance. Select architecture using measured workload behavior rather than “bigger is faster.”
 
 ## 25.5 Cost Optimization
 
@@ -5221,6 +6813,10 @@ Question:
 
 > What does one customer/order/request cost us?
 
+### Practical evidence
+
+Assign owners/tags, measure unit cost, remove idle resources, match capacity to demand, review transfer/observability cost, and use commitment discounts only after understanding the stable usage baseline.
+
 ## 25.6 Sustainability
 
 Focus:
@@ -5230,6 +6826,10 @@ Focus:
 - efficient software
 - managed/shared infrastructure choices
 - data lifecycle efficiency
+
+### Practical evidence
+
+Reduce waste through efficient software, higher utilization, managed services where appropriate, data lifecycle policies, right-sized resources, and architectures that avoid unnecessary work or data movement.
 
 ## 25.7 Architecture review habit
 
@@ -5282,6 +6882,12 @@ Analyze:
 - trends
 - usage patterns
 
+### Investigation workflow
+
+When spend changes, group/filter by dimensions such as service, account, Region, usage type, or cost-allocation tag, then compare the time range to deployments and traffic changes.
+
+Do not stop at “EC2 cost increased.” Drill to the usage dimension that changed: instance hours, data transfer, EBS, public IPv4, snapshots, or another related charge.
+
 ## 26.3 AWS Budgets
 
 Create alerts for:
@@ -5291,6 +6897,12 @@ Create alerts for:
 - reservation/commitment utilization in supported contexts
 
 For learners, budget alerts should be one of the first configurations.
+
+### Budgets are guardrails, not hard caps
+
+A budget alert tells people/automation that spend or usage crossed a configured threshold. Do not assume a budget automatically prevents charges unless you have deliberately configured supported budget actions and understand their behavior.
+
+For learner accounts, set multiple thresholds so you get an early warning before the full budget is consumed.
 
 ## 26.4 Cost allocation tags
 
@@ -5304,6 +6916,26 @@ CostCenter = CC-42
 ```
 
 Then analyze cost.
+
+### Tagging needs governance
+
+A tag helps FinOps only if teams use the same keys and values consistently. Define mandatory tags and allowed formats in a small standard.
+
+Bad:
+
+```text
+env=production
+Environment=Prod
+environment=prd
+```
+
+Better:
+
+```text
+Environment=prod
+```
+
+Consistent tags improve ownership, chargeback/showback, cleanup automation, and incident coordination.
 
 ## 26.5 Compute Optimizer
 
@@ -5363,6 +6995,12 @@ Check:
 - workload growth
 - SLO headroom
 
+### Right-size after observing the workload
+
+Use representative peak periods and latency/SLO needs. A server averaging 10% CPU may still be correctly sized if it needs memory, I/O, network bandwidth, or brief peak headroom.
+
+Right-sizing is a multidimensional engineering decision, not “reduce every instance with low average CPU.”
+
 ## 26.9 Unit economics
 
 Measure cost per useful unit.
@@ -5400,6 +7038,10 @@ Add:
 - versioned assets
 - deployment pipeline
 
+### Why this pattern works
+
+S3 stores static objects, CloudFront provides edge caching/HTTPS delivery, and Route 53 provides DNS. Keep the S3 origin private and deploy versioned assets so long cache lifetimes are safe. Use a separate API architecture for dynamic server-side behavior.
+
 ## 27.2 Three-tier application
 
 ```text
@@ -5422,6 +7064,10 @@ Add:
 - CloudWatch
 - backups
 
+### Failure and security boundaries
+
+Spread the application across at least two AZs, allow only the load balancer to reach the app tier, allow only the app tier to reach the DB port, externalize sessions/files, and make instance replacement routine. Add caching/queues only when a measured requirement justifies them.
+
 ## 27.3 Serverless API
 
 ```text
@@ -5441,6 +7087,10 @@ Add:
 - WAF
 - DLQ/event retry patterns
 
+### Important production additions
+
+Define authentication, throttling, idempotency, Lambda concurrency, DynamoDB key design, structured logs/traces, alarms, and deployment/versioning. Serverless removes server management; it does not remove architecture responsibility.
+
 ## 27.4 Event-driven order system
 
 ```text
@@ -5455,6 +7105,10 @@ EventBridge
  ├→ Email SQS → Worker
  └→ Analytics stream
 ```
+
+### Protect business invariants
+
+Events decouple services but make distributed consistency explicit. Use stable event schemas, idempotent consumers, correlation IDs, retry/DLQ behavior, and compensating actions for workflows such as payment/inventory failures.
 
 ## 27.5 Container platform
 
@@ -5471,6 +7125,10 @@ ECS Fargate
 RDS / DynamoDB / ElastiCache
 ```
 
+### Operational checklist
+
+Version images immutably, scan them, use task roles, centralize logs, implement health checks, deploy across AZs, autoscale on workload metrics, externalize state, and define rollback. Avoid `latest` as the only production image identifier.
+
 ## 27.6 Kubernetes platform
 
 ```text
@@ -5486,6 +7144,10 @@ managed data services
 
 Use only when Kubernetes benefits justify complexity.
 
+### Kubernetes-specific justification
+
+Add EKS only when Kubernetes APIs/ecosystem/portability/team standardization provide real value. Budget for cluster upgrades, add-ons, ingress/networking, autoscaling, security, observability, and platform-team ownership.
+
 ## 27.7 Asynchronous media processor
 
 ```text
@@ -5499,6 +7161,10 @@ Upload → S3
 ```
 
 Queue protects workers from traffic bursts.
+
+### Backpressure is the key property
+
+The queue separates upload rate from processing rate. Scale workers using backlog/oldest-message age, make jobs idempotent, store source/output durably, and send poison jobs to a monitored DLQ instead of retrying forever.
 
 ## 27.8 Multi-account platform
 
@@ -5514,6 +7180,10 @@ Organization
 
 Identity Center + SCP + centralized logs + delegated security.
 
+### Governance goal
+
+Use account boundaries to reduce blast radius and separate ownership. Centralize identity, logging/security, account vending, network/shared services, backup, and policy guardrails while letting application teams deploy within approved boundaries.
+
 ## 27.9 Data lake
 
 ```text
@@ -5526,8 +7196,12 @@ Glue
 S3 curated
  ├→ Athena
  ├→ Redshift
- └→ SageMaker
+ └→ SageMaker AI
 ```
+
+### Data-lake governance
+
+Separate raw and curated data, keep immutable raw copies where required, catalog schemas, partition/convert formats for query efficiency, control dataset-level permissions, and define retention/quality ownership. A bucket full of CSV files is not automatically a governed data lake.
 
 ## 27.10 RAG assistant
 
@@ -5540,6 +7214,10 @@ User → API → retrieve relevant chunks
                 ↓
               Answer
 ```
+
+### Production RAG checklist
+
+Evaluate retrieval quality separately from model quality. Enforce document permissions before retrieval, preserve source metadata, defend against prompt injection in documents, define citation/grounding behavior, and measure answer quality on a representative test set.
 
 ---
 
@@ -5566,6 +7244,10 @@ Need batch scheduler?
   → AWS Batch
 ```
 
+### Selection order
+
+Start with execution shape: event-driven function, long-running container, VM/host-controlled workload, batch job, or Kubernetes workload. Then compare runtime limits, startup behavior, networking, autoscaling, operations, and cost. Prefer the highest managed abstraction that still satisfies the requirement.
+
 ## 28.2 Storage
 
 ```text
@@ -5581,6 +7263,10 @@ Shared Linux file?
 Specialized managed filesystem?
   → FSx family
 ```
+
+### Selection order
+
+First identify the interface the application needs: object, block, shared file, archive, or temporary local scratch. Then compare durability, sharing, latency/throughput, lifecycle, backup, encryption, and cost.
 
 ## 28.3 Database
 
@@ -5601,6 +7287,10 @@ Warehouse analytics?
   → Redshift
 ```
 
+### Selection order
+
+Write the access patterns and consistency/transaction requirements before naming a database. Relational joins/transactions point toward RDS/Aurora; predictable key access can point toward DynamoDB; cache/in-memory, graph, document, time-series, and warehouse workloads each have specialized options.
+
 ## 28.4 Integration
 
 ```text
@@ -5620,6 +7310,10 @@ Need API front door?
   → API Gateway
 ```
 
+### Selection order
+
+Ask whether the communication is synchronous request/response, buffered work, fanout notification, routed event, stream, or multi-step workflow. That distinction often chooses API Gateway, SQS, SNS, EventBridge, Kinesis/MSK, or Step Functions more reliably than service feature memorization.
+
 ## 28.5 Operations
 
 ```text
@@ -5635,6 +7329,10 @@ What was resource configuration?
 Fleet management/session/patching?
   → Systems Manager
 ```
+
+### Selection order
+
+Start from the operational question: metrics/logs/alarms → CloudWatch; API audit → CloudTrail; configuration/compliance → Config; fleet operations → Systems Manager; service/account event visibility → AWS Health. Combine services when an incident spans multiple layers.
 
 ## 28.6 Security
 
@@ -5664,6 +7362,10 @@ Security finding aggregation?
   → Security Hub
 ```
 
+### Selection order
+
+Map the control objective first: identity/authorization, encryption keys, secrets, certificates, web filtering, DDoS protection, threat detection, vulnerability management, sensitive-data discovery, posture aggregation, or external-access analysis. Security services complement architecture controls; they do not replace them.
+
 ---
 
 # 29. Hands-On Labs and Portfolio Projects
@@ -5684,6 +7386,32 @@ Goal:
 
 > No daily root usage and visible cost controls.
 
+### Outcome
+
+You should finish with a learner account that is difficult to misuse accidentally.
+
+### Steps
+
+1. Protect root access and verify MFA/recovery information.
+2. Create a normal administrative access path using IAM Identity Center or another appropriate non-root method.
+3. Create an AWS Budget with at least an early-warning threshold.
+4. Enable/verify billing visibility available to your account.
+5. Define learner tags such as `Project`, `Owner`, and `Environment`.
+6. Record a cleanup rule: every lab must end by deleting chargeable resources.
+
+### Verify
+
+- Sign out and confirm you can perform normal work without root.
+- Confirm budget notifications are configured to a monitored destination.
+- Run `aws sts get-caller-identity` from your CLI profile and identify the account/principal.
+
+### Common mistakes
+
+- using root because it is convenient,
+- storing permanent access keys in a Git repository,
+- assuming the free tier means every service is free,
+- forgetting public IPv4/NAT/database/log charges.
+
 ## Lab 2 — Launch private EC2
 
 Build:
@@ -5703,6 +7431,30 @@ Learn:
 - NAT
 - SSM role
 
+### Outcome
+
+Operate a private EC2 instance without opening SSH to the internet.
+
+### Steps
+
+1. Create a VPC with public and private subnets in one or two AZs for the lab.
+2. Create an internet path for the public subnet and an outbound path for the private subnet if needed.
+3. Launch EC2 in the private subnet without a public IP.
+4. Attach an instance role that permits the required Systems Manager managed-instance access.
+5. Ensure the instance can reach Systems Manager through NAT or appropriate endpoints.
+6. Connect with Session Manager.
+7. Inspect route tables, SGs, the instance ENI, and SSM status.
+
+### Verify
+
+- EC2 has no direct public inbound path.
+- Session Manager connection succeeds.
+- If you intentionally remove the SSM network/role prerequisite, observe the failure and restore it.
+
+### Cleanup
+
+Terminate EC2 and remove NAT/endpoints/VPC resources that can continue charging.
+
 ## Lab 3 — Static website
 
 ```text
@@ -5717,6 +7469,27 @@ Learn:
 - CDN
 - DNS
 - TLS
+
+### Outcome
+
+Publish static content through CloudFront while the S3 bucket remains private.
+
+### Steps
+
+1. Create an S3 bucket and upload `index.html` plus a versioned asset such as `app.v1.js`.
+2. Block public bucket access.
+3. Create a CloudFront distribution using a private S3 origin-access configuration.
+4. Request the object through CloudFront and confirm direct public S3 access is blocked.
+5. Add a custom domain and ACM certificate if you own a test domain.
+6. Change a versioned asset and observe cache behavior.
+
+### Verify
+
+Use browser developer tools or `curl -I` to inspect status codes/cache headers. Confirm the bucket itself is not public.
+
+### Learning question
+
+Why is changing `app.js` in place harder to cache safely than publishing `app.<hash>.js`?
 
 ## Lab 4 — Highly available web app
 
@@ -5734,6 +7507,28 @@ Test:
 - verify replacement
 - observe target health
 
+### Outcome
+
+Prove that an instance failure does not equal an application outage.
+
+### Steps
+
+1. Create a launch template with a small web-server bootstrap script.
+2. Create an ALB and target group across two AZs.
+3. Create an ASG with minimum/desired capacity of at least two for the exercise.
+4. Allow application traffic from the ALB security group, not from the whole internet.
+5. Observe target health.
+6. Terminate one instance manually.
+7. Watch the ASG replace it and the target group become healthy again.
+
+### Verify
+
+Continuously request the ALB endpoint while replacing an instance and note whether the user path remains available.
+
+### Extension
+
+Add a scaling policy and generate controlled load; observe scale-out and scale-in behavior.
+
 ## Lab 5 — RDS application
 
 Build:
@@ -5748,6 +7543,27 @@ Add:
 - backup
 - Multi-AZ if budget permits in controlled lab
 - monitoring
+
+### Outcome
+
+Connect an application to a non-public database using least-privilege network access and managed secrets.
+
+### Steps
+
+1. Place RDS in DB subnets without broad public exposure.
+2. Create a DB security group that allows the database port only from the app security group.
+3. Store credentials in Secrets Manager or another appropriate secure mechanism.
+4. Connect from the application and create/read a small table.
+5. Enable automated backups/retention appropriate for the lab.
+6. Observe DB connections, CPU, storage, and logs/metrics available for the engine.
+
+### Failure exercise
+
+Remove the SG rule or use the wrong DNS/port and troubleshoot the timeout systematically. This teaches the difference between network failure and authentication/query failure.
+
+### Cleanup
+
+Delete snapshots you do not intentionally want to retain; snapshots can outlive the DB instance and continue costing money.
 
 ## Lab 6 — Serverless CRUD API
 
@@ -5767,6 +7583,23 @@ Implement:
 - delete
 - authentication
 
+### Outcome
+
+Build a small authenticated API without managing servers.
+
+### Steps
+
+1. Design the DynamoDB partition/sort key from your CRUD access patterns.
+2. Create Lambda functions or one routed handler with a least-privilege execution role.
+3. Create API Gateway routes for create/read/update/delete.
+4. Add validation and an authentication mechanism appropriate to the lab.
+5. Use conditional/idempotent behavior where duplicate requests could create duplicate effects.
+6. Emit structured logs with a request/correlation ID.
+
+### Verify
+
+Test success, invalid input, unauthorized access, missing item, duplicate request, and throttling/error paths—not only the happy path.
+
 ## Lab 7 — Queue worker
 
 ```text
@@ -5781,6 +7614,24 @@ Observe:
 - visibility timeout
 - DLQ
 
+### Outcome
+
+See buffering, retries, visibility timeout, and DLQ behavior directly.
+
+### Steps
+
+1. Create an SQS queue and DLQ with a redrive policy.
+2. Create a Lambda consumer.
+3. Send normal messages and confirm processing/deletion.
+4. Send a deliberately poisonous message that always fails.
+5. Observe receive attempts and eventual DLQ movement.
+6. Alarm or at least inspect oldest-message age/DLQ depth.
+7. Fix the consumer and redrive the message safely.
+
+### Verify
+
+Confirm processing is idempotent by sending the same business identifier more than once.
+
 ## Lab 8 — Event fanout
 
 ```text
@@ -5793,6 +7644,22 @@ EventBridge
 ```
 
 Learn loose coupling.
+
+### Outcome
+
+One business event should feed multiple independent consumers without the producer calling them directly.
+
+### Steps
+
+1. Define a small versioned `OrderCreated` event schema.
+2. Put events on an EventBridge event bus.
+3. Create rules that route matching events to separate targets such as SQS and Lambda.
+4. Add a rule that matches only a subset, for example `country=IN`.
+5. Change one consumer to fail and confirm other consumers still receive the event.
+
+### Verify
+
+Explain why the producer should not need to know every current and future consumer.
 
 ## Lab 9 — Container deployment
 
@@ -5810,6 +7677,25 @@ ALB
 
 Add autoscaling.
 
+### Outcome
+
+Deploy an immutable container image as a resilient ECS service.
+
+### Steps
+
+1. Build the application image locally.
+2. Tag it with a unique version/commit identifier.
+3. Authenticate to ECR and push the image.
+4. Create an ECS task definition with logging and least-privilege roles.
+5. Run it on Fargate behind an ALB.
+6. Use at least two tasks across AZs for the HA exercise.
+7. Configure autoscaling using a workload-relevant metric.
+8. Deploy a new immutable image version and observe replacement behavior.
+
+### Verify
+
+Terminate/stop a task and confirm the service restores desired count.
+
 ## Lab 10 — IaC
 
 Rebuild Lab 9 using:
@@ -5818,6 +7704,24 @@ Rebuild Lab 9 using:
 - CDK
 
 No manual production-style resource creation.
+
+### Outcome
+
+Recreate a meaningful environment from version-controlled code.
+
+### Steps
+
+1. Choose CloudFormation or CDK.
+2. Model networking, roles, logging, and ECS resources from the previous lab.
+3. Parameterize only values that legitimately vary by environment.
+4. Run template validation/synthesis.
+5. Review the change set before deployment.
+6. Deploy, test, then make one controlled change through IaC.
+7. Intentionally change one manageable resource manually and inspect drift where supported.
+
+### Verify
+
+Delete the stack/environment and recreate it. If manual undocumented steps are required, capture/fix that gap.
 
 ## Lab 11 — CI/CD
 
@@ -5837,6 +7741,26 @@ deploy ECS
 
 Add manual approval before production.
 
+### Outcome
+
+A source change should produce a tested, traceable artifact and a controlled deployment.
+
+### Steps
+
+1. Connect a Git source provider supported by your chosen pipeline setup.
+2. Run unit/static/security checks in CI.
+3. Build one versioned container artifact.
+4. Push it to ECR.
+5. Deploy to a test environment.
+6. Run a smoke test.
+7. Require manual approval before production for this learning pipeline.
+8. Deploy the same artifact to production.
+9. Define rollback criteria.
+
+### Security check
+
+Inspect every pipeline role. Remove broad permissions that are not required by a stage.
+
 ## Lab 12 — Central observability
 
 Build dashboard for:
@@ -5849,6 +7773,30 @@ Build dashboard for:
 - DB connections
 
 Create useful alarms.
+
+### Outcome
+
+Create a dashboard that can answer “is the user experience healthy and, if not, where is the bottleneck?”
+
+### Build
+
+Include signals for:
+
+- request volume,
+- error rate,
+- latency percentiles,
+- CPU/memory/saturation,
+- queue depth and oldest message age,
+- DB connections/latency,
+- deployment version or event annotation if available.
+
+### Alarm design
+
+Create at least one symptom alarm (for example high 5xx) and one cause/saturation alarm. Write the first three investigation steps in the alarm description/runbook.
+
+### Verify
+
+Generate a controlled failure and confirm the dashboard/alarm makes the problem visible.
 
 ## Lab 13 — Data lake
 
@@ -5864,6 +7812,24 @@ SQL analytics
 
 Then convert to partitioned Parquet and compare scanned data.
 
+### Outcome
+
+Understand why file format and partitioning change analytical cost/performance.
+
+### Steps
+
+1. Upload a representative CSV dataset to an S3 raw prefix.
+2. Catalog it and query with Athena.
+3. Record bytes scanned/query time for a meaningful query.
+4. Transform data to compressed Parquet.
+5. Partition by a field commonly used in filters, such as date when appropriate.
+6. Run an equivalent selective query.
+7. Compare scanned data and maintainability.
+
+### Common mistake
+
+Do not create thousands of tiny files without considering query-engine overhead. Data-lake layout is part of performance design.
+
 ## Lab 14 — DR exercise
 
 For a sample app:
@@ -5873,6 +7839,25 @@ For a sample app:
 - restore
 - measure RTO
 - calculate achieved RPO
+
+### Outcome
+
+Measure recovery instead of merely declaring that backups exist.
+
+### Steps
+
+1. Write a starting timestamp and define the test RPO/RTO.
+2. Create/verify a backup of a sample data store.
+3. Record the last recoverable data point.
+4. Simulate loss of the primary resource in a safe lab.
+5. Restore into a new resource/environment.
+6. Reconnect the application and run validation tests.
+7. Record actual recovery completion time and recovered data point.
+8. Compare achieved RTO/RPO with targets.
+
+### Deliverable
+
+Write a one-page recovery runbook including owner, prerequisites, restore steps, validation, DNS/traffic steps, and rollback/escalation.
 
 ## Lab 15 — GenAI RAG
 
@@ -5887,6 +7872,25 @@ Bedrock
 ```
 
 Implement per-user/document authorization.
+
+### Outcome
+
+Build a small grounded assistant and evaluate retrieval/security, not only whether the model can answer a demo question.
+
+### Steps
+
+1. Put a small set of non-sensitive test documents in S3.
+2. Create a chunking/indexing pipeline using a supported vector/search approach.
+3. Store source metadata and document authorization attributes.
+4. Retrieve top matching chunks for a question.
+5. Send only authorized context to a Bedrock model.
+6. Ask the model to cite/identify the source context in the response.
+7. Test a question that is not answered by the documents.
+8. Test a malicious instruction embedded inside a document.
+
+### Evaluate
+
+Measure retrieval relevance, grounded-answer correctness, unauthorized-document leakage, latency, and cost per request.
 
 ---
 
@@ -5911,6 +7915,10 @@ Private instance:
 - NAT subnet route → IGW?
 ```
 
+### Evidence to collect first
+
+From the instance, record DNS resolution, destination IP, route path, and connection error. Then inspect the subnet route table, public/private addressing, IGW/NAT path, SG/NACL, OS firewall, and proxy settings. Avoid changing multiple controls at once; one broad “allow all” change destroys evidence.
+
 ## 30.2 ALB returns 502/503
 
 Check:
@@ -5923,6 +7931,10 @@ Check:
 - app crashes
 - target-group protocol/port
 - timeout behavior
+
+### Distinguish 502 from 503
+
+Check target-group health and ALB access/application logs. A 503 often means no usable targets/capacity; a 502 commonly indicates the load balancer reached a target but received an invalid/failed upstream response. Confirm app port, protocol, health, TLS, SGs, and target process logs.
 
 ## 30.3 RDS connection timeout
 
@@ -5941,6 +7953,10 @@ Check:
 10. Connection pool exhausted?
 ```
 
+### Timeout vs authentication
+
+A timeout usually points first to network/DNS/routing/SG/NACL/listener reachability. An immediate authentication error means the TCP path probably works and you should inspect credentials, user permissions, TLS, or DB configuration. Use the exact endpoint and port from the client environment.
+
 ## 30.4 S3 AccessDenied
 
 Check all permission layers:
@@ -5957,6 +7973,10 @@ Check all permission layers:
 
 “AccessDenied” can be the result of multiple policy systems.
 
+### Permission layers to inspect
+
+Check caller identity, identity policy, bucket/access-point policy, object ownership context, SCP/boundary, Block Public Access if public access is intended, VPC endpoint policy, and KMS key permission for KMS-encrypted objects. Capture the exact API action and object/bucket ARN involved.
+
 ## 30.5 Lambda timeout
 
 Check:
@@ -5970,6 +7990,10 @@ Check:
 - memory/CPU
 - recursive retries
 - synchronous architecture
+
+### Find where time is spent
+
+Use logs/traces and downstream metrics. Common causes include slow network calls without client timeouts, DB connection waits, DNS/egress problems, insufficient CPU/memory, excessive initialization, or a job that simply does not fit the Lambda duration model.
 
 ## 30.6 Lambda works locally but cannot reach RDS
 
@@ -5989,6 +8013,10 @@ routes
 
 A private RDS endpoint is not reachable merely because both resources are “in AWS.”
 
+### Compare environments
+
+Local success proves application logic/credentials may work; it does not prove Lambda networking. Check VPC attachment, subnet routing, DB SG allowing the Lambda SG, NACLs, DNS, database public/private endpoint assumptions, TLS, and Lambda concurrency/connection pressure.
+
 ## 30.7 SQS messages keep reappearing
 
 Likely:
@@ -6005,6 +8033,10 @@ Fix:
 - delete on success
 - DLQ
 
+### Why a message returns
+
+Usually the consumer received it but did not delete it before the visibility timeout expired, or processing failed. Compare processing time with visibility timeout, inspect function errors/throttling, verify delete/ack behavior, and look for a poison message. Design idempotency before simply increasing visibility forever.
+
 ## 30.8 ECS task keeps stopping
 
 Check:
@@ -6019,6 +8051,10 @@ Check:
 - task execution role
 - health check
 - port mapping
+
+### Inspect the stop reason before redeploying
+
+Check ECS service events, task `stoppedReason`, container exit code/reason, CloudWatch logs, health-check failures, image pull/auth, secrets, CPU/memory, networking, and dependency reachability. A repeatedly replaced unhealthy task is a symptom, not a fix.
 
 ## 30.9 EKS pod cannot start
 
@@ -6040,6 +8076,10 @@ Then investigate:
 - health probes
 - network policy/security group
 - DNS
+
+### Move layer by layer
+
+Inspect pod status/events first, then image pull, scheduling/resources, service account/IAM, volumes, config/secrets, node health, CNI/networking, and application logs. `kubectl describe pod` and event output often reveal the first failing layer faster than changing cluster-wide settings.
 
 ## 30.10 Cost suddenly increased
 
@@ -6065,6 +8105,10 @@ Then check recent changes:
 - runaway autoscaling
 
 Use CloudTrail to identify provisioning actions.
+
+### Correlate cost with a change
+
+Record when the increase started, then compare Cost Explorer usage dimensions with deployments, traffic, log-volume changes, new NAT/cross-AZ paths, data-processing jobs, snapshots, public IPv4, and scaling events. Identify the usage quantity that changed before attempting optimization.
 
 ---
 
@@ -6127,6 +8171,12 @@ Use CloudTrail to identify provisioning actions.
 - [ ] Deployment rollback.
 - [ ] CloudTrail centralized.
 
+- [ ] Critical alarms have an owner and actionable runbook.
+- [ ] Alert noise/duplicates have been reviewed.
+- [ ] Deployments can be traced to a version/commit.
+- [ ] Time synchronization and correlation/request IDs support incident investigation.
+- [ ] Service quotas and account/Region limits are monitored where exhaustion would cause an outage.
+
 ## Application
 
 - [ ] Timeouts.
@@ -6137,6 +8187,12 @@ Use CloudTrail to identify provisioning actions.
 - [ ] Input validation.
 - [ ] Secure dependency management.
 
+- [ ] Dependency calls have explicit connection/request timeouts.
+- [ ] Retries are bounded and use backoff/jitter where appropriate.
+- [ ] Asynchronous consumers are safe under duplicate delivery.
+- [ ] Schema/event/API changes are backward compatible during rollout where required.
+- [ ] Health checks distinguish liveness/readiness appropriately for the platform.
+
 ## Cost
 
 - [ ] Major cost drivers known.
@@ -6145,6 +8201,18 @@ Use CloudTrail to identify provisioning actions.
 - [ ] Data-transfer architecture reviewed.
 - [ ] Log retention configured.
 - [ ] Unit economics measured.
+
+## How to use this checklist
+
+Do not treat a checked box as proof by itself. For important controls, link to evidence: an IaC file, dashboard, alarm, runbook, restore-test result, architecture decision record, or security review.
+
+Add four statuses during a real review:
+
+```text
+Ready | Risk accepted | Action required | Not applicable
+```
+
+A production review should have named owners and due dates for every unresolved action.
 
 ---
 
@@ -6335,6 +8403,20 @@ Why?
 - worker scales independently
 - failures retry safely
 
+## How to answer architecture questions
+
+A strong answer is rarely only a service name. Use this structure:
+
+1. **Clarify requirements** — traffic, latency, data, compliance, RPO/RTO, budget, team skills.
+2. **State the simplest viable design.**
+3. **Explain the request/data path.**
+4. **Explain failure and scaling behavior.**
+5. **Explain security and observability.**
+6. **Name the main cost drivers.**
+7. **Explain one alternative and why you did not choose it.**
+
+Interviewers often care more about your reasoning and trade-offs than whether you mention the newest service.
+
 ---
 
 # 33. Learning Roadmap
@@ -6473,6 +8555,22 @@ aws configure
 
 Prefer SSO/federated profiles where supported rather than permanent IAM-user keys.
 
+### Preferred workforce setup
+
+For workforce/federated access, use an SSO profile when appropriate:
+
+```bash
+aws configure sso
+```
+
+Then run commands with a named profile:
+
+```bash
+aws sts get-caller-identity --profile my-dev
+```
+
+`aws configure` writes local configuration/credential information for the selected profile. Do not commit `~/.aws/credentials` or copied access keys to source control.
+
 ## Check identity
 
 ```bash
@@ -6481,11 +8579,35 @@ aws sts get-caller-identity
 
 This is one of the most useful troubleshooting commands.
 
+### Output
+
+Typical output contains the effective account and principal identity:
+
+```json
+{
+  "UserId": "...",
+  "Account": "123456789012",
+  "Arn": "arn:aws:sts::123456789012:assumed-role/RoleName/session"
+}
+```
+
+Use this before destructive/troubleshooting commands to confirm you are in the intended account and role.
+
 ## List S3 buckets
 
 ```bash
 aws s3 ls
 ```
+
+`aws s3 ls` uses the high-level S3 CLI. For API-level detail, the `s3api` command family exposes lower-level operations.
+
+Useful pattern:
+
+```bash
+aws s3 ls --profile my-dev
+```
+
+Expected output is a list containing bucket creation timestamps and bucket names that the current principal is allowed to list.
 
 ## Copy file to S3
 
@@ -6493,11 +8615,25 @@ aws s3 ls
 aws s3 cp report.pdf s3://example-bucket/reports/report.pdf
 ```
 
+The first path is the local source; the second is the S3 destination URI.
+
+Verify afterward:
+
+```bash
+aws s3 ls s3://example-bucket/reports/
+```
+
+For sensitive data, do not assume the upload command alone proves the required encryption/ownership policy. Verify bucket policy, default encryption, KMS requirements, and object metadata as appropriate.
+
 ## Sync directory
 
 ```bash
 aws s3 sync ./dist s3://example-bucket/
 ```
+
+`sync` copies differences between a local directory and S3 prefix. It is convenient for static assets and bulk directory synchronization.
+
+Be careful with deletion behavior. Do not add destructive options until you understand exactly which side is the source and destination. For production deployment, prefer versioned/immutable artifacts when rollback matters.
 
 ## Describe EC2 instances
 
@@ -6505,11 +8641,30 @@ aws s3 sync ./dist s3://example-bucket/
 aws ec2 describe-instances
 ```
 
+Filter large output instead of reading everything:
+
+```bash
+aws ec2 describe-instances \
+  --filters 'Name=instance-state-name,Values=running' \
+  --query 'Reservations[].Instances[].{Id:InstanceId,PrivateIp:PrivateIpAddress,Type:InstanceType}' \
+  --output table
+```
+
+The command returns reservation/instance metadata for instances visible to the caller in the selected Region.
+
 ## Describe security groups
 
 ```bash
 aws ec2 describe-security-groups
 ```
+
+Use filters or a group ID when investigating one path:
+
+```bash
+aws ec2 describe-security-groups --group-ids sg-xxxxxxxx
+```
+
+Inspect both ingress and egress. Remember that a security-group ID may be referenced by another security-group rule, which is often safer than broad CIDR ranges for application tiers.
 
 ## List Lambda functions
 
@@ -6517,14 +8672,33 @@ aws ec2 describe-security-groups
 aws lambda list-functions
 ```
 
+The result includes function metadata for the selected Region. Many AWS CLI commands are Region-scoped, so “nothing returned” may simply mean you are querying the wrong Region.
+
+Check:
+
+```bash
+aws configure get region
+```
+
+or pass `--region` explicitly.
+
 ## Invoke Lambda
 
 ```bash
 aws lambda invoke \
   --function-name example-function \
+  --cli-binary-format raw-in-base64-out \
   --payload '{"name":"AWS"}' \
   response.json
 ```
+
+### Parameters
+
+- `--function-name` — function name or supported identifier.
+- `--payload` — invocation payload.
+- final filename — where the CLI writes the function response payload for this command form.
+
+Inspect CLI metadata output and `response.json`. The exact payload/encoding behavior can depend on AWS CLI version/options, so verify the current Lambda CLI reference when scripting production invocations.
 
 ## List SQS queues
 
@@ -6540,6 +8714,10 @@ aws sqs send-message \
   --message-body '{"orderId":"ORD-1001"}'
 ```
 
+The command returns message metadata such as a message ID. For FIFO queues, additional FIFO-specific parameters such as message group/deduplication behavior may be required depending on queue configuration.
+
+Do not place secrets in queue messages unless the data-handling design explicitly protects them; messages can appear in logs, DLQs, and troubleshooting workflows.
+
 ## CloudFormation deploy
 
 ```bash
@@ -6548,15 +8726,44 @@ aws cloudformation deploy \
   --stack-name sample-stack
 ```
 
+For templates that create/update IAM resources, you may need the appropriate `--capabilities` acknowledgement depending on the template.
+
+Production habit:
+
+```text
+validate/synth → review change → deploy → verify stack events → smoke test
+```
+
+Do not assume a successful stack status means the application is healthy; infrastructure creation and application validation are separate checks.
+
 ## ECS list clusters
 
 ```bash
 aws ecs list-clusters
 ```
 
+Use the returned cluster ARNs/names as input to commands such as listing services/tasks and describing failures.
+
+```bash
+aws ecs list-services --cluster my-cluster
+aws ecs list-tasks --cluster my-cluster
+```
+
+Always confirm Region/profile because ECS resources are regional/account-scoped.
+
 ## ECR login concept
 
-Use AWS CLI to obtain an authentication token and authenticate Docker to the regional ECR registry according to the current ECR documentation.
+Authenticate Docker to a private ECR registry by retrieving an authorization password from the AWS CLI and piping it to `docker login`:
+
+```bash
+aws ecr get-login-password --region ap-south-1 | \
+  docker login --username AWS --password-stdin \
+  123456789012.dkr.ecr.ap-south-1.amazonaws.com
+```
+
+Replace the account ID and Region with your registry values. The ECR authorization token is temporary, so this is an authentication step rather than a permanent Docker password.
+
+The IAM principal must be allowed to retrieve the auth token and perform the required repository operations such as pushing image layers/manifests. Avoid echoing or storing the password in scripts; pipe it directly to `docker login` as shown.
 
 ## Useful CLI habits
 
@@ -6574,6 +8781,18 @@ aws ec2 describe-instances \
   --query 'Reservations[].Instances[].InstanceId' \
   --output text
 ```
+
+### Additional habits
+
+```text
+--no-cli-pager    avoid interactive pager in scripts
+--filters         reduce server-side result set where supported
+--query           JMESPath projection/filter on CLI output
+--output table    human-readable inspection
+--output json     automation/default structured output
+```
+
+Use shell scripts with `set -e`/error handling carefully; many AWS operations are eventually asynchronous and require explicit waiter/status checks rather than assuming the next command can run immediately.
 
 ---
 
@@ -6701,6 +8920,20 @@ Primary references used to shape this handbook:
 - [Amazon Redshift Management Guide](https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html)
 - [Amazon SageMaker AI Developer Guide](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html)
 - [Amazon Bedrock User Guide](https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html)
+
+Additional current-reference links used for the August 2026 accuracy pass:
+
+- [AWS account root user best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html)
+- [MFA for the AWS account root user](https://docs.aws.amazon.com/IAM/latest/UserGuide/enable-mfa-for-root.html)
+- [Amazon Data Firehose documentation](https://docs.aws.amazon.com/firehose/)
+- [Amazon SageMaker AI rename and overview](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html)
+- [AWS Cloud9 availability notice](https://docs.aws.amazon.com/cloud9/latest/user-guide/welcome.html)
+- [Amazon MemoryDB documentation](https://docs.aws.amazon.com/memorydb/)
+- [Amazon Timestream documentation](https://docs.aws.amazon.com/timestream/)
+- [Timestream for LiveAnalytics availability change](https://docs.aws.amazon.com/timestream/latest/developerguide/AmazonTimestreamForLiveAnalytics-availability-change.html)
+- [Amazon Quick documentation](https://docs.aws.amazon.com/quick/)
+- [Amazon WorkSpaces Applications documentation](https://docs.aws.amazon.com/appstream2/)
+- [Amazon Q Developer documentation](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html)
 
 ---
 
@@ -7266,9 +9499,9 @@ Kafka-based managed streaming.
 
 AWS-native real-time streaming ingestion.
 
-### Data Firehose
+### Amazon Data Firehose
 
-Managed delivery of streaming data to supported destinations.
+Managed delivery of streaming data to supported destinations. **Amazon Data Firehose was previously known as Amazon Kinesis Data Firehose**, so older tutorials and API namespaces may still use the `firehose`/Kinesis-era terminology.
 
 ### Glue
 
@@ -7290,7 +9523,7 @@ Search/log analytics.
 
 Managed big-data processing frameworks.
 
-### QuickSight
+### Amazon Quick Sight
 
 BI visualization.
 
@@ -7398,21 +9631,27 @@ Best-practice recommendations based on available plan/features.
 
 Browser-based shell for AWS CLI tasks.
 
-### Cloud9 note
+### AWS Cloud9 availability note
 
-Developer-tool offerings can evolve. Prefer current AWS guidance rather than assuming older tutorials represent the recommended development environment.
+AWS Cloud9 is **no longer available to new customers**. Existing customers can continue to use it. New learners should avoid designing a new development workflow that depends on Cloud9 availability and should follow current AWS developer-tool guidance.
+
+### Amazon Q Developer
+
+Amazon Q Developer is a generative-AI assistant for understanding, building, extending, and operating AWS applications. It can help with AWS questions, software-development tasks, and supported operational workflows.
+
+Use it as an assistant, not an authority: review generated code/commands, apply least-privilege access, protect sensitive context, and validate infrastructure changes before execution.
 
 ---
 
 ## E.8 End-user computing
 
-### WorkSpaces
+### Amazon WorkSpaces
 
 Managed virtual desktop capabilities.
 
-### AppStream
+### Amazon WorkSpaces Applications (formerly AppStream 2.0)
 
-Application streaming for supported virtual-app scenarios.
+AWS documentation now uses **Amazon WorkSpaces Applications** for the managed application-streaming service previously known as Amazon AppStream 2.0. It streams centrally managed applications/desktops to users without requiring the application to be installed on the endpoint.
 
 Use cases:
 
@@ -7714,6 +9953,16 @@ Alternative cache patterns.
 
 Use carefully because data consistency becomes more complex.
 
+### Write-through
+
+The application/cache layer writes to the cache and durable store as part of the write path. Reads can be fast and cache contents stay current, but every write pays the additional cache work.
+
+### Write-behind
+
+Writes are acknowledged into an intermediate/cache layer and persisted to the durable store asynchronously. This can improve write throughput but introduces durability/order/retry complexity.
+
+Do not use write-behind for critical business data unless the loss/replay/ordering model is explicitly designed and tested.
+
 ## F.13 CQRS
 
 Command Query Responsibility Segregation separates write and read models.
@@ -7799,6 +10048,10 @@ Region B = standby
 
 Simpler than active-active but failover must be tested.
 
+### What must be ready in the passive Region
+
+Document data replication, infrastructure deployment, secrets/keys, quotas, dependencies, DNS/traffic switching, and how much capacity already exists. A “standby Region” that requires hours of untested manual creation is backup-and-restore, not true warm standby.
+
 ## F.18 Multi-Region active-active
 
 ```text
@@ -7810,6 +10063,12 @@ Global routing
 ```
 
 Hard parts are usually data and operations, not DNS.
+
+### The data problem
+
+Serving traffic from two Regions is the easy diagram. The hard part is deciding where writes go, how conflicts are resolved, how globally unique business actions remain unique, and what happens when Regions cannot communicate.
+
+Design the business invariants and data consistency model before choosing global routing.
 
 ## F.19 Deployment safety hierarchy
 
@@ -7942,6 +10201,12 @@ GPU/custom host?
 → EC2/ECS/EKS as justified
 ```
 
+### Selection criteria
+
+Estimate document size/page count, expected CPU/GPU/memory, maximum processing duration, burst concurrency, model/runtime dependencies, and whether work can be retried safely.
+
+If OCR regularly exceeds Lambda runtime/package/resource constraints, a queued container worker may be a cleaner fit. If using a managed document-AI service, compare supported document types, extraction features, regional availability, cost per page/request, security, and confidence/evaluation needs.
+
 ## Step 4 — Store state
 
 Possible:
@@ -7966,6 +10231,18 @@ confidence >= threshold?
 ```
 
 Step Functions can make state explicit.
+
+### Persist workflow state
+
+Do not keep a human-approval workflow “waiting” only in application memory. Persist the business state and correlation ID so the process survives deployments and restarts.
+
+Example states:
+
+```text
+UPLOADED → OCR_RUNNING → REVIEW_REQUIRED → APPROVED → ERP_PENDING → POSTED
+```
+
+Record who approved, what data changed, timestamps, and the version of extracted data that was approved.
 
 ## Step 6 — ERP outage
 
@@ -8049,6 +10326,18 @@ Business SLO:
 
 This single project exercises a large portion of practical AWS architecture.
 
+### Add traceability
+
+Assign one correlation/document ID at upload and propagate it through S3 metadata/database state, queue messages, OCR logs, human review, and ERP posting. Then an operator can trace one invoice end-to-end without searching unrelated logs.
+
+Create alarms not only on infrastructure failure but also business stuck states, for example:
+
+```text
+REVIEW_REQUIRED older than 4 hours
+ERP_PENDING older than 15 minutes
+DLQ message count > 0
+```
+
 ---
 
 # Appendix H — Keep This Handbook Current
@@ -8070,3 +10359,19 @@ Review the handbook periodically for:
 
 For production decisions, always confirm against current AWS documentation.
 
+## Verified service-name and availability notes — 17 August 2026
+
+These items were explicitly checked against current AWS documentation during this revision:
+
+- **AWS Cloud9:** no longer available to new customers; existing customers can continue using it.
+- **Amazon Data Firehose:** current name for the service previously known as Amazon Kinesis Data Firehose.
+- **Amazon SageMaker AI:** the original Amazon SageMaker service was renamed Amazon SageMaker AI on December 3, 2024.
+- **Amazon Quick / Quick Sight:** QuickSight evolved into the broader Amazon Quick experience; the BI capability continues as Amazon Quick Sight.
+- **Amazon WorkSpaces Applications:** current documentation name for the application-streaming service previously known as AppStream 2.0.
+- **Amazon Timestream for LiveAnalytics:** AWS closed new-customer access effective June 20, 2025; new customers should evaluate the current Timestream options such as Timestream for InfluxDB according to AWS guidance.
+- **Root-user MFA:** AWS requires MFA configuration for AWS account root users; continue to treat root as break-glass access and do not create root access keys.
+
+When an older tutorial conflicts with current AWS documentation, prefer the current documentation and release/availability notices.
+
+
+<!-- Revision: comprehensive editorial and accuracy pass completed 2026-08-17 -->

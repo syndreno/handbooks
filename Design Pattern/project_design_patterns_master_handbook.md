@@ -162,6 +162,8 @@ Examples:
 
 ## Design Pattern
 
+A design pattern names a recurring collaboration/structure that solves a recurring design problem. It is a vocabulary for discussing intent and trade-offs, not a requirement to reproduce one exact class diagram.
+
 A reusable solution structure for a recurring problem.
 
 Examples:
@@ -197,6 +199,8 @@ Examples:
 - Django
 
 ## Library
+
+A library is reusable code that **your application calls** directly. It differs from a framework mainly in control flow: a framework typically calls into your code at defined extension points, while a library is invoked where you choose.
 
 A reusable set of functions/classes that your application calls.
 
@@ -287,6 +291,8 @@ class AuditLogger {}
 ```
 
 ### Real-world scenario
+
+This subsection focuses on **Real-world scenario**. Use the items below as concrete criteria: understand what each item means, why it is relevant in this context, and what evidence in code or a problem would make you apply it.
 
 If the email provider changes, the tax calculation class should not change.
 
@@ -487,6 +493,8 @@ Do not build multi-region failover for an internal application with 30 users unl
 
 ## Separation of Concerns — SoC
 
+Separation of Concerns divides a system so unrelated reasons to change live in different modules or layers. The goal is not to maximize file count; it is to keep business rules, presentation, persistence, integration, and other concerns from becoming entangled.
+
 Different concerns should live in different parts of the system.
 
 Example:
@@ -543,6 +551,8 @@ account.withdraw(amount);
 
 ## Favor Composition Over Inheritance
 
+Composition builds behavior by giving an object collaborators rather than inheriting every behavior from a base class. It usually makes runtime substitution and testing easier because dependencies are explicit and independently replaceable.
+
 Instead of:
 
 ```text
@@ -568,9 +578,13 @@ Composition usually makes behavior easier to replace.
 
 ## Coupling
 
+Coupling measures how much one component knows about or depends on another component's concrete details. Lower coupling makes replacement and testing easier, but zero coupling is neither realistic nor desirable: collaborating components still need clear contracts.
+
 Coupling means how strongly one component depends on another.
 
 ### High coupling
+
+This example creates its dependency directly, so the class is tied to one concrete implementation and even to construction details such as configuration. Tests or provider changes must work around that hard-coded dependency.
 
 ```ts
 class PaymentService {
@@ -579,6 +593,8 @@ class PaymentService {
 ```
 
 ### Lower coupling
+
+Here the dependency is supplied from outside through a contract. The class only needs the behavior promised by that contract, so a production gateway, test fake, or different provider can be substituted without changing the business class.
 
 ```ts
 class PaymentService {
@@ -631,6 +647,8 @@ The caller should not need to know:
 
 ## Composition
 
+Composition builds behavior by giving an object collaborators rather than inheriting every behavior from a base class. It usually makes runtime substitution and testing easier because dependencies are explicit and independently replaceable.
+
 Build complex behavior by combining small components.
 
 Example:
@@ -655,6 +673,8 @@ They are divided into:
 
 ## Creational Patterns
 
+Creational patterns focus on **how objects are created**. Their purpose is not to hide `new` for its own sake, but to separate construction decisions from the code that uses the created object when creation varies by configuration, family, lifecycle, or complexity.
+
 Concerned with object creation.
 
 - Singleton
@@ -664,6 +684,8 @@ Concerned with object creation.
 - Prototype
 
 ## Structural Patterns
+
+Structural patterns organize classes and objects so larger structures remain understandable and replaceable. They are most useful when existing components must be composed, wrapped, adapted, simplified, shared, or accessed through a controlled boundary.
 
 Concerned with object composition and structure.
 
@@ -699,9 +721,13 @@ Concerned with communication and responsibility between objects.
 
 ## Intent
 
+The intent states the design problem **Singleton Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Ensure only one instance of a class exists and provide a global access point.
 
 ## Example uses
+
+This example makes **Singleton Pattern** concrete. Identify the input/initial state, follow the state changes in order, and compare the final result with the stated intent so the code is understandable without relying on another section.
 
 - Configuration manager
 - Application logger
@@ -727,6 +753,8 @@ class Config {
 
 ## Scenario
 
+This scenario shows the pressure that can justify **Singleton Pattern**. Focus on what is changing or difficult in the original design; the pattern is valuable only if it makes that change safer or clearer.
+
 Your application loads configuration from environment variables once.
 
 ```ts
@@ -735,10 +763,14 @@ const config = Config.getInstance();
 
 ## Advantages
 
+These are the practical benefits of **Singleton Pattern**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - One shared instance
 - Centralized configuration
 
 ## Problems
+
+These are the main trade-offs introduced by **Singleton Pattern**. Treat them as design costs to evaluate against the expected benefit, especially for small systems where additional layers, indirection, or infrastructure can reduce clarity.
 
 Singleton can create hidden global dependencies.
 
@@ -748,10 +780,14 @@ Modern dependency injection often provides a cleaner alternative.
 
 ## Use when
 
+Use **Singleton Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Exactly one logical instance is required
 - Lifecycle is truly application-wide
 
 ## Avoid when
+
+Avoid **Singleton Pattern** when its extra structure does not solve a concrete problem. A simpler design is usually better when requirements are stable, there is only one implementation, or the abstraction would merely hide straightforward code.
 
 You only want Singleton because creating dependencies manually feels inconvenient.
 
@@ -760,6 +796,8 @@ You only want Singleton because creating dependencies manually feels inconvenien
 # 9.2 Factory Method Pattern
 
 ## Intent
+
+The intent states the design problem **Factory Method Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Delegate object creation to a factory instead of directly calling constructors everywhere.
 
@@ -801,6 +839,8 @@ sender.send("Invoice approved");
 
 ## Real-world scenarios
 
+Use **Factory Method Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Payment gateways
 - Report generators
 - File parsers
@@ -809,6 +849,8 @@ sender.send("Invoice approved");
 - OCR engines
 
 ## Use when
+
+Use **Factory Method Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
 
 The exact implementation depends on:
 
@@ -822,6 +864,8 @@ The exact implementation depends on:
 # 9.3 Abstract Factory Pattern
 
 ## Intent
+
+The intent states the design problem **Abstract Factory Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Create families of related objects without exposing concrete classes.
 
@@ -850,6 +894,8 @@ interface CloudFactory {
 
 ## Use when
 
+Use **Abstract Factory Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 Related components must be created together.
 
 Examples:
@@ -863,6 +909,8 @@ Examples:
 # 9.4 Builder Pattern
 
 ## Intent
+
+The intent states the design problem **Builder Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Construct complex objects step by step.
 
@@ -897,6 +945,8 @@ const report = new ReportBuilder()
 
 ## Real-world scenarios
 
+Use **Builder Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - HTTP request construction
 - Search queries
 - Report generation
@@ -909,6 +959,8 @@ const report = new ReportBuilder()
 # 9.5 Prototype Pattern
 
 ## Intent
+
+The intent states the design problem **Prototype Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Create new objects by cloning an existing object.
 
@@ -946,6 +998,8 @@ Examples:
 # 10.1 Adapter Pattern
 
 ## Intent
+
+The intent states the design problem **Adapter Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Convert one interface into another interface expected by your application.
 
@@ -985,6 +1039,8 @@ Now business logic depends on `PaymentGateway`, not Stripe.
 
 ## Common uses
 
+Use **Adapter Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Third-party SDKs
 - Legacy systems
 - External APIs
@@ -997,6 +1053,8 @@ Now business logic depends on `PaymentGateway`, not Stripe.
 # 10.2 Facade Pattern
 
 ## Intent
+
+The intent states the design problem **Facade Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Provide a simple interface over a complicated subsystem.
 
@@ -1022,6 +1080,8 @@ Internally the facade coordinates multiple services.
 
 ## Use when
 
+Use **Facade Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 A subsystem is complicated and consumers should not know every internal step.
 
 ---
@@ -1029,6 +1089,8 @@ A subsystem is complicated and consumers should not know every internal step.
 # 10.3 Decorator Pattern
 
 ## Intent
+
+The intent states the design problem **Decorator Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Add behavior to an object without changing its original class.
 
@@ -1072,6 +1134,8 @@ MetricsDecorator
 
 ## Real-world examples
 
+Use **Decorator Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Logging
 - Caching
 - Retry
@@ -1086,6 +1150,8 @@ Middleware systems often behave similarly to decorators.
 # 10.4 Proxy Pattern
 
 ## Intent
+
+The intent states the design problem **Proxy Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Provide a substitute object that controls access to another object.
 
@@ -1122,6 +1188,8 @@ class CachedProductRepository implements ProductRepository {
 
 ## Intent
 
+The intent states the design problem **Composite Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Treat individual objects and groups of objects uniformly.
 
 Scenario:
@@ -1148,6 +1216,8 @@ A department calculates the sum of children.
 
 ## Common uses
 
+Use **Composite Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - File systems
 - Menu trees
 - Organization hierarchy
@@ -1159,6 +1229,8 @@ A department calculates the sum of children.
 # 10.6 Bridge Pattern
 
 ## Intent
+
+The intent states the design problem **Bridge Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Separate an abstraction from its implementation so both can vary independently.
 
@@ -1225,6 +1297,8 @@ Modern applications use this pattern less explicitly because frameworks and runt
 
 ## Intent
 
+The intent states the design problem **Strategy Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Encapsulate interchangeable algorithms behind a common interface.
 
 Example:
@@ -1261,6 +1335,8 @@ class InvoiceCalculator {
 
 ## Use cases
 
+Use **Strategy Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Tax calculation
 - Discount algorithms
 - Routing algorithms
@@ -1274,6 +1350,8 @@ class InvoiceCalculator {
 # 11.2 Observer Pattern
 
 ## Intent
+
+The intent states the design problem **Observer Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Notify multiple subscribers when something happens.
 
@@ -1304,6 +1382,8 @@ eventBus.publish("InvoiceApproved", invoice);
 
 ## Common uses
 
+Use **Observer Pattern** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Event systems
 - UI state
 - Domain events
@@ -1315,6 +1395,8 @@ eventBus.publish("InvoiceApproved", invoice);
 # 11.3 Command Pattern
 
 ## Intent
+
+The intent states the design problem **Command Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Represent an operation as an object.
 
@@ -1432,6 +1514,8 @@ Useful when state transitions have complex rules.
 
 ## Intent
 
+The intent states the design problem **Template Method Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Define the overall algorithm in a base class while allowing subclasses to override selected steps.
 
 Example:
@@ -1469,6 +1553,8 @@ EmailInvoiceProcessor
 
 ## Intent
 
+The intent states the design problem **Iterator Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Traverse a collection without exposing its internal representation.
 
 Example:
@@ -1493,6 +1579,8 @@ Useful for:
 # 11.8 Mediator Pattern
 
 ## Intent
+
+The intent states the design problem **Mediator Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Reduce direct communication between many components by routing communication through a mediator.
 
@@ -1529,6 +1617,8 @@ Common in:
 
 ## Intent
 
+The intent states the design problem **Memento Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Capture and restore an object's previous state.
 
 Common uses:
@@ -1553,6 +1643,8 @@ Previous Document State
 # 11.10 Visitor Pattern
 
 ## Intent
+
+The intent states the design problem **Visitor Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
 
 Add operations to a complex object structure without changing the object classes.
 
@@ -1640,6 +1732,8 @@ Important ones include:
 
 ## Intent
 
+The intent states the design problem **Repository Pattern** is meant to solve. Keep the intent separate from one particular implementation: different languages and frameworks may express the same pattern with different syntax.
+
 Hide database access behind a domain-friendly interface.
 
 Example:
@@ -1672,6 +1766,8 @@ class MySqlInvoiceRepository implements InvoiceRepository {
 
 ## Why use it?
 
+The value of **Repository Pattern** is the change it makes cheaper or safer. Evaluate the benefit against the extra abstraction/infrastructure it introduces; if there is no real variation or boundary pressure, a simpler design may be better.
+
 Business logic should say:
 
 ```ts
@@ -1685,6 +1781,8 @@ SELECT * FROM invoice_details WHERE invd_id = ?
 ```
 
 ## Benefits
+
+These are the practical benefits of **Repository Pattern**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
 
 - Easier testing
 - Database isolation
@@ -1795,6 +1893,8 @@ ORMs such as Hibernate, Entity Framework and SQLAlchemy often provide Unit of Wo
 
 ## Active Record
 
+Active Record combines data plus persistence operations on the same model object, such as `save()` or query helpers. It is productive for CRUD-heavy applications, but rich domain logic can become tightly coupled to database concerns as complexity grows.
+
 The model knows how to save itself.
 
 ```ts
@@ -1810,17 +1910,23 @@ Common in:
 
 ### Advantages
 
+These are the practical benefits of **Active Record**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Simple
 - Productive
 - Great for CRUD systems
 
 ### Disadvantages
 
+These are the main trade-offs introduced by **Active Record**. Treat them as design costs to evaluate against the expected benefit, especially for small systems where additional layers, indirection, or infrastructure can reduce clarity.
+
 Domain logic becomes coupled to persistence.
 
 ---
 
 ## Data Mapper
+
+Data Mapper keeps domain objects separate from persistence logic. A mapper/repository translates between domain state and database representation, which improves persistence independence and testability at the cost of more explicit mapping code.
 
 Domain objects do not know how they are stored.
 
@@ -1834,11 +1940,15 @@ Common in more domain-heavy systems.
 
 ### Advantages
 
+These are the practical benefits of **Data Mapper**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Domain remains clean
 - Easier testing
 - Persistence-independent
 
 ### Disadvantages
+
+These are the main trade-offs introduced by **Data Mapper**. Treat them as design costs to evaluate against the expected benefit, especially for small systems where additional layers, indirection, or infrastructure can reduce clarity.
 
 - More code
 - More abstractions
@@ -1850,6 +1960,8 @@ Common in more domain-heavy systems.
 These are frequently confused.
 
 ## Entity
+
+An entity has a stable identity that matters over time even when its attributes change. Two entities with the same field values can still be different if their identities differ; business behavior and invariants often belong with the entity rather than in transport DTOs.
 
 An object with identity.
 
@@ -1927,6 +2039,8 @@ It does not always need to be identical to the domain entity.
 
 ## Dependency Injection
 
+Dependency Injection (DI) supplies a component's collaborators from outside rather than letting the component construct concrete dependencies itself. Inversion of Control (IoC) is the broader idea that control over creation or flow is delegated to a container/framework or external orchestrator. DI is one common technique for achieving IoC.
+
 Dependencies are supplied to a class instead of created internally.
 
 Bad:
@@ -1959,6 +2073,8 @@ const service = new InvoiceService(
 ```
 
 ## Benefits
+
+These are the practical benefits of **Dependency Injection and IoC**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
 
 - Testability
 - Replaceability
@@ -2003,13 +2119,19 @@ Common in:
 
 ### Controller
 
+The controller receives an input/request, coordinates the relevant application action, and chooses the response or view. It should avoid becoming a container for unrelated domain rules.
+
 Handles request/response.
 
 ### Model
 
+The model represents application data and/or domain behavior, depending on the MVC variant and framework. It is more than a database table in the original pattern, although many frameworks use 'model' for persistence-oriented classes.
+
 Represents data or domain behavior.
 
 ### View
+
+The view presents data to the user and should focus on rendering rather than business decisions. Keeping presentation logic separate makes the same underlying behavior easier to test or expose through another interface.
 
 Displays output.
 
@@ -2072,6 +2194,8 @@ MySQL
 ```
 
 ## Benefits
+
+These are the practical benefits of **Layered / N-Tier Architecture**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
 
 - Easy to understand
 - Clear responsibility separation
@@ -2155,11 +2279,15 @@ Presentation
 
 ## Advantages
 
+These are the practical benefits of **Clean Architecture**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Highly testable
 - Infrastructure replaceable
 - Business rules protected
 
 ## Disadvantages
+
+These are the main trade-offs introduced by **Clean Architecture**. Treat them as design costs to evaluate against the expected benefit, especially for small systems where additional layers, indirection, or infrastructure can reduce clarity.
 
 - More files
 - More abstractions
@@ -2190,6 +2318,8 @@ Core application:
 
 ## Ports
 
+A **port** is an interface/contract at the application boundary. An inbound port describes an action the application offers; an outbound port describes a capability the application needs from infrastructure, such as persistence, messaging, or an ERP integration.
+
 Interfaces defined by the application.
 
 Example:
@@ -2201,6 +2331,8 @@ interface NotificationPort {}
 ```
 
 ## Adapters
+
+An **adapter** implements or invokes a port using a concrete technology. For example, an HTTP controller can adapt a request to an inbound use case, while a database repository or ERP client can implement an outbound port.
 
 Concrete implementations.
 
@@ -2261,9 +2393,13 @@ Modules communicate through defined interfaces or events.
 
 ## Why it is powerful
 
+The value of **Modular Monolith** is the change it makes cheaper or safer. Evaluate the benefit against the extra abstraction/infrastructure it introduces; if there is no real variation or boundary pressure, a simpler design may be better.
+
 You get many benefits of modular systems without distributed-system complexity.
 
 ## Best choice for many business applications
+
+This recommendation is about trade-offs, not a universal rule. Prefer the simpler deployable architecture while one process can meet scaling/ownership needs; move to distributed services only when independent deployment, scaling, isolation, or team ownership creates enough value to justify operational complexity.
 
 Before starting with microservices, consider a modular monolith.
 
@@ -2288,6 +2424,8 @@ Each service may own its own database.
 
 ## Advantages
 
+These are the practical benefits of **Microservices**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Independent deployment
 - Independent scaling
 - Team autonomy
@@ -2307,6 +2445,8 @@ Microservices introduce major complexity:
 - Data duplication
 
 ## Use when
+
+Use **Microservices** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
 
 You actually need independent scaling, deployment, ownership or isolation.
 
@@ -2332,11 +2472,15 @@ Producer does not directly call every consumer.
 
 ## Advantages
 
+These are the practical benefits of **Event-Driven Architecture**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Loose coupling
 - Asynchronous processing
 - Easy extensibility
 
 ## Challenges
+
+These are the main trade-offs introduced by **Event-Driven Architecture**. Treat them as design costs to evaluate against the expected benefit, especially for small systems where additional layers, indirection, or infrastructure can reduce clarity.
 
 - Event ordering
 - Duplicate events
@@ -2375,6 +2519,8 @@ Separate operations that change state from operations that read state.
 
 ## Commands
 
+A **command** represents an intent to change system state, such as creating or approving an entity. It should carry the data needed to request the action and is typically handled for side effects; a command does not imply that the operation will always succeed.
+
 ```text
 CreateInvoice
 ApproveInvoice
@@ -2383,6 +2529,8 @@ PostInvoice
 ```
 
 ## Queries
+
+A **query** asks for data without expressing an intent to change business state. In CQRS, read models can be shaped for the caller rather than mirroring write-domain entities, which allows read and write concerns to evolve independently when that separation is valuable.
 
 ```text
 GetInvoiceById
@@ -2436,6 +2584,8 @@ Current state is reconstructed from events.
 
 ## Advantages
 
+These are the practical benefits of **Event Sourcing**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Complete audit history
 - Time-travel/debugging
 - Event replay
@@ -2484,7 +2634,11 @@ Those reverse operations are called compensating actions.
 
 ## Two Saga Styles
 
+Sagas coordinate a business transaction that spans multiple services without one global ACID transaction. The two common styles differ in who decides the next step: **choreography** reacts to events, while **orchestration** uses a coordinator that directs participants.
+
 ### Choreography
+
+In choreography, each participant reacts to events and emits the next event without one central coordinator. This reduces central control but can make end-to-end flow, debugging, and change impact harder to see as the number of participants grows.
 
 Services react to events.
 
@@ -2499,6 +2653,8 @@ ShipmentCreated
 ```
 
 ### Orchestration
+
+In orchestration, a saga coordinator explicitly tells participants which step to perform and handles success/failure transitions. The workflow is easier to visualize centrally, but the orchestrator becomes an important component that must remain focused on coordination rather than absorbing domain logic.
 
 A central orchestrator tells services what to do.
 
@@ -2810,6 +2966,8 @@ Invoice
 
 # Message Queue
 
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
+
 One message is usually processed by one consumer.
 
 Example:
@@ -2837,6 +2995,8 @@ InvoiceApproved
 ---
 
 # Dead Letter Queue
+
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
 
 Messages that repeatedly fail are moved to a special queue.
 
@@ -3025,10 +3185,14 @@ src/
 
 ### Good for
 
+Use **Layer-Based Structure** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Small projects
 - Simple CRUD applications
 
 ### Problem
+
+This subsection focuses on **Problem**. Use the items below as concrete criteria: understand what each item means, why it is relevant in this context, and what evidence in code or a problem would make you apply it.
 
 As project size increases, files related to one feature become scattered.
 
@@ -3112,6 +3276,8 @@ Before choosing patterns, understand the problem.
 
 ## Step 1 — Identify actors
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Example:
 
 ```text
@@ -3124,6 +3290,8 @@ ERP System
 ```
 
 ## Step 2 — Identify use cases
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 ```text
 Create Invoice
@@ -3138,6 +3306,8 @@ Generate Report
 
 ## Step 3 — Identify business rules
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Example:
 
 ```text
@@ -3148,6 +3318,8 @@ ERP posting is allowed only after final approval.
 ```
 
 ## Step 4 — Identify external dependencies
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 ```text
 Database
@@ -3161,9 +3333,13 @@ Message Broker
 
 ## Step 5 — Protect the domain
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Business rules should not depend directly on those external systems.
 
 ## Step 6 — Define interfaces
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 ```text
 InvoiceRepository
@@ -3174,6 +3350,8 @@ FileStorage
 ```
 
 ## Step 7 — Implement adapters
+
+An **adapter** implements or invokes a port using a concrete technology. For example, an HTTP controller can adapt a request to an inbound use case, while a database repository or ERP client can implement an outbound port.
 
 ```text
 MySqlInvoiceRepository
@@ -3250,6 +3428,8 @@ Patterns involved:
 
 ## Vendor-Specific Extraction Strategy
 
+A vendor-specific strategy encapsulates extraction rules that vary by vendor while exposing one common extraction contract. The surrounding workflow can select the appropriate strategy without scattering vendor `if/else` checks through validation, storage, and posting code.
+
 ```ts
 interface ExtractionStrategy {
     extract(document: OcrDocument): InvoiceFields;
@@ -3299,6 +3479,8 @@ Now the business layer can switch engines.
 ---
 
 ## Approval Chain
+
+An approval chain models ordered decision steps where each stage may approve, reject, or route the request onward. A Chain of Responsibility or explicit workflow/state machine can keep routing rules separate from unrelated business logic; audit each transition because approvals are business-significant.
 
 ```text
 Invoice
@@ -3597,6 +3779,8 @@ Use this decision guide.
 
 ## Object creation is complicated?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Consider:
 
 - Factory
@@ -3606,11 +3790,15 @@ Consider:
 
 ## Multiple interchangeable algorithms?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Use:
 
 - Strategy
 
 ## Need to adapt a third-party API?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Use:
 
@@ -3618,11 +3806,15 @@ Use:
 
 ## Need one simple API over many services?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Use:
 
 - Facade
 
 ## Need to add behavior without changing original class?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Use:
 
@@ -3630,11 +3822,15 @@ Use:
 
 ## Need lifecycle-specific behavior?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Use:
 
 - State
 
 ## Need sequential processing?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Use:
 
@@ -3642,11 +3838,15 @@ Use:
 
 ## Need event subscribers?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Use:
 
 - Observer / Pub-Sub
 
 ## Need database isolation?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Use:
 
@@ -3654,11 +3854,15 @@ Use:
 
 ## Need multiple writes as one transaction?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Use:
 
 - Unit of Work
 
 ## Need reliable async integration?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Consider:
 
@@ -3668,17 +3872,23 @@ Consider:
 
 ## Need distributed business transaction?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Use:
 
 - Saga
 
 ## Read and write workloads differ significantly?
 
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
+
 Consider:
 
 - CQRS
 
 ## Need complete event history as the source of truth?
+
+Answer this question from the concrete design/problem pressure first. The suggested pattern is a candidate, not an automatic choice; compare it with the simplest alternative and check whether the expected variation is real.
 
 Consider:
 
@@ -3694,6 +3904,8 @@ Patterns are commonly combined.
 
 ## Factory + Strategy
 
+Factory and Strategy solve different parts of the same variation: the **Factory** chooses/creates the appropriate implementation, while the **Strategy** defines the interchangeable behavior. Keep selection logic out of the strategy itself so each responsibility stays clear.
+
 Factory chooses the correct strategy.
 
 ```text
@@ -3708,6 +3920,8 @@ UPI / Card / BankTransfer Strategy
 
 ## Adapter + Strategy
 
+Strategy gives callers one behavioral contract; adapters make incompatible providers conform to that contract. This is useful when multiple third-party services perform the same business capability but expose different SDKs or payloads.
+
 Different third-party providers share one strategy interface.
 
 ```text
@@ -3721,6 +3935,8 @@ PaymentGateway
 
 ## Repository + Unit of Work
 
+Repositories express persistence operations for domain objects, while Unit of Work coordinates multiple changes under one transaction boundary. Do not let each repository independently commit if the business operation requires all writes to succeed or roll back together.
+
 Repositories perform persistence operations.
 
 Unit of Work coordinates one transaction.
@@ -3729,6 +3945,8 @@ Unit of Work coordinates one transaction.
 
 ## State + Strategy
 
+State and Strategy can look structurally similar but express different intent. **State** changes behavior because the object's lifecycle state changed; **Strategy** changes behavior because an algorithm/policy was selected. Combining them can let each state delegate a variable algorithm without mixing the two concepts.
+
 State controls which behavior is currently allowed.
 
 Strategy chooses how that behavior is performed.
@@ -3736,6 +3954,8 @@ Strategy chooses how that behavior is performed.
 ---
 
 ## Observer + Command
+
+An event/observer can announce that something happened, while a command represents an intention to perform an action. Combining them carefully can decouple reactions, but avoid turning every method call into an event/command if synchronous direct collaboration is simpler.
 
 A command changes the system.
 
@@ -3755,6 +3975,8 @@ InvoiceApproved Event
 
 ## CQRS + Event-Driven Architecture
 
+CQRS separates write commands from read queries, while events can propagate write-side changes to independent read models. This combination is useful when read models need different shapes or scaling, but introduces eventual consistency and operational complexity.
+
 Commands update write models.
 
 Events update read models.
@@ -3762,6 +3984,8 @@ Events update read models.
 ---
 
 ## Event Sourcing + CQRS
+
+Event Sourcing stores state changes as an event history; CQRS can use those events to build read models optimized for queries. They are related but independent—CQRS does not require Event Sourcing, and Event Sourcing does not require separate read/write databases.
 
 A common but not mandatory combination.
 
@@ -3809,13 +4033,19 @@ expect(fakeRepo.savedInvoice.status).toBe("APPROVED");
 
 ## Dummy
 
+A **dummy** object exists only to satisfy a parameter or constructor requirement; the code under test does not use it. It is useful when an interface requires a collaborator that is irrelevant to the specific test.
+
 Passed but not used.
 
 ## Stub
 
+A **stub** returns controlled, predefined answers so a test can drive the code through a chosen path. Stubs are about supplying inputs from collaborators, not verifying how many times a method was called.
+
 Returns predefined values.
 
 ## Fake
+
+A **fake** is a lightweight but functioning implementation, such as an in-memory repository. It behaves realistically enough for tests while avoiding production infrastructure such as a database or network service.
 
 Working simplified implementation.
 
@@ -3827,6 +4057,8 @@ InMemoryInvoiceRepository
 
 ## Mock
 
+A **mock** is configured around expected interactions and is commonly used to verify that the code under test called a collaborator correctly. Overusing mocks can couple tests to implementation details, so prefer state-based assertions when they express the behavior more clearly.
+
 Verifies interactions.
 
 Example:
@@ -3836,6 +4068,8 @@ expect(mailer.send).toHaveBeenCalled()
 ```
 
 ## Spy
+
+A **spy** records calls made to a real or partially real collaborator so the test can inspect those interactions afterward. Some testing libraries also allow a spy to replace or wrap the original behavior.
 
 Records calls while retaining behavior.
 
@@ -3894,11 +4128,15 @@ Use incremental refactoring.
 
 ## Step 1 — Add tests
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Protect current behavior.
 
 ---
 
 ## Step 2 — Identify unstable areas
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Look for:
 
@@ -3911,6 +4149,8 @@ Look for:
 ---
 
 ## Step 3 — Extract responsibilities
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Before:
 
@@ -3935,6 +4175,8 @@ ErpPoster
 
 ## Step 4 — Introduce interfaces at boundaries
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Example:
 
 ```text
@@ -3950,6 +4192,8 @@ External boundaries are strong candidates for adapters.
 ---
 
 ## Step 5 — Replace conditions with strategies
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Before:
 
@@ -3969,6 +4213,8 @@ VendorExtractionStrategy
 
 ## Step 6 — Introduce domain behavior
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Before:
 
 ```ts
@@ -3985,6 +4231,8 @@ invoice.approve(userId);
 ---
 
 ## Step 7 — Refactor by module
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Do not redesign the whole codebase simultaneously.
 
@@ -4187,9 +4435,13 @@ Be prepared to answer questions like:
 
 ## What is a design pattern?
 
+A design pattern is a reusable design idea for a recurring problem, described in terms of intent, participants, collaboration, and trade-offs. It is not a framework or a copy-paste implementation.
+
 A reusable design approach for a recurring software problem.
 
 ## Factory vs Abstract Factory?
+
+Factory Method typically creates one product through a creation abstraction; Abstract Factory creates a **family of related products** intended to be used together. Choose based on whether the variation is one implementation or a consistent product family.
 
 Factory creates a specific product.
 
@@ -4219,6 +4471,8 @@ Facade:
 
 ## Decorator vs Proxy?
 
+Both wrap another object and can preserve the same interface. Decorator's primary intent is to **add/combine behavior**; Proxy's primary intent is to **control access** such as lazy loading, remote access, caching, or authorization.
+
 Decorator primarily adds behavior.
 
 Proxy primarily controls access.
@@ -4233,6 +4487,8 @@ Pub/Sub often uses a message broker or event channel and producers do not know s
 
 ## Repository vs DAO?
 
+Both isolate data access, but a Repository is usually phrased in domain/collection terms and returns domain objects/aggregates, while a DAO is often closer to persistence operations and tables/records. Real codebases sometimes use the names interchangeably, so intent matters more than the label.
+
 Both abstract data access.
 
 Repository is usually domain-oriented.
@@ -4240,6 +4496,8 @@ Repository is usually domain-oriented.
 DAO is commonly table/data-operation oriented.
 
 ## Active Record vs Data Mapper?
+
+Active Record lets the model know how to persist itself; Data Mapper keeps persistence outside the domain object. Active Record is simpler for CRUD-centric systems, while Data Mapper gives stronger separation for complex domains or multiple persistence concerns.
 
 Active Record model knows persistence.
 
@@ -4252,6 +4510,8 @@ A normal monolith may have poorly defined internal boundaries.
 A modular monolith deliberately isolates business modules.
 
 ## Microservices vs Modular Monolith?
+
+A modular monolith keeps modules in one deployable process while preserving internal boundaries; microservices add independent deployment and distributed-system costs. Choose microservices only when those independent deployment/scaling/ownership benefits justify network, consistency, observability, and operational complexity.
 
 Use microservices only when independent deployment/scaling/ownership justifies distributed-system complexity.
 
@@ -4277,6 +4537,8 @@ Use these projects to master patterns.
 
 ## Beginner Project 1 — Notification System
 
+Build one notification use case with several delivery channels. Define a common sender abstraction, select an implementation through a factory or dependency injection, and adapt any provider whose API does not match your interface. The goal is to add a new channel without rewriting the business use case.
+
 Support:
 
 - Email
@@ -4293,6 +4555,8 @@ Practice:
 ---
 
 ## Beginner Project 2 — Report Generator
+
+Build a report pipeline that can produce multiple output formats or layouts. Use the project to practice separating report data from rendering, selecting a formatter strategy, and keeping file/export concerns outside the domain calculation code.
 
 Generate:
 
@@ -4331,6 +4595,8 @@ Practice:
 ---
 
 ## Intermediate Project 4 — Approval Workflow
+
+Model an approval request moving through actors such as Employee, Manager, Department Head, and Finance. Use Chain of Responsibility for routing/escalation, State for lifecycle rules, and Observer or Command only where they solve a concrete notification/audit/action requirement. Define what happens for approval, rejection, insufficient authority, and end-of-chain cases.
 
 Create:
 
@@ -4383,6 +4649,8 @@ Practice:
 
 ## Advanced Project 6 — Event-Driven Order Platform
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 Build:
 
 ```text
@@ -4407,9 +4675,13 @@ Practice:
 
 # 50. Learning Roadmap
 
+Use this plan as a sequence of skill dependencies rather than a rigid calendar. Spend extra time where you cannot yet explain the invariant, implement without copying, or analyze complexity; mastery is more important than keeping pace with a date label.
+
 Recommended order:
 
 ## Phase 1 — Fundamentals
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Learn:
 
@@ -4424,6 +4696,8 @@ Learn:
 ---
 
 ## Phase 2 — Principles
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Master:
 
@@ -4456,6 +4730,8 @@ These appear frequently in real applications.
 
 ## Phase 4 — Enterprise Application Patterns
 
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
+
 Learn:
 
 - Repository
@@ -4471,6 +4747,8 @@ Learn:
 
 ## Phase 5 — Architecture
 
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
+
 Learn:
 
 1. Layered Architecture
@@ -4482,6 +4760,8 @@ Learn:
 ---
 
 ## Phase 6 — Distributed Systems
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Only after mastering application architecture:
 
@@ -4497,6 +4777,8 @@ Only after mastering application architecture:
 ---
 
 ## Phase 7 — Build Real Projects
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Patterns become meaningful only when you experience the problems they solve.
 
@@ -4551,6 +4833,8 @@ Build projects and intentionally refactor them.
 
 # 52. Final Design Checklist
 
+Treat this section as an evidence-based self-check. Mark an item complete only when you can explain it in simple language, implement or apply it without copying, analyze its trade-offs, and recognize cases where it should not be used.
+
 Before calling a project architecture "good", ask:
 
 ## Requirements
@@ -4566,6 +4850,8 @@ Before calling a project architecture "good", ask:
 - [ ] Are large classes split appropriately?
 
 ## Coupling
+
+Coupling measures how much one component knows about or depends on another component's concrete details. Lower coupling makes replacement and testing easier, but zero coupling is neither realistic nor desirable: collaborating components still need clear contracts.
 
 - [ ] Can I replace external dependencies without rewriting business logic?
 - [ ] Are third-party SDKs hidden behind adapters?

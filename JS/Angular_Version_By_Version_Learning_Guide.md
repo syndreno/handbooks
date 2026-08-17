@@ -134,6 +134,8 @@ There is no missing framework generation you need to learn.
 ---
 
 # 4. Version Timeline at a Glance
+Use the timeline to build a **mental map**, not to memorize every release note. The important question is: “Which version introduced or stabilized a concept that changes how I read or write Angular code?”
+
 
 | Version | Initial release | Learner headline |
 |---|---:|---|
@@ -1370,6 +1372,8 @@ Do not change framework, state architecture, forms architecture, and all tests i
 ---
 
 # 29. What a New Learner Should Focus On Today
+Learn the current model first: standalone-first architecture, Signals, built-in control flow, modern forms/testing, zoneless behavior, and current routing/HTTP patterns. Learn legacy APIs second so you can maintain older enterprise code without letting old defaults shape all new code.
+
 
 ## Learn deeply
 
@@ -1423,6 +1427,8 @@ Examples:
 ---
 
 # 30. Official Sources
+Release history is easy to misremember. Use Angular's official release policy, Update Guide, compatibility table, roadmap, and release posts whenever an exact version/date or migration requirement matters.
+
 
 Use these as the source of truth:
 
@@ -1438,6 +1444,8 @@ Use these as the source of truth:
 ---
 
 # Appendix A — Version Memory Map
+This memory map compresses the timeline into landmarks. It is intentionally selective: use it to recognize the era of a codebase, then consult the detailed version section before planning an upgrade.
+
 
 If you remember only one line per major version, remember this:
 
@@ -1503,6 +1511,8 @@ Not all of these are “wrong.” Some are still supported or common. The issue 
 ---
 
 # Appendix C — Practical Decision Guide
+Use this guide when you encounter unfamiliar Angular syntax in a tutorial or legacy repository. Identify the era, check whether the API is still supported, and decide whether you need to learn it for maintenance or prefer the current pattern for new code.
+
 
 ## New Angular v22 application
 

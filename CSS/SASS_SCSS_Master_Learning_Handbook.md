@@ -293,6 +293,23 @@ The browser never sees `$space`.
 
 This distinction matters because Sass variables are **compile-time values**, whereas CSS custom properties are **runtime values**.
 
+
+## Build-time mental model
+
+Sass is a compiler step, not a browser runtime. The compiler receives one or more Sass/SCSS source files plus configuration, resolves Sass features, and emits ordinary CSS.
+
+```text
+SCSS + modules + compiler options
+              ↓
+           Dart Sass
+              ↓
+      CSS (+ optional source map)
+```
+
+This gives you a useful debugging boundary: compiler errors belong to Sass/source/tooling; a successfully generated rule that loses in DevTools is a CSS cascade problem.
+
+Generated CSS is the artifact browsers consume. Do not hand-edit generated output when the real source of truth is SCSS, because the next build will overwrite the change.
+
 ---
 
 # 5. Installing and Running Dart Sass
@@ -363,6 +380,28 @@ npm run sass:build
 
 > Pin versions according to your project's dependency policy rather than blindly relying on the newest major release.
 
+
+## Project-local installation
+
+For team projects, prefer a project dependency:
+
+```bash
+npm install --save-dev sass
+```
+
+A local dependency is recorded in `package.json` and the lockfile, making local builds and CI more reproducible. Run it with `npx sass` or a package script.
+
+```json
+{
+  "scripts": {
+    "build:css": "sass src/scss/main.scss dist/main.css",
+    "watch:css": "sass --watch src/scss/main.scss:dist/main.css"
+  }
+}
+```
+
+A global installation is convenient for experimentation, but it should not be the only definition of the compiler version used by a shared project.
+
 ---
 
 # 6. Your First SCSS File
@@ -416,6 +455,25 @@ You already used two major Sass concepts:
 
 - variables
 - parent selector nesting
+
+
+## What to notice
+
+A first SCSS file should teach the compile cycle rather than just the syntax:
+
+```scss
+$brand: #2563eb;
+
+.card {
+  color: $brand;
+
+  &:hover {
+    color: white;
+  }
+}
+```
+
+The variable is replaced at compile time, nesting is expanded, and `&` becomes the current selector. After every beginner exercise, inspect the emitted CSS. If you cannot predict the output, simplify the Sass until the relationship between source and generated CSS is clear.
 
 ---
 
@@ -527,6 +585,23 @@ $c1: #2563eb;
 $x: 16px;
 $big: 64rem;
 ```
+
+
+## Sass variables are compile-time values
+
+A Sass variable such as `$primary` exists while Sass is compiling. It normally disappears from the final CSS:
+
+```scss
+$primary: #2563eb;
+
+.button {
+  background: $primary;
+}
+```
+
+Use Sass variables for module configuration, calculations, maps, loops, and values needed only while generating CSS.
+
+Do not confuse them with CSS custom properties (`--primary`), which remain in the browser, inherit through the DOM, participate in the cascade, and can change at runtime. A design system often uses Sass for authoring/configuration and CSS custom properties for runtime theming.
 
 ---
 
@@ -953,6 +1028,21 @@ color: $brand;
 
 Use interpolation only when textual insertion is actually needed.
 
+
+## Use interpolation only in textual CSS contexts
+
+`#{...}` converts a Sass expression into part of generated CSS syntax. Typical uses include selector names, property names, comments, or custom property construction.
+
+```scss
+$state: "active";
+
+.tab--#{$state} {
+  font-weight: 700;
+}
+```
+
+Do not interpolate a variable in an ordinary value position when direct Sass evaluation already works. Overusing interpolation weakens type behavior and can make generated selectors difficult to search. Prefer explicit selectors or map-driven loops when they express the same design more clearly.
+
 ---
 
 # 13. Nesting
@@ -1043,6 +1133,22 @@ A useful rule of thumb:
 
 > Most component styles should stay within roughly 1–3 nesting levels.
 
+
+## Nest for ownership, not DOM depth
+
+Nesting is most useful when related selectors belong to one component:
+
+```scss
+.card {
+  padding: 1rem;
+
+  &__title { font-weight: 700; }
+  &:hover { box-shadow: 0 4px 12px rgb(0 0 0 / 12%); }
+}
+```
+
+Avoid copying the entire HTML hierarchy into SCSS. Deep nesting creates long selectors, unnecessary specificity, and coupling to markup structure. Before adding another nesting level, ask whether the final selector would still make sense if the component moved elsewhere in the DOM.
+
 ---
 
 # 14. The Parent Selector `&`
@@ -1124,6 +1230,13 @@ Output:
 ```
 
 This can be useful, but CSS custom properties are often cleaner for theming.
+
+
+## Predict the emitted selector
+
+Read `&` as “the current outer selector.” For `.button`, `&:focus-visible` becomes `.button:focus-visible`, while `&--danger` becomes `.button--danger`.
+
+`&` can also appear in more advanced selector arrangements, but complexity rises quickly. A practical habit is to write the expected CSS selector in a comment or inspect the compiled output. If the result is surprising, use a clearer explicit selector rather than relying on clever nesting.
 
 ---
 
@@ -1209,6 +1322,27 @@ This is often the best of both worlds:
 
 - Sass generates token structures
 - CSS variables provide runtime theming
+
+
+## Combine build-time defaults with runtime tokens
+
+Sass can generate CSS custom properties:
+
+```scss
+$brand-default: #2563eb;
+
+:root {
+  --brand: #{$brand-default};
+}
+
+.button {
+  background: var(--brand);
+}
+```
+
+The Sass variable is resolved while building; `--brand` remains live in the browser.
+
+Use this combination when Sass is useful for token source files or generation but the application still needs runtime themes, inheritance, JavaScript-driven values, or per-component overrides. Do not attempt to call a Sass function on a CSS custom property's future runtime value—the compiler cannot know that computed value.
 
 ---
 
@@ -1319,6 +1453,23 @@ If multiple files ultimately load the same module, its emitted CSS is included o
 
 This is one of the major advantages of the module system.
 
+
+## What `@use` gives you
+
+`@use` loads a Sass module and exposes its public members through a namespace by default:
+
+```scss
+@use "tokens";
+
+.button {
+  color: tokens.$primary;
+}
+```
+
+The loaded file is evaluated once, and the namespace makes the dependency visible at the call site. This is safer than legacy Sass `@import`, where members were commonly injected into one global namespace.
+
+Use `as *` sparingly because it removes much of that clarity. For application code, short meaningful namespaces usually make ownership easier to understand and refactor.
+
 ---
 
 # 19. `@forward` and Library APIs
@@ -1377,6 +1528,23 @@ A consumer can access forwarded members using the resulting prefix.
 
 `@forward` is particularly useful when publishing a design system or component library.
 
+
+## `@forward` is for exposing an API
+
+`@use` consumes a module; `@forward` re-exports members so another file can act as a public entry point.
+
+```text
+_internal token/helper files
+          ↓ @forward
+      _index.scss
+          ↓ @use
+        consumer
+```
+
+This is useful in a design-system or component library where consumers should import one stable module rather than know every internal filename.
+
+Keep implementation helpers private when they are not part of the supported API. A clean forwarding layer makes later internal reorganization less disruptive to consumers.
+
 ---
 
 # 20. Configurable Modules
@@ -1410,6 +1578,15 @@ This lets library consumers customize behavior without editing the source.
 Only expose variables as configurable if they are part of the intended public API.
 
 Do not encourage users to configure internal/private implementation details.
+
+
+## Configuration happens when a module is first loaded
+
+Variables declared with `!default` can act as module configuration points. A consumer supplies values with `with (...)` when loading the module.
+
+The important design rule is to expose **intentional configuration**, not every internal variable. Treat configurable variables like public API parameters: document their expected type, units, and effect.
+
+Because modules are evaluated once, organize configuration at clear entry points. If a value must vary dynamically at runtime rather than once at compile time, CSS custom properties are often a better mechanism.
 
 ---
 
@@ -1449,6 +1626,13 @@ Mixins can contain:
 - content blocks
 
 Use a mixin when the reused behavior should emit CSS.
+
+
+## Inputs and emitted output
+
+A mixin packages declarations or nested rules and can accept arguments. Calling it with `@include` emits CSS at the inclusion point.
+
+Use a mixin when callers need generated style rules, especially when parameters or an `@content` block vary the result. Do not automatically turn every repeated declaration into a mixin: repeated inclusion copies output and can increase CSS size. Sometimes a shared CSS class, custom property, or ordinary composition pattern is simpler.
 
 ---
 
@@ -1516,6 +1700,20 @@ Keyword arguments improve readability.
 
 Use variadic APIs carefully. Too much flexibility can make mixins difficult to understand.
 
+
+## Design arguments like a small API
+
+Mixin parameters should have clear names and predictable types:
+
+```scss
+@mixin surface($radius: 0.75rem, $shadow: none) {
+  border-radius: $radius;
+  box-shadow: $shadow;
+}
+```
+
+Defaults reduce noise for common cases; named arguments make optional calls easier to read. Avoid long parameter lists containing unrelated switches. If the mixin requires many independent options, a map/configuration object or several smaller mixins may communicate the design better.
+
 ---
 
 # 23. `@content` and Content Blocks
@@ -1564,6 +1762,29 @@ A content block can also receive values using `using`.
 ```
 
 This is more advanced and useful in reusable libraries.
+
+
+## A caller-supplied block
+
+A mixin with `@content` can wrap styles supplied by its caller:
+
+```scss
+@mixin up($width) {
+  @media (min-width: $width) {
+    @content;
+  }
+}
+
+.card {
+  @include up(48rem) {
+    display: grid;
+  }
+}
+```
+
+The parameter controls the wrapper and the content block supplies the declarations to emit. This is useful for media-query helpers, feature-query wrappers, and repeated contextual patterns.
+
+Keep wrappers thin. If readers must jump through several nested content mixins to discover where a declaration ends up, the abstraction is costing more than it saves.
 
 ---
 
@@ -1628,6 +1849,19 @@ Use a mixin when you want to emit **declarations or rules**.
   @return $number;
 }
 ```
+
+
+## Function contract
+
+A Sass function receives arguments and **returns a Sass value** with `@return`. It should be used where a CSS/Sass value is expected:
+
+```scss
+padding: double(8px);
+```
+
+A function is a good fit for unit conversion, token lookup, validation, or deterministic calculations. A mixin is the better tool when you need to emit declarations or nested rules.
+
+Document expected units. For example, a `rem($px)` helper that expects pixel lengths should reject or clearly handle unitless values rather than silently producing surprising output.
 
 ---
 
@@ -1793,6 +2027,17 @@ Warnings inform the developer but compilation can continue.
 
 Use errors to protect public APIs from invalid configuration.
 
+
+## Three different diagnostics
+
+Use the directives according to severity:
+
+- `@debug` — developer information while compiling;
+- `@warn` — compilation can continue, but the caller should notice a problem or deprecated usage;
+- `@error` — invalid input makes it unsafe to continue.
+
+They are especially useful inside reusable functions and mixins. Instead of allowing an unknown token name to become `null` and fail later, validate it at the API boundary and return a message that identifies the bad input.
+
 ---
 
 # 28. `@extend` and Placeholder Selectors
@@ -1904,6 +2149,21 @@ $colors: (
 }
 ```
 
+
+## Namespaced APIs are easier to reason about
+
+Built-in modules provide Sass operations that are not ordinary CSS. Their namespaces show where behavior comes from:
+
+```scss
+map.get(...)
+math.div(...)
+color.adjust(...)
+```
+
+The function arguments are Sass values and the return value is another Sass value used during compilation. These APIs do not execute in the browser.
+
+Load only the modules a file needs. This explicit dependency style aligns with the broader `@use` module system and avoids relying on deprecated global versions of built-in functions.
+
 ---
 
 # 31. `sass:math`
@@ -1962,6 +2222,15 @@ $b: math.max(2rem, 4rem);
 }
 ```
 
+
+## What the math module returns
+
+Most `sass:math` functions take Sass numbers and return a number or related numeric result. Unit compatibility matters: a value such as `2rem` is not interchangeable with every other unit in every operation.
+
+`math.div($a, $b)` is the explicit Sass arithmetic form for division. Use CSS `/` syntax where CSS itself defines a slash-separated value, and use browser `calc()` when the expression intentionally depends on runtime CSS values.
+
+For reusable numeric helpers, validate whether an input is unitless or has the units your API expects.
+
 ---
 
 # 32. `sass:string`
@@ -1989,6 +2258,13 @@ String functions are helpful for:
 - debugging
 
 Avoid excessive string meta-programming when a straightforward selector or map would be clearer.
+
+
+## Use strings for generation, not ordinary styling
+
+The string module is useful when code is generating names or processing library metadata. Its inputs are Sass strings; functions return transformed strings, indexes, lengths, or related values depending on the operation.
+
+Most application styles do not need string manipulation. If you find yourself constructing many selector names dynamically, consider whether explicit classes, a map plus `@each`, or component markup would be easier to search and maintain.
 
 ---
 
@@ -2040,6 +2316,15 @@ Modern Sass encourages module-based APIs such as `color.adjust`, `color.scale`, 
 
 Also remember that a browser can often handle runtime color work using modern CSS functions. Use Sass color calculations when compile-time output is what you want.
 
+
+## Compile-time color transformation
+
+`sass:color` functions receive Sass color values and return new color values. The result is normally written as a concrete color into generated CSS.
+
+That makes them appropriate for build-time palettes. They are not a substitute for runtime CSS color functions when the input comes from a CSS custom property or must respond to the browser at runtime.
+
+When deriving hover or state colors, check contrast rather than assuming that making a color lighter or darker automatically preserves accessibility.
+
 ---
 
 # 34. `sass:list`
@@ -2080,6 +2365,23 @@ $directions: top, right, bottom, left;
   }
 }
 ```
+
+
+## List mental model
+
+A Sass list is an ordered collection. Functions such as `list.length`, `list.nth`, `list.append`, and `list.index` inspect or produce list values during compilation.
+
+Lists are useful for ordered scales and iteration:
+
+```scss
+$spaces: 0.25rem, 0.5rem, 1rem;
+
+@each $space in $spaces {
+  // generate or calculate with $space
+}
+```
+
+Remember that Sass list indexing is not the same mental model as JavaScript arrays; use the documented Sass functions rather than assuming JavaScript-like methods.
 
 ---
 
@@ -2165,6 +2467,21 @@ Usage:
   }
 }
 ```
+
+
+## Maps model named configuration
+
+A map stores key/value pairs. `map.get($map, $key)` retrieves a value, `map.has-key` checks existence, and `map.merge` returns a map containing merged entries.
+
+Maps are a strong fit for design tokens because keys carry meaning:
+
+```text
+"sm" -> 36rem
+"md" -> 48rem
+"lg" -> 64rem
+```
+
+Wrap important lookups in a helper that raises `@error` for unknown keys. Silent `null` values are harder to diagnose once they flow into generated component CSS.
 
 ---
 
@@ -2302,6 +2619,13 @@ Sass works with CSS at-rules.
 
 Sass should complement modern CSS, not replace it.
 
+
+## Sass should preserve CSS meaning
+
+Standard CSS at-rules such as `@media`, `@supports`, `@font-face`, `@keyframes`, and modern browser features remain CSS concepts even when authored inside SCSS. Sass may make them easier to organize or generate, but the browser is responsible for evaluating the emitted CSS.
+
+Do not replace a browser-time condition with Sass compile-time logic. For example, a viewport breakpoint belongs in `@media`; Sass can provide the breakpoint token or helper that generates the query.
+
 ---
 
 # 39. Responsive Design Patterns
@@ -2364,6 +2688,21 @@ Prefer:
 ```
 
 Readable code ages better.
+
+
+## Keep runtime conditions in CSS
+
+A breakpoint mixin can reduce repetition:
+
+```scss
+@include up("md") {
+  // responsive declarations
+}
+```
+
+but the generated output should still be an ordinary media or container query. Sass does not know the user's device size during compilation.
+
+Centralize breakpoint tokens, prefer mobile-first base rules when they fit the product, and use container queries when a component's behavior should depend on its container instead of the entire viewport.
 
 ---
 
@@ -2434,6 +2773,21 @@ This pattern gives you:
 - validation
 - discoverable scales
 - easier refactoring
+
+
+## From data to a stable API
+
+Maps can hold token data, while helper functions provide validated access:
+
+```scss
+@function space($name) {
+  // look up $name and error if it is unknown
+}
+```
+
+This separates **storage** from **usage**. Components ask for semantic tokens rather than reaching into arbitrary nested structures everywhere.
+
+For runtime themes, consider generating CSS custom properties from the Sass token map. This keeps Sass as the source/generator while allowing the browser to switch values without recompiling.
 
 ---
 
@@ -2532,6 +2886,13 @@ Every generated class increases CSS size.
 
 Generate only utilities that have real value.
 
+
+## Generation trades repetition in source for repetition in output
+
+Loops can turn a scale into predictable classes, which is useful for a controlled design system. However, every generated selector adds CSS whether or not the application uses it.
+
+Generate only utilities with a clear naming contract and bounded token set. Inspect the compiled stylesheet and measure output size. For a handful of styles, writing explicit classes may be simpler and smaller than building a general generator.
+
 ---
 
 # 43. Component Architecture
@@ -2573,6 +2934,20 @@ Example:
 ```
 
 Keep component logic close together, but do not nest every DOM descendant.
+
+
+## Components should own their styles and dependencies
+
+A maintainable Sass component usually has:
+
+- a clear public selector/API;
+- explicit `@use` dependencies;
+- shallow selectors;
+- tokens rather than unexplained magic values;
+- states such as hover, focus, disabled, and invalid where relevant;
+- responsive rules close enough to understand component behavior.
+
+Avoid components that mutate global variables or depend on another file having been loaded “somewhere earlier.” Explicit modules make components safer to move and test.
 
 ---
 
@@ -2730,6 +3105,22 @@ Do not overdo it:
 ```
 
 Prefer simple, intentional class names.
+
+
+## Sass helps write BEM, but does not replace the naming method
+
+The parent selector can reduce repetition:
+
+```scss
+.card {
+  &__title { ... }
+  &--featured { ... }
+}
+```
+
+which emits `.card__title` and `.card--featured`.
+
+Do not over-nest BEM elements just because Sass allows it. BEM class names are already designed to express component relationships without requiring deep descendant selectors. Prefer a stable class contract over selectors tied to exact DOM depth.
 
 ---
 
@@ -2955,6 +3346,18 @@ console.log(result.css);
 
 Use the modern API rather than legacy `render()`/`renderSync()` APIs in new integrations.
 
+
+## Inputs, result, and errors
+
+The modern API has two main input forms:
+
+- `compile()` / `compileAsync()` take a stylesheet **file path**;
+- `compileString()` / `compileStringAsync()` take a Sass **source string**.
+
+Successful calls return a compile result whose `css` property contains generated CSS. Invalid source or failed imports raise/reject with an error, so build integrations should surface those failures clearly.
+
+Choose async variants when your integration requires asynchronous importers/functions or concurrency characteristics that benefit from them; do not assume “async” is automatically faster for every package and workload.
+
 ---
 
 # 50. CLI Workflow and Build Options
@@ -3110,6 +3513,19 @@ Sass errors usually include:
 Your Sass may look elegant while producing undesirable CSS.
 
 Always inspect the output.
+
+
+## Debug the right layer
+
+Use a predictable sequence:
+
+1. reproduce the compiler error with the smallest entry file;
+2. check module paths/namespaces and the exact line in the diagnostic;
+3. use `@debug` for compile-time values when needed;
+4. inspect generated CSS;
+5. load DevTools to check cascade, inheritance, layout, and runtime custom properties.
+
+A rule present in generated CSS but crossed out in DevTools is usually not a Sass compiler problem. A missing rule may be a control-flow, module, selector-generation, or build-entry issue.
 
 ---
 
@@ -3339,6 +3755,21 @@ for new integrations.
 Avoid starting new projects with discontinued implementations such as LibSass/Ruby Sass.
 
 Use Dart Sass.
+
+
+## Treat deprecation warnings as migration work
+
+Dart Sass deprecates features before removal so projects have time to move. In particular, Sass `@import` and global built-in function calls were deprecated beginning with Dart Sass 1.80.0. Modern code should use the module system and namespaced built-ins.
+
+Do not globally silence warnings without understanding them. In an application upgrade:
+
+1. record the installed Sass version;
+2. collect warnings in CI/local builds;
+3. separate warnings from your own code and dependencies;
+4. migrate source incrementally;
+5. compile and visually test the generated CSS after each group of changes.
+
+Deprecation behavior changes over time, so consult the official breaking-change documentation when upgrading the compiler.
 
 ---
 
@@ -3614,6 +4045,22 @@ Prefer:
 over compressed source code.
 
 Let a formatter handle whitespace if your project uses one.
+
+
+## A practical team standard
+
+Good Sass conventions should reduce cognitive load, not enforce style for its own sake. Agree on:
+
+- module/partial naming;
+- namespace naming;
+- token locations;
+- selector/nesting limits;
+- when mixins/functions are appropriate;
+- formatting and linting;
+- policy for deprecation warnings;
+- how generated CSS is reviewed.
+
+Prefer modern module syntax, explicit dependencies, predictable component ownership, and small public APIs. A style rule that makes the generated CSS harder to inspect is usually a poor trade.
 
 ---
 

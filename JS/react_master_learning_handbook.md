@@ -1,4 +1,6 @@
 # React Master Learning Handbook
+> **Revision note (August 2026):** React **19.2** remains the current stable documentation baseline. The handbook keeps React 19-era APIs while reinforcing places where code examples previously had too little beginner explanation.
+
 
 > **A single-file beginner-to-advanced guide for learning modern React**
 >
@@ -651,6 +653,8 @@ function DeleteButton({ onDelete }) {
 ---
 
 # 10. `children` and Composition
+`children` lets a component receive nested UI from its parent. Composition is React's main reuse mechanism: prefer combining small components through props/children instead of building deep inheritance hierarchies.
+
 
 `children` is the content placed inside a component.
 
@@ -688,6 +692,8 @@ React favors composition over inheritance.
 ---
 
 # 11. Conditional Rendering
+Conditional rendering means choosing which JSX appears from current state/props. Use ordinary JavaScript conditions, but keep complex business rules outside JSX so the rendered branches remain easy to read and test.
+
 
 ## `if`
 
@@ -759,6 +765,8 @@ Array index keys can be unsafe when items are inserted, removed, reordered, or f
 ---
 
 # 13. Events
+React event handlers are functions passed to JSX props such as `onClick`. Pass the function rather than calling it during render, and treat events as user intent that updates state or starts an operation.
+
 
 ```jsx
 function SaveButton() {
@@ -946,6 +954,8 @@ const sorted = [...items].sort(compareFunction);
 ---
 
 # 17. Forms
+Forms combine user input, state, validation, submission, loading, and errors. Decide whether a field should be controlled by React state, left uncontrolled and read when needed, or managed by a form library/framework feature based on complexity.
+
 
 Controlled form:
 
@@ -1090,6 +1100,8 @@ This avoids duplicated sources of truth.
 ---
 
 # 20. Single Source of Truth
+For each piece of state, choose one owner. Other components should receive that value or derive from it rather than keeping independent copies that can drift out of sync.
+
 
 Bad:
 
@@ -1115,6 +1127,8 @@ Store the minimal source state. Derive what you can.
 ---
 
 # 21. Derived State
+Derived state is a value that can be calculated from existing props/state. Prefer calculating it during render (or memoizing only when necessary) instead of storing a second synchronized copy with an Effect.
+
 
 Bad:
 
@@ -1498,6 +1512,8 @@ Do not put every state variable in Context. Context is a distribution mechanism,
 ---
 
 # 32. `useReducer`
+`useReducer` centralizes state transitions as `(state, action) → nextState`. It is useful when many related updates share rules or when named actions make a complex state machine easier to understand than several independent setters.
+
 
 Reducers centralize complex state updates.
 
@@ -1900,6 +1916,8 @@ Suspense is not automatically a replacement for every manually managed loading s
 ---
 
 # 44. Lazy Loading and Code Splitting
+Code splitting delays JavaScript until a feature is needed. Use `lazy`/Suspense or framework-level route splitting for heavy, infrequently used UI; do not split tiny components so aggressively that network overhead and loading complexity become worse than the bundle savings.
+
 
 Load a heavy screen only when required.
 
@@ -2008,6 +2026,8 @@ Frameworks/libraries may provide more convenient error-boundary abstractions.
 ---
 
 # 48. Data Fetching
+Data fetching is an application/framework concern around React, not just “call `fetch` in every component.” Prefer your framework's server/data APIs or a well-defined client data layer when they can handle caching, deduplication, mutations, and race conditions more reliably.
+
 
 Basic browser-side fetch:
 
@@ -2072,6 +2092,8 @@ Large applications often benefit from a framework or server-state library for:
 ---
 
 # 49. Race Conditions and Cancellation
+A race occurs when older asynchronous work finishes after newer work and overwrites the UI. Use cleanup, cancellation (`AbortController` where supported), request identity, or framework/data-library primitives so only the relevant result wins.
+
 
 Scenario:
 
@@ -2228,6 +2250,8 @@ Link:
 ---
 
 # 52. Authentication and Authorization
+Authentication identifies a user; authorization decides what they may do. Client-side checks can shape the UI, but protected data and mutations must be authorized on the server because users control browser code.
+
 
 Simplified flow:
 
@@ -2356,6 +2380,8 @@ Do not treat server data exactly like simple local component state.
 ---
 
 # 55. Styling
+React does not prescribe one styling system. Choose plain CSS, CSS Modules, utility CSS, CSS-in-JS, or a component system based on scope, runtime cost, design-system needs, and team conventions—not because React requires a specific option.
+
 
 React does not force one styling approach.
 
@@ -2675,6 +2701,8 @@ Important distinction:
 ---
 
 # 61. Immutability
+React state should be treated as immutable snapshots. Create a new object/array when state changes instead of mutating the existing value; this keeps rendering and memoization assumptions predictable.
+
 
 Immutable object update:
 
@@ -2996,6 +3024,8 @@ Keep React, server-rendering packages, frameworks, and dependencies patched. Ser
 ---
 
 # 68. SSR, Hydration, and Streaming
+SSR renders initial HTML on the server; hydration connects that HTML to client-side React; streaming sends parts of the server result as they become ready. These techniques improve startup/UX for suitable applications but require server-safe code and consistent server/client output.
+
 
 ## CSR
 
@@ -3608,6 +3638,8 @@ const [state, dispatch] = useReducer(reducer, {
 ---
 
 # 77. Practice Projects
+Each project should exercise more than the happy path. Add loading/empty/error states, form validation, accessibility, at least one performance consideration, and automated tests so the project demonstrates application engineering rather than only JSX syntax.
+
 
 ## Beginner
 
@@ -3979,6 +4011,8 @@ Suspense:
 ---
 
 # 80. Glossary
+Use the glossary for recall, then return to the full chapter when a term affects architecture. Terms such as render, commit, Effect, transition, Suspense, server component, and hydration have precise meanings that matter in debugging.
+
 
 **Component** — reusable unit of React UI.
 
@@ -4027,6 +4061,8 @@ Suspense:
 ---
 
 # 81. Mastery Checklist
+A checked item means you can explain the concept, implement it from memory in a small example, identify a common misuse, and choose an alternative when appropriate.
+
 
 ## Fundamentals
 
@@ -4600,6 +4636,8 @@ Reusable component libraries often support both patterns intentionally.
 ---
 
 # Appendix K — React Code Review Checklist
+Review behavior first: state ownership, Effects, accessibility, async failure/race handling, server/client boundaries, security, and tests. Formatting belongs mostly to automated tooling.
+
 
 - [ ] Components are reasonably focused.
 - [ ] Hooks follow Rules of Hooks.

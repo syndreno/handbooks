@@ -168,6 +168,18 @@ This distinction is the foundation of good time management.
 
 # 3. Core Principles of Time Management
 
+These principles are more important than any individual productivity technique. A tool such as Pomodoro, GTD, or time blocking only helps when it supports good decisions about priorities, capacity, and attention.
+
+A useful test for any technique is:
+
+```text
+Does this help me choose better work,
+protect time for it,
+and finish it with less unnecessary friction?
+```
+
+If not, the technique is adding complexity rather than helping.
+
 ## Principle 1: Time is finite
 
 You cannot add more hours to the day.
@@ -261,7 +273,7 @@ Reply to simple emails
 - Solving production issues
 - Analytical work
 
-### Medium-energy tasks
+## Medium-energy tasks
 
 - Meetings
 - Code review
@@ -420,7 +432,16 @@ Complete 30 SQL query exercises and build one sample reporting database by Septe
 
 # 7. Prioritization
 
-Prioritization means deciding which tasks deserve attention first.
+Prioritization means deciding which tasks deserve attention first **and which tasks can wait, shrink, move, be delegated, or disappear**. A priority is a trade-off, not just a label.
+
+A task can be:
+
+- urgent but low-impact;
+- important but not urgent;
+- both urgent and important;
+- neither.
+
+That is why "do the most urgent thing" is not a complete prioritization system.
 
 Ask four questions:
 
@@ -449,13 +470,38 @@ Possible order:
 4. Update profile picture
 ```
 
-Priority should be based on impact, not on which task feels easiest.
+Priority should be based on impact, deadlines, dependencies, risk, and consequences—not on which task feels easiest.
+
+## A simple priority decision model
+
+When two tasks compete, compare:
+
+| Question | Why it matters |
+|---|---|
+| What is the consequence of delay? | Reveals urgency and risk |
+| Who or what is blocked? | Reveals dependencies |
+| What outcome does this create? | Reveals value |
+| Is the deadline real or negotiable? | Prevents false urgency |
+| Can scope be reduced? | Creates capacity |
+| Can someone else own it? | Tests delegation |
+
+When priorities still conflict, escalate the **trade-off**, not just the problem.
 
 ---
 
 # 8. Planning Systems
 
-Time management normally needs two different systems:
+Time management normally needs two different systems: a **calendar** for time commitments and a **task system** for actions. Trying to make either one do everything often creates confusion.
+
+A third optional layer is a **notes/reference system** for information that is not itself an action.
+
+```text
+Calendar → when
+Tasks    → what
+Notes    → supporting information
+```
+
+The tools can be separate apps or different views inside one app. The separation is conceptual, not a requirement to buy more software.
 
 ## Calendar
 
@@ -715,6 +761,8 @@ Common batching categories:
 
 # 14. Pomodoro Technique
 
+The Pomodoro Technique uses a timer to create a clear focus interval followed by a short break. Its main value is not that **25 minutes is magically optimal**; the value is making "start now and focus until the timer ends" concrete.
+
 The classic Pomodoro method:
 
 ```text
@@ -733,6 +781,12 @@ Alternative versions:
 ```
 
 Use whichever fits your work.
+
+## When to shorten or lengthen the interval
+
+Use shorter intervals when the main problem is **starting** or when your attention is fragmented. Use longer intervals when the work has a high setup cost, such as architecture, deep debugging, writing, or mathematical problem-solving.
+
+Do not stop productive flow merely because a timer rings. The timer serves the work; the work does not serve the timer.
 
 ## Good for
 
@@ -796,6 +850,8 @@ Random browsing
 
 # 16. Managing Interruptions
 
+An interruption is an external event that asks you to switch attention. Some interruptions are necessary—production incidents, safety issues, urgent customer problems—so the goal is **not zero interruption**. The goal is to make the escalation path clear and prevent normal work from being treated like an emergency.
+
 Interruptions may come from:
 
 - colleagues,
@@ -832,7 +888,16 @@ Resume your previous task.
 
 # 17. Managing Distractions
 
-Distractions can be external or internal.
+Distractions can be external or internal. Unlike a genuine interruption, a distraction often does not require action now; it simply competes for attention.
+
+A useful distinction is:
+
+```text
+Interruption → something asks for your attention
+Distraction  → your attention is pulled away
+```
+
+Both can break focus, but they need different solutions.
 
 ## External
 
@@ -1316,7 +1381,7 @@ Attending unnecessary meetings
 
 # 27. Parkinson's Law
 
-Parkinson's Law suggests:
+Parkinson's Law is a management observation often summarized as:
 
 > Work tends to expand to fill the time available for its completion.
 
@@ -1341,9 +1406,31 @@ Review from 4:00–4:30.
 
 Do not use unrealistic deadlines that damage quality.
 
+### When to use it
+
+Use bounded time when a task can absorb endless polishing: drafting slides, cleaning notes, routine analysis, or administrative work.
+
+### When not to use it
+
+Do not compress work whose duration is constrained by testing, review, physical processes, external dependencies, safety requirements, or quality gates. A shorter calendar slot does not make inherently uncertain work deterministic.
+
 ---
 
 # 28. The 80/20 Rule in Practice
+
+This section applies the Pareto thinking tool from the previous chapter instead of redefining it. The practical workflow is:
+
+```text
+List outcomes
+    ↓
+Identify the few activities most connected to those outcomes
+    ↓
+Protect those activities
+    ↓
+Reduce low-value work
+    ↓
+Review whether the assumption was correct
+```
 
 Example learning plan:
 
@@ -1422,7 +1509,9 @@ AI recommendations in this release
 
 # 30. Eat the Frog
 
-"Eat the frog" means completing your most important or difficult task early rather than avoiding it all day.
+"Eat the frog" is a simple prioritization heuristic: complete a meaningful task you are likely to avoid before low-value work consumes the day.
+
+It does **not** mean the hardest task must always be first. The best first task may instead be the one with the highest impact, earliest real deadline, or strongest dependency.
 
 Example:
 
@@ -1435,9 +1524,13 @@ Then perform lower-value work later.
 
 This is especially useful when you have strong morning energy.
 
+If your best energy occurs later, schedule the difficult task in that stronger period instead. Energy-aware scheduling is more important than copying a morning routine.
+
 ---
 
 # 31. The Two-Minute Rule
+
+The Two-Minute Rule is most useful while **processing incoming items**: if an action is genuinely tiny and doing it now costs less than tracking and revisiting it, complete it.
 
 If a task can truly be completed in around two minutes, sometimes it is efficient to do it immediately.
 
@@ -1460,6 +1553,8 @@ Use the rule during processing time, not during deep work.
 
 # 32. The Ivy Lee Method
 
+The Ivy Lee Method is a deliberately simple daily prioritization system. It works best when you need a short ordered list rather than a complex task-management framework.
+
 At the end of each day:
 
 1. Write six important tasks for tomorrow.
@@ -1470,6 +1565,10 @@ At the end of each day:
 6. Repeat.
 
 This method is intentionally simple.
+
+## Limitation
+
+Real work is not always strictly sequential. Meetings, incidents, dependencies, and collaborative tasks may force reordering. Treat the list as a default order, not as a rule that prevents sensible adaptation.
 
 ---
 
@@ -1485,13 +1584,13 @@ Plan a day with:
 
 Example:
 
-### Big
+## Big
 
 ```text
 Finish authentication feature.
 ```
 
-### Medium
+## Medium
 
 ```text
 Review PR
@@ -1499,7 +1598,7 @@ Prepare status update
 Write unit tests
 ```
 
-### Small
+## Small
 
 ```text
 Reply email
@@ -1514,6 +1613,8 @@ Adjust based on your actual workday.
 ---
 
 # 34. The 4D Method
+
+The 4D Method is an **inbox-processing decision rule**, not a complete planning system. It helps prevent incoming work from remaining in an undefined state.
 
 For every incoming task:
 
@@ -1543,6 +1644,8 @@ Remove tasks that do not need to happen.
 ---
 
 # 35. Buffer Time and Slack
+
+Buffer time is deliberately unallocated capacity. It absorbs normal uncertainty so one delayed meeting or unexpected request does not destroy the rest of the schedule.
 
 Do not plan your day at 100% capacity.
 
@@ -1655,7 +1758,7 @@ Which project can wait?
 
 # 38. Context Switching
 
-Context switching happens when you frequently move between unrelated tasks.
+Context switching happens when you move between tasks that require different mental context. Switching is not inherently bad—work often requires it—but **frequent, unplanned switching** increases restart effort and makes it easier to lose your place.
 
 Example:
 
@@ -1683,6 +1786,8 @@ Each switch requires mental reorientation.
 
 # 39. Managing Dependencies
 
+A dependency is a condition that affects when work can start or finish. Some dependencies are hard blockers; others only make the task slower or riskier.
+
 A dependency occurs when one task cannot move forward until something else happens.
 
 Example:
@@ -1706,6 +1811,8 @@ Follow-up: Aug 14
 ---
 
 # 40. Waiting Tasks and Follow-Ups
+
+A task you have delegated or requested from someone else should not disappear from your system. Track it as a **waiting item** with an owner, request date, and next follow-up point.
 
 Many tasks are not "to do."
 
@@ -2155,7 +2262,17 @@ I won't be able to complete this by 3 PM without delaying the client report. I c
 
 # 54. Setting Boundaries
 
-Boundaries define when and how people can use your time.
+Boundaries define when and how people can use your time. A boundary works best when it also explains the **alternative path** for legitimate urgent needs.
+
+For example:
+
+```text
+Normal questions → team channel, checked at 11:30 and 4:00
+Production outage → phone call immediately
+Meeting requests  → calendar with agenda
+```
+
+This protects focus without making you unreachable.
 
 Examples:
 
@@ -2173,7 +2290,7 @@ Good boundaries are clear, respectful, and consistent.
 
 # 55. Decision Management
 
-Many people lose time not because tasks are large, but because decisions remain unresolved.
+Many projects lose time not because execution is slow, but because decisions remain unresolved. An open decision can block many downstream tasks, so decision work deserves explicit ownership and deadlines just like implementation work.
 
 Examples:
 
@@ -2208,7 +2325,7 @@ Once the decision is made, execution can continue.
 
 # 56. Automation and Tools
 
-Automation can save time when the task is repetitive and predictable.
+Automation can save time when the task is repetitive, predictable, and safe enough to standardize. Good automation removes repeated execution; bad automation merely moves the work into maintenance and debugging.
 
 Examples:
 
@@ -2237,11 +2354,29 @@ A five-minute task done once may not need automation.
 
 A five-minute task done every day may.
 
+### Consider total cost
+
+Before automating, include:
+
+```text
+Build time
+Testing time
+Failure handling
+Documentation
+Maintenance
+Security/permissions
+Human review where needed
+```
+
+Automate stable repetition first. Avoid automating a broken or poorly understood process.
+
 ---
 
 # 57. Time Management Metrics
 
-You do not need to measure everything.
+You do not need to measure everything. A useful metric should help you make a decision; otherwise it becomes administrative overhead.
+
+Prefer **trend metrics** over vanity metrics. For example, "planned vs actual duration is improving" is usually more actionable than "I completed 47 tasks" because task counts can be inflated by splitting work into tiny pieces.
 
 Useful metrics can include:
 

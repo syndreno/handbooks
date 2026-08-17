@@ -2,7 +2,7 @@
 
 > **ChatGPT • Claude • Cursor • Google Gemini • Amp**
 >
-> **Edition:** August 2026  
+> **Edition:** August 17, 2026  
 > **Audience:** Beginner → Intermediate → Advanced → Professional  
 > **Purpose:** A single practical handbook for learning modern AI assistants, AI coding agents, prompting, context engineering, tool use, research, coding workflows, security, automation, and multi-agent work.
 >
@@ -61,6 +61,15 @@
 47. [Glossary](#47-glossary)
 48. [Official Documentation and Further Learning](#48-official-documentation-and-further-learning)
 49. [Final Principles](#49-final-principles)
+50. [Appendix A — One-Page Prompt Cheat Sheet](#appendix-a--one-page-prompt-cheat-sheet)
+51. [Appendix B — One-Page Coding Agent Checklist](#appendix-b--one-page-coding-agent-checklist)
+52. [Appendix C — Cross-Product Mental Map](#appendix-c--cross-product-mental-map)
+53. [Appendix D — Master Practice Challenge](#appendix-d--master-practice-challenge)
+54. [Appendix E — Advanced Prompting Patterns](#appendix-e--advanced-prompting-patterns)
+55. [Appendix F — Building AI Features with APIs](#appendix-f--building-ai-features-with-apis)
+56. [Appendix G — Daily AI Coding-Agent Operating System](#appendix-g--daily-ai-coding-agent-operating-system)
+57. [Appendix H — Product Feature Volatility Guide](#appendix-h--product-feature-volatility-guide)
+58. [Appendix I — AI Mastery Self-Assessment](#appendix-i--ai-mastery-self-assessment)
 
 ---
 
@@ -110,7 +119,7 @@ The goal is to become good at **designing AI-assisted workflows**.
 
 # 2. The Big Picture: What These Tools Actually Are
 
-The products in this handbook overlap, but they are not identical.
+The products in this handbook overlap, but they are not identical. Do not choose an AI tool only by model benchmark scores: the surrounding **context system, file/repository access, permissions, integrations, execution environment, and review workflow** often matter just as much as the model.
 
 | Product | Main Identity | Typical Strength |
 |---|---|---|
@@ -231,7 +240,7 @@ Repeat
 
 An LLM does not behave exactly like a traditional database.
 
-It generates responses based on learned statistical patterns plus the context supplied during inference.
+It generates responses based on learned statistical patterns plus the context supplied during inference. That means a fluent answer is not proof that the underlying claim is present in a source, current, or correct. When a task depends on external facts, use retrieval/search/tools and verify the evidence.
 
 ## 3.6 Foundation Model
 
@@ -479,6 +488,8 @@ Mitigation:
 
 # 6. Prompt Engineering Fundamentals
 
+Prompt engineering is mainly about making the task unambiguous: define the goal, relevant context, constraints, evidence, verification method, and desired output. A better prompt cannot compensate for missing data, unavailable tools, insufficient permissions, or an unsuitable model; fix those system constraints instead of endlessly rewriting wording.
+
 ## 6.1 Weak Prompt
 
 ```text
@@ -689,7 +700,7 @@ Explain exactly how many HTTP requests occur before and after the fix.
 Root cause, corrected code, and regression tests.
 ```
 
-This framework works in ChatGPT, Claude, Gemini, Cursor, Amp, and most other assistants.
+This framework works in ChatGPT, Claude, Gemini, Cursor, Amp, and most other assistants. You do not need every field for every task. For a small request, `Goal + Context + Output` may be enough; add constraints, method, and verification as the task becomes riskier or more ambiguous.
 
 ---
 
@@ -697,7 +708,7 @@ This framework works in ChatGPT, Claude, Gemini, Cursor, Amp, and most other ass
 
 ## 8.1 Hallucination
 
-A hallucination is generated content that sounds plausible but is unsupported or incorrect.
+A hallucination is generated content that sounds plausible but is unsupported or incorrect. Distinguish it from a normal software error: a tool can return a real error, while a hallucination is the model inventing or misrepresenting information. Also distinguish **uncertainty** (“I do not know”) from hallucination; a system should prefer explicit uncertainty over fabricated confidence.
 
 Examples:
 
@@ -775,7 +786,7 @@ source code > assumptions
 
 # 9. Files, Images, Audio, PDFs, and Multimodal AI
 
-Modern assistants can often process more than text.
+Modern assistants can often process more than text. Multimodal input changes what evidence is available, but it does not remove the need for verification. Tables can be misread, screenshots may omit hidden state, OCR can fail, and scanned PDF pages may need visual inspection rather than text extraction alone.
 
 Possible inputs:
 
@@ -863,6 +874,8 @@ Always verify important values.
 
 # 10. Web Search, Research, and Source Grounding
 
+Use external search when the answer depends on current or source-specific information. A strong research workflow separates **what the source states, what the assistant infers, and what the assistant recommends** so that facts and judgments do not blur together.
+
 ## 10.1 Normal Chat vs Search
 
 Normal conversation can rely on model knowledge.
@@ -931,7 +944,7 @@ Forum content may be useful for debugging, but should not override authoritative
 
 # 11. Memory, Personalization, Projects, and Persistent Instructions
 
-Several AI products support persistent context, but implementations differ.
+Several AI products support persistent context, but implementations differ. Treat persistent context as a data-governance decision: what should be stored, who can see it, how long it stays useful, and how it can be corrected or removed. Secrets, temporary logs, and one-off task details usually do not belong in durable memory.
 
 Understand the conceptual categories.
 
@@ -1080,7 +1093,17 @@ semantic search
 
 # 13. Tools, Function Calling, MCP, Skills, Hooks, and Plugins
 
-These terms are related but not identical.
+These terms are related but not identical. A simple way to separate them is to ask **what layer they extend**:
+
+| Concept | Extends | Typical purpose |
+|---|---|---|
+| Function/tool calling | Model ↔ application runtime | Let the model request a typed action |
+| MCP | AI host/client ↔ external capability server | Standardize access to tools/resources/prompts |
+| Skill | Agent behavior/procedure | Reusable domain workflow or instructions |
+| Hook | Deterministic lifecycle | Run checks/automation before or after events |
+| Plugin/extension | Product/platform | Bundle new capabilities or integrations |
+
+Product implementations differ, so check current official documentation for exact packaging, precedence, and permission behavior.
 
 ## 13.1 Tool
 
@@ -1215,6 +1238,8 @@ Always read the product's own definition.
 
 # 14. AI Agents and Agentic Workflows
 
+An agent is not simply a chatbot with a longer prompt. The defining engineering change is that the system can choose and execute actions over multiple steps, observe results, and adapt its next step within policy limits. Keep deterministic control over high-risk boundaries such as authentication, authorization, approvals, monetary limits, and deployment gates.
+
 ## 14.1 Assistant vs Agent
 
 Assistant:
@@ -1322,6 +1347,8 @@ Plan
 ---
 
 # 15. Human-in-the-Loop and Permission Design
+
+Human approval is a control for uncertainty and blast radius. The useful question is not whether a human should approve everything, but which actions are expensive, irreversible, externally visible, privileged, or difficult to validate automatically.
 
 The correct question is not:
 
@@ -1588,7 +1615,7 @@ Always consider whether the output must be manually verified.
 
 ## 16.14 ChatGPT Work
 
-ChatGPT's work-oriented experience is designed around longer deliverable-oriented work, local/connected information, and richer execution workflows.
+ChatGPT Work is OpenAI's work-oriented agent for longer deliverable-focused tasks. As of August 2026, official product notes describe Work as able to research/analyze information, use files and connected apps, create finished artifacts, and participate in scheduled or monitored workflows where supported by plan and workspace settings.
 
 Use it when the task is closer to:
 
@@ -1731,7 +1758,7 @@ Keep content requirements in instructions, not only style settings.
 
 ## 17.6 Projects
 
-Claude Projects can organize related instructions, knowledge, and conversations.
+Claude Projects can organize related instructions, knowledge, and conversations. Current Anthropic guidance notes that project knowledge and project instructions can be reused across chats, while ordinary chat context is not automatically shared across project chats unless it is added to project knowledge. Large project knowledge can use retrieval automatically.
 
 Use them for:
 
@@ -2040,7 +2067,7 @@ Never throw raw database errors from HTTP controllers.
 
 Cursor can use `AGENTS.md` as repository instruction context.
 
-This is useful for cross-tool compatibility because multiple coding agents increasingly recognize repository instruction files.
+This is useful for cross-tool compatibility because multiple coding agents increasingly recognize repository instruction files. Current Cursor documentation describes root-level `AGENTS.md` as the simple project-wide alternative to structured `.cursor/rules`; use `.cursor/rules` when you need scoped or metadata-driven rules.
 
 ## 18.7 User Rules
 
@@ -2395,7 +2422,7 @@ Gemini CLI is an open-source terminal agent with tool use and MCP support.
 
 Important August 2026 note:
 
-> Google's official deprecation guidance states that consumer/free Google-login access to Gemini CLI changed in June 2026, with those users moved toward Antigravity CLI, while certain enterprise/API-key use cases remained supported. Verify the current authentication/support path before installing based on an older tutorial.
+> On **June 18, 2026**, Gemini CLI stopped serving requests for individual free, Google AI Pro, and Google AI Ultra accounts. Google directs those individual users to **Antigravity CLI**. Gemini CLI remains supported for specified enterprise/Google Cloud and paid API-key paths. Verify the current authentication/support path before following an older tutorial.
 
 This is a good example of why AI-tool tutorials age quickly.
 
@@ -2470,7 +2497,7 @@ Separate threads reduce context pollution.
 
 ## 20.3 Agent Modes
 
-As of August 2026, Amp's current Owner's Manual describes four modes:
+As of August 2026, Amp's current Owner's Manual and SDK documentation describe four built-in modes:
 
 ```text
 low
@@ -2638,7 +2665,9 @@ Process:
 
 # 21. AI Coding Agent Fundamentals
 
-A coding agent is not merely autocomplete.
+A coding agent is not merely autocomplete. Autocomplete predicts a local continuation; an agent can inspect a repository, form a plan, edit multiple files, execute commands, observe failures, and iterate. That makes verification part of the workflow rather than an optional final step.
+
+A strong coding-agent task defines **scope, invariants, quality gates, and stop conditions** in addition to the requested feature.
 
 It can often:
 
@@ -2701,6 +2730,8 @@ Completion requires evidence.
 ---
 
 # 22. AGENTS.md, CLAUDE.md, GEMINI.md, Cursor Rules, and Repository Instructions
+
+Repository instructions are best for durable facts such as build commands, architecture boundaries, coding conventions, test requirements, and dangerous operations. They are poor storage for temporary task status, secrets, or instructions that conflict with organization-level policy. When multiple instruction mechanisms exist, document and test the precedence you expect because product-specific behavior can evolve.
 
 ## 22.1 Purpose
 
@@ -2781,6 +2812,8 @@ Link to deeper documentation instead.
 
 # 23. Planning Before Coding
 
+Planning is most valuable when a task crosses modules, changes public contracts, touches data migrations/security, or has multiple plausible solutions. For a one-line typo, a formal plan can be unnecessary overhead. Separate investigation from implementation when the cost of misunderstanding is high.
+
 ## 23.1 When Planning Is Worth It
 
 Plan first for:
@@ -2831,6 +2864,8 @@ verification
 ---
 
 # 24. Debugging with AI
+
+Debugging should move from **symptom → reproducible evidence → competing hypotheses → smallest discriminating test → root cause → regression test → fix**. An AI assistant is most useful when it helps preserve that discipline instead of jumping to the first plausible patch.
 
 ## 24.1 Weak Debugging
 
@@ -2978,6 +3013,8 @@ Prefer incremental modernization unless there is a strong architectural reason.
 
 # 27. Testing with AI
 
+AI can generate tests quickly, but quantity is not quality. A useful test fails for the intended defect, passes after the fix, and protects a behavior that matters. Ask the assistant to explain what each generated test proves and which important failure mode remains untested.
+
 ## 27.1 Test Categories
 
 ```text
@@ -3034,6 +3071,8 @@ any skipped tests
 ---
 
 # 28. Code Review and Security Review
+
+AI can accelerate review, but it should not replace ownership. High-quality review output is evidence-based: cite the affected file/function or execution result, explain impact, separate confirmed defects from hypotheses, and avoid burying important findings under a long list of low-confidence warnings.
 
 ## 28.1 General Review Prompt
 
@@ -3742,7 +3781,7 @@ current plan support
 
 # 39. How to Evaluate AI Output
 
-Use a scorecard.
+Use a scorecard. Evaluate the result against the task—not against how polished it sounds. For code, execution evidence and tests are stronger than confident prose; for research, source quality and traceability are stronger than citation count; for extraction, field-level accuracy is stronger than an attractive summary.
 
 | Dimension | Question |
 |---|---|
@@ -4060,7 +4099,7 @@ Stop and report before any action outside those boundaries.
 
 # 41. Scenario Library
 
-# Scenario 1 — Beginner Learns Git
+## Scenario 1 — Beginner Learns Git
 
 Prompt:
 
@@ -4081,7 +4120,7 @@ Best suited to: ChatGPT, Claude, Gemini.
 
 ---
 
-# Scenario 2 — Fix a Multi-File Bug
+## Scenario 2 — Fix a Multi-File Bug
 
 Task:
 
@@ -4107,7 +4146,7 @@ Best suited to: Cursor, Claude Code, Codex, Amp.
 
 ---
 
-# Scenario 3 — Research a Current Technology Decision
+## Scenario 3 — Research a Current Technology Decision
 
 Task:
 
@@ -4129,7 +4168,7 @@ Best suited to: ChatGPT research, Claude research, Gemini deep research.
 
 ---
 
-# Scenario 4 — Legacy Application Modernization
+## Scenario 4 — Legacy Application Modernization
 
 Task:
 
@@ -4151,7 +4190,7 @@ Coding-agent choices: Cursor, Claude Code, Codex, Amp.
 
 ---
 
-# Scenario 5 — Analyze a PDF Requirements Document
+## Scenario 5 — Analyze a PDF Requirements Document
 
 Workflow:
 
@@ -4167,7 +4206,7 @@ General AI: ChatGPT, Claude, Gemini.
 
 ---
 
-# Scenario 6 — Build a Prototype
+## Scenario 6 — Build a Prototype
 
 Workflow:
 
@@ -4184,7 +4223,7 @@ Claude Artifacts can be useful for interactive prototypes; coding agents are use
 
 ---
 
-# Scenario 7 — PR Review
+## Scenario 7 — PR Review
 
 Workflow:
 
@@ -4201,7 +4240,7 @@ Use a different agent/model for review when possible to reduce shared blind spot
 
 ---
 
-# Scenario 8 — SQL Performance
+## Scenario 8 — SQL Performance
 
 Provide:
 
@@ -4217,7 +4256,7 @@ Ask AI to form evidence-based hypotheses.
 
 ---
 
-# Scenario 9 — DevOps Failure
+## Scenario 9 — DevOps Failure
 
 Problem:
 
@@ -4242,7 +4281,7 @@ Never give production-write access before diagnosis requires it.
 
 ---
 
-# Scenario 10 — Build a Personal Learning System
+## Scenario 10 — Build a Personal Learning System
 
 Use a general AI assistant for:
 
@@ -4258,7 +4297,7 @@ Use memory/project features for durable preferences and learning goals.
 
 ---
 
-# Scenario 11 — Multi-Agent Feature
+## Scenario 11 — Multi-Agent Feature
 
 ```text
 Agent A → research API library
@@ -4271,7 +4310,7 @@ CI → validate
 
 ---
 
-# Scenario 12 — Production Incident
+## Scenario 12 — Production Incident
 
 Use AI to help summarize logs and hypotheses, but keep operational control with humans.
 
@@ -4292,7 +4331,7 @@ Human:
 
 # 42. Choosing the Right Tool
 
-There is no universal winner.
+There is no universal winner. Choose the **workflow surface** first and the model second: general assistant for broad knowledge work, repository-native agent for code changes, terminal agent for shell-centric work, research mode for multi-source investigations, and direct APIs when you are building the capability into your own product.
 
 Choose by workflow.
 
@@ -5915,7 +5954,7 @@ Fast coding without understanding creates future operational risk.
 
 # Appendix H — Product Feature Volatility Guide
 
-Use this to decide what to memorize.
+Use this to decide what to memorize. This handbook was re-checked on **August 17, 2026** for the most time-sensitive product notes. Even so, exact model names, plan access, command flags, quotas, UI labels, authentication paths, and beta features can change quickly; verify them in official documentation before production decisions.
 
 ## Durable — Learn Deeply
 

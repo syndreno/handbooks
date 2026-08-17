@@ -122,6 +122,16 @@ This handbook is designed to help you:
 60. [Glossary](#60-glossary)
 61. [Further Learning and Official Resources](#61-further-learning-and-official-resources)
 
+
+### Appendix Index
+
+- [Appendix A — Slide Design Recipes](#appendix-a--slide-design-recipes)
+- [Appendix B — Slide Writing Formulas](#appendix-b--slide-writing-formulas)
+- [Appendix C — Presentation Length Guide](#appendix-c--presentation-length-guide)
+- [Appendix D — How to Critique Any Slide](#appendix-d--how-to-critique-any-slide)
+- [Appendix E — Building Your Own Reusable PowerPoint System](#appendix-e--building-your-own-reusable-powerpoint-system)
+- [Appendix F — Mastery Test](#appendix-f--mastery-test)
+
 ---
 
 # 1. PowerPoint Fundamentals
@@ -949,6 +959,31 @@ Where supported, you may be able to:
 
 An icon should clarify meaning, not merely fill empty space.
 
+## 11.5 Icon vs Illustration vs Diagram
+
+Use an **icon** for a compact concept label:
+
+```text
+Lock → Security
+Cloud → Cloud service
+Person → User
+```
+
+Use an **illustration** when mood, context, or storytelling matters.
+
+Use a **diagram** when relationships, sequence, ownership, or architecture must be understood.
+
+Do not use icons as a replacement for explanation when the audience may interpret the symbol differently.
+
+## 11.6 SVG Advantages and Cautions
+
+SVG is vector-based, so it can scale cleanly without the pixelation typical of low-resolution raster images.
+
+Depending on PowerPoint version and the SVG source, you may be able to recolor or convert/edit parts of the graphic. Test the specific file because complex SVG features can render differently after import.
+
+Also verify usage rights. "Available on the internet" does not mean "free to reuse in a commercial presentation."
+
+
 ---
 
 # 12. SmartArt
@@ -1251,6 +1286,47 @@ Example:
 3. Enable MFA
 ```
 
+## 17.4 Screenshot Workflow
+
+For a software instruction slide:
+
+```text
+Capture
+→ crop
+→ remove irrelevant areas
+→ highlight target
+→ add step number
+→ add one short instruction
+```
+
+The screenshot should answer "where do I click?" without forcing the learner to search the entire interface.
+
+## 17.5 Privacy and Security Check
+
+Before inserting or sharing screenshots, inspect them for:
+
+- usernames,
+- email addresses,
+- customer information,
+- access tokens/keys,
+- internal URLs,
+- browser tabs,
+- notifications,
+- personal files,
+- confidential system names.
+
+Blurred or covered sensitive content may still exist in the original source image if you simply place another shape over it. For high-risk sharing, create a properly redacted image or recapture a sanitized screen.
+
+## 17.6 Screen Recording Practical Tips
+
+- Close unrelated applications and notifications.
+- Rehearse the workflow before recording.
+- Use a readable zoom level.
+- Keep cursor movement deliberate.
+- Prefer short task-focused clips over one long recording.
+- Add captions/transcript where appropriate for accessibility.
+
+
 ---
 
 # 18. Design Principles
@@ -1472,6 +1548,43 @@ A user manually changes every slide:
 
 This defeats the purpose.
 
+## 21.5 Theme vs Slide Master vs Layout vs Template
+
+These concepts are related but not interchangeable.
+
+| Item | Main purpose |
+|---|---|
+| Theme | Defines coordinated colors, fonts, and effects |
+| Slide Master | Controls global slide-level design and layout inheritance |
+| Layout | Defines placeholders/positioning for a particular slide type |
+| Template | Reusable presentation file containing theme/master/layouts and possibly example content |
+
+### Example
+
+A company template may contain:
+
+```text
+Brand theme
++ corporate fonts/colors
++ title slide layout
++ agenda layout
++ chart layout
++ closing slide
++ example slides
++ instructions
+```
+
+A user creates new slides from those layouts instead of manually rebuilding the brand on every slide.
+
+## 21.6 When to Modify the Master
+
+Use Slide Master/layouts for **repeated structural changes**.
+
+Use normal slide editing for **content unique to one slide**.
+
+If you manually move the title box on 40 individual slides, that is a sign the layout/master may need correction.
+
+
 ---
 
 # 22. Slide Master and Custom Layouts
@@ -1565,6 +1678,42 @@ Usually:
 Using a different dramatic transition on every slide.
 
 It distracts from the content.
+
+## 23.4 Transition vs Animation
+
+A **transition** controls how one slide enters from the previous slide.
+
+An **animation** controls an object on a slide.
+
+Example:
+
+```text
+Fade between Slide 4 and Slide 5 → transition
+Make a bullet appear on Slide 5 → animation
+```
+
+A slide normally has one selected transition effect, while several objects on that slide can have animations.
+
+## 23.5 Where the Transition Is Applied
+
+If you want a Fade when moving from Slide 4 to Slide 5, apply the transition to **Slide 5**. The effect plays as Slide 5 replaces Slide 4.
+
+## 23.6 Timing
+
+Transition settings can include:
+
+- effect options,
+- duration,
+- advance on click,
+- automatic advance after a time,
+- sound in some contexts.
+
+Use automatic timing only when the presentation is meant to advance predictably. For a live executive discussion, click-controlled advancement is usually safer.
+
+### Common mistake
+
+Applying a transition to every slide before testing it can make navigation feel slow. Preview representative sections before using **Apply to All**.
+
 
 ---
 
@@ -1727,6 +1876,40 @@ Use the same interface elements on consecutive slides and let Morph animate the 
 
 Not every object behaves identically, and feature support can vary by PowerPoint version.
 
+## 26.6 What Morph Needs
+
+Morph works best when PowerPoint can identify objects on consecutive slides as related.
+
+The easiest pattern is:
+
+```text
+Create slide
+→ duplicate slide
+→ change position/size/format
+→ apply Morph to the second slide
+```
+
+This preserves object identity more reliably than rebuilding the second slide from scratch.
+
+## 26.7 Object Matching with Names
+
+In supported desktop versions, advanced Morph workflows can use matching object names in the Selection Pane. Microsoft's naming technique uses the same custom name beginning with:
+
+```text
+!!
+```
+
+on corresponding objects across consecutive slides.
+
+Use this only when normal duplication/object matching does not produce the intended result.
+
+## 26.8 Limitation Awareness
+
+Morph is not a universal animation engine. Some object types behave differently, and charts are not handled like ordinary shapes for Morphing. If an object does not transform correctly, use conventional animations, duplicate/convert the visual, or simplify the effect.
+
+Always test on the PowerPoint version that will actually present the deck.
+
+
 ---
 
 # 27. Zoom and Interactive Navigation
@@ -1760,6 +1943,28 @@ Users should understand:
 - Where they are
 - Where buttons go
 - How to return
+
+## 27.4 Types of Zoom
+
+Where supported, PowerPoint provides three useful Zoom patterns:
+
+- **Summary Zoom** — creates a navigable overview of selected sections/slides.
+- **Slide Zoom** — links visually to a specific slide.
+- **Section Zoom** — links to a section.
+
+This is useful when the presenter needs to choose the next topic based on audience questions rather than follow one fixed sequence.
+
+## 27.5 When Zoom Is Not the Best Choice
+
+Avoid complex interactive navigation when:
+
+- the presentation will be exported to a static PDF,
+- a user will view it in software that does not preserve the behavior,
+- the audience should follow one mandatory sequence,
+- the navigation itself becomes harder to understand than the content.
+
+For simple navigation, ordinary hyperlinks/action buttons may be more predictable.
+
 
 ---
 
@@ -1802,6 +2007,49 @@ Before delivery:
 - Click every interactive element.
 - Test on the actual machine.
 
+## 28.3 Link Targets
+
+A link can point to several kinds of destinations:
+
+```text
+Specific slide
+Section/home slide
+Web page
+External file
+Email target
+Another presentation
+```
+
+Internal slide links are usually more portable than links to files stored on one person's local drive.
+
+## 28.4 Action Buttons
+
+Action buttons are shapes with presentation actions such as navigation.
+
+A useful training pattern:
+
+```text
+Home
+Previous
+Next
+Practice
+Answer
+```
+
+Keep button position consistent across slides so learners do not have to search.
+
+## 28.5 Broken-Link Prevention
+
+Before sending the deck to another computer:
+
+- verify file-based links,
+- keep linked companion files in a predictable package/folder,
+- avoid links to temporary local paths,
+- test links in Slide Show mode.
+
+If the deck must work offline, do not depend on internet-only destinations without a fallback.
+
+
 ---
 
 # 29. Speaker Notes
@@ -1834,6 +2082,38 @@ Mention:
 - Largest improvement came from enterprise onboarding changes.
 - Do not claim the new billing process caused the entire improvement.
 ```
+
+## 29.3 Notes Are Part of the File
+
+Speaker notes are not automatically private just because the audience cannot see them during Slide Show. People who receive the editable presentation may be able to read them.
+
+Before external sharing, review notes for:
+
+- internal commentary,
+- personal reminders,
+- confidential data,
+- unsupported claims,
+- draft wording,
+- source links that should remain internal.
+
+## 29.4 A Useful Notes Template
+
+```text
+Key message:
+Evidence/source:
+What to say:
+What not to overclaim:
+Transition to next slide:
+Likely question:
+Backup answer:
+```
+
+This turns notes into a delivery aid rather than a hidden essay.
+
+## 29.5 Do Not Write a Second Presentation in Notes
+
+If a presenter cannot understand the slide without reading a full paragraph from notes, simplify the speaking plan. Notes should support delivery, not create a script that forces the presenter to look away from the audience continuously.
+
 
 ---
 
@@ -1870,6 +2150,42 @@ Depending on version:
 The slide should support you.
 
 You should not turn your back to the audience and read every bullet.
+
+## 30.5 Before Connecting to the Room
+
+Test:
+
+```text
+Display/projector recognized
+Correct screen shown to audience
+Presenter View on the intended monitor
+Audio routed correctly
+Videos play
+Remote/clicker works
+Fonts render correctly
+Internet-dependent content available
+```
+
+If Presenter View appears on the wrong display, change the display/presentation settings before the audience arrives.
+
+## 30.6 Essential Delivery Shortcuts
+
+Common Windows shortcuts include:
+
+```text
+F5          Start Slide Show from beginning
+Shift + F5  Start from current slide
+Esc         End Slide Show
+B           Black screen
+W           White screen
+```
+
+`B` is useful when you want the audience's attention on you rather than the projected slide.
+
+## 30.7 Navigation Discipline
+
+Avoid repeatedly exiting Slide Show to hunt for a slide. Use sections, slide numbers, Presenter View navigation, or a planned interactive menu when non-linear discussion is expected.
+
 
 ---
 
@@ -2078,6 +2394,29 @@ For a workshop:
 - Presenter uses notes.
 - Detailed workbook is separate.
 
+## 35.3 Choose the Output for the Audience
+
+| Output | Best use |
+|---|---|
+| Full-page slides | Detailed visual review or poster-like content |
+| Handouts with multiple slides | Compact participant reference |
+| Notes pages | Presenter/teacher material with notes |
+| Outline | Text-focused review when slide visuals are not required |
+
+## 35.4 Print Preview Checks
+
+Before printing many copies:
+
+- confirm page orientation,
+- verify color/grayscale readability,
+- check whether background graphics are useful,
+- inspect margins and clipping,
+- verify speaker notes are not accidentally included,
+- print one test page.
+
+A slide designed for a bright screen may need different contrast or detail when printed in grayscale.
+
+
 ---
 
 # 36. Exporting PowerPoint
@@ -2196,6 +2535,50 @@ Treat macro-enabled presentations carefully.
 
 Do not enable unknown macros from untrusted sources.
 
+## 38.4 Inspect the Entire Presentation Package
+
+Sensitive information can exist in places that are not obvious during Slide Show.
+
+Check:
+
+```text
+Hidden slides
+Speaker notes
+Comments
+Document properties
+Off-slide objects
+Embedded Excel workbooks
+Linked file paths
+Macros/VBA
+Alt text
+Screenshots
+Revision/version copies
+```
+
+Use Microsoft's document-inspection features where available, but still perform a manual review.
+
+## 38.5 Embedded vs Linked Data
+
+An embedded workbook/chart can carry more underlying data than the chart visibly displays.
+
+If you intend to share only the summarized chart, verify whether the recipient can open or edit the embedded workbook data.
+
+## 38.6 External Sharing Workflow
+
+```text
+Save internal working copy
+→ create external copy
+→ remove hidden/internal material
+→ inspect links/embedded data
+→ verify permissions/classification
+→ export to PDF if editing is unnecessary
+→ reopen the exact file being sent
+→ review it as the recipient
+```
+
+PDF export reduces some editing exposure but is not a substitute for proper information-classification policy.
+
+
 ---
 
 # 39. PowerPoint for Business
@@ -2237,6 +2620,59 @@ Transition time      4 months
 Primary risk         Migration capacity
 ```
 
+## 39.3 Decision-Oriented Slide Structure
+
+A strong business slide often contains:
+
+```text
+Conclusion title
+Evidence
+Implication
+Required action/decision
+```
+
+Example:
+
+```text
+Title: Supplier consolidation can save ₹1.8 Cr annually
+
+Evidence:
+- 14 current vendors
+- 6 target vendors
+- duplicated support contracts
+
+Implication:
+- lower cost
+- fewer contract renewals
+- migration effort
+
+Decision:
+Approve 4-month transition plan
+```
+
+## 39.4 Executive Summary Is Not a Table of Contents
+
+A useful executive summary states the major conclusions and decisions, not only the topics that follow.
+
+Weak:
+
+```text
+Revenue
+Customers
+Operations
+Risks
+```
+
+Better:
+
+```text
+Revenue missed plan by 6%, driven by West region
+Customer retention improved to 93%
+Operations backlog will normalize by October
+Two risks require leadership decisions this week
+```
+
+
 ---
 
 # 40. PowerPoint for Education and Training
@@ -2277,6 +2713,38 @@ Slide 2 → add services.
 Slide 3 → add data flow.
 
 Slide 4 → add security.
+
+## 40.4 Design Around a Learning Objective
+
+Write an observable objective:
+
+```text
+By the end of this module, learners can create a PivotTable
+from a clean Excel Table and change the value calculation to % of total.
+```
+
+This is stronger than:
+
+```text
+Understand PivotTables.
+```
+
+because it describes what the learner should be able to do.
+
+## 40.5 Explain → Demonstrate → Practice → Check
+
+A practical training sequence:
+
+```text
+1. Explain the concept simply.
+2. Demonstrate one correct example.
+3. Let the learner perform a similar task.
+4. Check the result.
+5. Explain common mistakes.
+```
+
+Do not use animation merely to make training "engaging." Use motion when it controls cognitive load or reveals a process in the order learners should understand it.
+
 
 ---
 
@@ -2431,6 +2899,50 @@ RAG commonly means:
 
 Always include labels so meaning is not color-only.
 
+## 43.4 Static Dashboard vs Interactive BI
+
+A PowerPoint dashboard is strong when you need a **curated snapshot with narrative**.
+
+It is weaker when users need:
+
+- live drill-down,
+- ad-hoc filtering,
+- constantly refreshed data,
+- very large datasets,
+- self-service exploration.
+
+In those cases, use a BI/reporting platform and bring selected conclusions into PowerPoint.
+
+## 43.5 Every KPI Needs Context
+
+Do not show:
+
+```text
+Revenue = ₹18.6 Cr
+```
+
+without context.
+
+Add one or more of:
+
+```text
+vs Target
+vs Prior Period
+Trend
+Threshold
+Owner
+Action
+```
+
+Example:
+
+```text
+Revenue ₹18.6 Cr | -4% vs plan | +11% YoY
+```
+
+Now the audience knows whether the number is good, bad, or simply large.
+
+
 ---
 
 # 44. PowerPoint for Interviews and Portfolios
@@ -2466,6 +2978,36 @@ Learning
 ## 44.3 Keep self-introduction short
 
 The presentation should focus on relevant value, not autobiography.
+
+## 44.4 Show Your Thinking, Not Confidential Data
+
+Replace proprietary details with:
+
+- anonymized labels,
+- normalized percentages,
+- recreated diagrams,
+- public information,
+- synthetic data.
+
+Never expose an employer's confidential customer names, source code, internal architecture, credentials, financial detail, or restricted screenshots just to make a portfolio look realistic.
+
+## 44.5 Time-Box the Story
+
+If you have 10 minutes, do not prepare 30 content-heavy slides.
+
+A simple split:
+
+```text
+1 min   Context
+2 min   Problem
+3 min   Approach
+2 min   Result
+1 min   Learning
+1 min   Close / questions
+```
+
+Rehearse to the actual time limit and keep backup slides for detail.
+
 
 ---
 
@@ -2523,6 +3065,38 @@ Example:
 
 The audience wants to know what happens next.
 
+## 45.4 Story Is Causality, Not Decoration
+
+A business story should connect facts:
+
+```text
+What changed?
+→ why did it change?
+→ why does it matter?
+→ what should we do?
+```
+
+Do not add a dramatic narrative that the evidence does not support.
+
+## 45.5 Horizontal vs Vertical Logic
+
+**Horizontal logic:** read only the slide titles. They should form a coherent argument.
+
+Example:
+
+```text
+Demand grew 18%
+Capacity grew only 5%
+Backlog doubled
+Two process bottlenecks explain 70% of delay
+Automation + staffing closes the gap by Q4
+```
+
+**Vertical logic:** within one slide, the evidence should support that slide's title.
+
+A deck is stronger when both levels work.
+
+
 ---
 
 # 46. Data Storytelling
@@ -2572,6 +3146,50 @@ Root cause was expedited delivery.
 Slide 5:
 
 Recommendation.
+
+## 46.5 Choose the Chart for the Question
+
+| Question | Often suitable |
+|---|---|
+| Compare categories | Bar/column |
+| Show trend over time | Line |
+| Show relationship | Scatter |
+| Show contribution to total | Stacked bar/column; sometimes limited pie/doughnut |
+| Show distribution | Histogram/box plot where appropriate |
+| Show progress vs target | Bullet-style or clearly labeled variance visual |
+
+The chart type is a tool, not the insight.
+
+## 46.6 Preserve Honest Scales and Context
+
+Avoid visual choices that exaggerate small differences.
+
+For bar/column charts, a non-zero baseline can make small gaps look enormous. If you intentionally use a truncated scale for a specialized reason, make it obvious.
+
+Also show enough time/context to avoid cherry-picking a convenient period.
+
+## 46.7 Separate Signal from Decoration
+
+A chart needs:
+
+```text
+Title with conclusion
+Relevant labels
+Units
+Source/time period when needed
+Annotation for key event
+```
+
+It usually does not need:
+
+```text
+3D effects
+heavy shadows
+every data label
+decorative icons on every point
+multiple competing colors
+```
+
 
 ---
 
@@ -2750,6 +3368,29 @@ Week 2:
 
 Add formatting and alignment shortcuts.
 
+## 48.7 Shortcut Context and Version Check
+
+PowerPoint shortcuts can behave differently depending on whether you selected:
+
+- text inside a placeholder,
+- the placeholder itself,
+- a shape,
+- a slide thumbnail,
+- multiple slides,
+- a table/chart,
+- Slide Show mode.
+
+Example:
+
+```text
+Ctrl + D
+```
+
+duplicates the selected object or slide, so confirm **what is selected** before pressing it repeatedly.
+
+For critical training documentation, verify shortcuts on the exact Windows/Mac/web version being taught rather than assuming every Office application shares the same keys.
+
+
 ---
 
 # 49. Advanced Selection and Alignment Techniques
@@ -2886,6 +3527,29 @@ Review:
 - AI-generated images/content
 - Brand guidelines
 
+## 50.6 Treat AI Output as a Draft Layer
+
+A reliable AI-assisted workflow is:
+
+```text
+Source material
+→ AI draft/outline
+→ factual verification
+→ message rewrite
+→ visual redesign
+→ accessibility check
+→ human rehearsal
+```
+
+Do not start from generated slides and skip source verification.
+
+## 50.7 Availability Changes
+
+Copilot and other AI capabilities can depend on product edition, licensing, account type, organization policy, region, and rollout state. Avoid writing process documentation that assumes every user sees the same AI commands.
+
+When training a team, document the required license/environment separately from the presentation-design concepts.
+
+
 ---
 
 # 51. Automation with VBA
@@ -2936,6 +3600,32 @@ End Sub
 
 Never enable macros from an unknown source merely because PowerPoint asks.
 
+## 51.5 Procedure Inputs and Side Effects
+
+The sample `AddConfidentialLabel` macro takes no explicit parameters and modifies every slide in `ActivePresentation`.
+
+That side effect is important. Before running automation across a production deck:
+
+1. save a backup,
+2. test on a copy,
+3. restrict the target slides/objects when possible,
+4. make the macro idempotent or detect existing objects if reruns are possible.
+
+Otherwise, running the same macro twice may create duplicate labels.
+
+## 51.6 Example: Avoid Duplicate Labels
+
+A robust production macro could search for a specifically named shape such as:
+
+```text
+ConfidentialLabel
+```
+
+before adding another one. Naming generated shapes makes later update/delete operations easier than relying only on position.
+
+Use VBA when repeatable desktop automation justifies the maintenance and security overhead. Do not add macros to a simple deck that does not need automation.
+
+
 ---
 
 # 52. PowerPoint Add-ins
@@ -2967,6 +3657,34 @@ Check:
 ## 52.2 Enterprise caution
 
 Do not install random add-ins on company devices without approval.
+
+## 52.3 What an Add-in Can Access
+
+Permissions vary by add-in technology and product. Before approval, ask:
+
+```text
+What presentation content can it read?
+Can it send content to an external service?
+What account permissions does it request?
+Where is data processed/stored?
+Can administrators control deployment?
+How is the add-in updated?
+```
+
+A visually useful add-in can still be inappropriate for confidential presentations.
+
+## 52.4 Evaluate the Workflow Benefit
+
+Install an add-in when it solves a repeated problem such as:
+
+- brand-compliant charting,
+- slide libraries,
+- diagram automation,
+- bulk formatting,
+- approved stock media.
+
+Do not add many overlapping productivity tools; conflicting shortcuts, duplicate features, and inconsistent templates can reduce productivity rather than improve it.
+
 
 ---
 
@@ -3876,6 +4594,21 @@ Useful official topics include:
 
 Feature names, availability, licensing, and behavior can change over time. For Microsoft 365 in particular, verify current Microsoft documentation when a workflow depends on a recently introduced feature.
 
+## 61.1 What to Verify in Official Documentation
+
+Because Microsoft 365 evolves, use current Microsoft documentation when you need exact details about:
+
+- feature availability by version/platform,
+- PowerPoint keyboard shortcuts,
+- Morph/Zoom support,
+- export and recording behavior,
+- Copilot licensing/capabilities,
+- accessibility tools,
+- macro/add-in security.
+
+Keep the handbook focused on durable concepts and treat changing UI/availability details as items to verify in the target environment.
+
+
 ---
 
 # Appendix A — Slide Design Recipes
@@ -4041,6 +4774,25 @@ Next step                       1.0 min
 Buffer                          1.0 min
 ```
 
+## Use Time, Not a Fixed Slide Count
+
+There is no universal "one slide per minute" rule.
+
+A single complex chart may need several minutes, while several visual transition slides may take seconds.
+
+Estimate presentation length by rehearsing:
+
+```text
+Message per slide
++ explanation time
++ demo/video time
++ expected questions
++ transitions
+```
+
+For an important meeting, finish the core story before the scheduled end so discussion does not force you to rush the final decision/next-step slides.
+
+
 ---
 
 # Appendix D — How to Critique Any Slide
@@ -4125,6 +4877,28 @@ Create layouts for:
 The goal is not to make every presentation identical.
 
 The goal is to remove repetitive formatting work so you can spend more time thinking.
+
+## Version the System
+
+Treat a corporate template or reusable slide library like a maintained product.
+
+Track:
+
+```text
+Template version
+Brand owner
+Last review date
+Supported aspect ratio
+Font dependencies
+Approved colors
+Required layouts
+Deprecated layouts
+Example deck
+Change notes
+```
+
+When the template changes, tell users what changed and whether old decks need migration. Silent template replacement can create mixed branding and layout drift.
+
 
 ---
 
@@ -4211,3 +4985,16 @@ When the audience understands, remembers, and knows what to do next, the present
 ---
 
 **End of Microsoft PowerPoint Master Handbook**
+
+## The Master Test
+
+Before keeping any element, ask:
+
+```text
+Does this help the audience understand, decide, remember, or act?
+```
+
+If the answer is no, remove or simplify it.
+
+Professional PowerPoint skill is not the ability to use every feature. It is the ability to choose the smallest set of words, visuals, motion, and supporting detail that communicates the message accurately to a specific audience.
+

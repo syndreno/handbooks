@@ -23,6 +23,65 @@ Become a production-ready **AI Engineer / LLM Engineer** who can build, evaluate
 
 The focus should be on **building real AI applications**, not only learning theory.
 
+> **Reviewed:** August 17, 2026  
+> **Learning philosophy:** learn enough theory to understand failure modes, then prove the concept by building, testing, measuring, and deploying something.
+
+## How to Use This Roadmap
+
+Do not treat every bullet as something you must master before moving forward. Use a spiral approach:
+
+```text
+Understand the idea
+      ↓
+Build the smallest working example
+      ↓
+Measure what succeeds and fails
+      ↓
+Improve the design
+      ↓
+Use it inside a real project
+      ↓
+Return later for deeper theory
+```
+
+For each phase, aim to produce an **observable outcome**: working code, a test, a benchmark, a deployed service, an architecture diagram, or a short technical explanation you can defend in an interview.
+
+## Table of Contents
+
+1. [AI Engineer Skill Map](#1-ai-engineer-skill-map)
+2. [Recommended Learning Order](#2-recommended-learning-order)
+3. [Phase 1 - Python](#3-phase-1---python)
+4. [Phase 2 - Mathematics for AI](#4-phase-2---mathematics-for-ai)
+5. [Phase 3 - NumPy, Pandas and Scikit-learn](#5-phase-3---numpy-pandas-and-scikit-learn)
+6. [Phase 4 - Deep Learning](#6-phase-4---deep-learning)
+7. [Phase 5 - Transformers](#7-phase-5---transformers)
+8. [Phase 6 - LLM Fundamentals](#8-phase-6---llm-fundamentals)
+9. [Important LLM Company Mapping](#9-important-llm-company-mapping)
+10. [LLM Runtimes vs LLM Models](#10-llm-runtimes-vs-llm-models)
+11. [Phase 7 - LLM Application Engineering](#11-phase-7---llm-application-engineering)
+12. [Phase 8 - Embeddings](#12-phase-8---embeddings)
+13. [Phase 9 - Vector Databases](#13-phase-9---vector-databases)
+14. [Phase 10 - RAG](#14-phase-10---rag)
+15. [Phase 11 - AI Agents](#15-phase-11---ai-agents)
+16. [Phase 12 - MCP](#16-phase-12---mcp)
+17. [Phase 13 - OCR and Document AI](#17-phase-13---ocr-and-document-ai)
+18. [Phase 14 - Fine-Tuning](#18-phase-14---fine-tuning)
+19. [Phase 15 - Evaluation](#19-phase-15---evaluation)
+20. [Phase 16 - AI Safety and Guardrails](#20-phase-16---ai-safety-and-guardrails)
+21. [Phase 17 - AI Backend Development](#21-phase-17---ai-backend-development)
+22. [Phase 18 - Docker and Deployment](#22-phase-18---docker-and-deployment)
+23. [Phase 19 - Cloud](#23-phase-19---cloud)
+24. [Phase 20 - AI Inference Engineering](#24-phase-20---ai-inference-engineering)
+25. [Recommended 24-Week Learning Plan](#25-recommended-24-week-learning-plan)
+26. [Recommended Learning Ratio](#26-recommended-learning-ratio)
+27. [Portfolio Projects](#27-portfolio-projects)
+28. [Target AI Engineer Technology Stack](#28-target-ai-engineer-technology-stack)
+29. [What Not to Spend Too Much Time On Initially](#29-what-not-to-spend-too-much-time-on-initially)
+30. [Interview Topics You Must Know](#30-interview-topics-you-must-know)
+31. [Final Learning Path](#31-final-learning-path)
+32. [Main Goal](#32-main-goal)
+33. [Mastery Checklist](#33-mastery-checklist)
+
 ---
 
 # 1. AI Engineer Skill Map
@@ -42,6 +101,18 @@ The focus should be on **building real AI applications**, not only learning theo
                     Agents             Security
                     Vision/OCR
 ```
+
+An AI engineer sits between model knowledge and software engineering. In most product teams, you are not expected to invent a new transformer architecture. You are expected to turn models into a reliable system.
+
+| Role | Typical primary focus | Where it overlaps with AI engineering |
+|---|---|---|
+| Data scientist | Analysis, experiments, statistical models | Evaluation, ML prototypes, data quality |
+| ML engineer | Training/deployment pipelines for ML models | Serving, monitoring, feature/data pipelines |
+| AI/LLM engineer | LLM/RAG/agent/document-AI applications | APIs, evaluation, deployment, security |
+| Research engineer | New model techniques and experiments | Deep learning, training, benchmarking |
+| Backend engineer | Reliable application/services architecture | APIs, databases, queues, authentication |
+
+You do not need equal depth in every branch. A strong production AI engineer usually has **deep software fundamentals**, strong LLM-system knowledge, and enough ML theory to understand what the system is doing and how to measure it.
 
 ---
 
@@ -71,6 +142,12 @@ The focus should be on **building real AI applications**, not only learning theo
 22. Cloud Deployment
 23. Monitoring and Optimization
 24. Portfolio and Interview Preparation
+
+## Why this order works
+
+The sequence deliberately moves from **deterministic engineering → model fundamentals → retrieval/tool use → production operations**. For example, RAG is much easier to understand after embeddings, and agents are much easier to build safely after you understand structured output and tool calling.
+
+You may learn topics in parallel, but avoid skipping foundations just because an orchestration framework can hide them. Framework code is easier to debug when you understand the underlying HTTP request, schema, retrieval step, and model response.
 
 ---
 
@@ -117,6 +194,27 @@ invoice = {
 
 You should be comfortable manipulating nested dictionaries, lists, JSON responses, and API data.
 
+### What “ready to move on” looks like
+
+You should be able to:
+
+- create and use a virtual environment;
+- install and pin dependencies;
+- read/write JSON and CSV files;
+- call a REST API and handle non-200 responses;
+- define typed functions and data models;
+- use exceptions without hiding errors;
+- write basic async code for concurrent I/O;
+- organize a small project into modules;
+- write tests with `pytest`;
+- use logging instead of relying only on `print()`.
+
+A useful mini-project is an API client that reads invoice records from JSON, validates them, calls a mock service, retries transient failures, and writes a structured result. This teaches the same plumbing used around LLM APIs later.
+
+### Common mistake
+
+Do not learn Python only through notebook cells. Production AI code also needs packages, configuration, tests, command-line execution, type checking, logging, and error handling.
+
 ---
 
 # 4. Phase 2 - Mathematics for AI
@@ -125,14 +223,17 @@ You do not need research-level mathematics.
 
 ## Linear Algebra
 
-Understand:
+Understand these ideas conceptually and be able to manipulate small examples:
 
-- Vector
-- Matrix
-- Tensor
-- Dot product
-- Matrix multiplication
-- Dimensions
+| Concept | Beginner meaning | Why AI engineers care |
+|---|---|---|
+| Scalar | One number | Loss, score, learning rate |
+| Vector | Ordered list of numbers | Embeddings and feature representations |
+| Matrix | 2D grid of numbers | Batches and neural-network transformations |
+| Tensor | N-dimensional array | Core data structure in PyTorch |
+| Dot product | Combines two vectors into one similarity/interaction score | Attention and similarity calculations |
+| Matrix multiplication | Applies many weighted combinations efficiently | Fundamental neural-network operation |
+| Dimension/shape | Size along each axis | Prevents common tensor-shape bugs |
 
 Example:
 
@@ -148,7 +249,7 @@ Embedding Model
 
 ## Statistics
 
-Understand:
+Statistics helps you reason about noisy data and whether an improvement is real rather than anecdotal. Understand:
 
 - Mean
 - Median
@@ -160,13 +261,17 @@ Understand:
 
 ## Calculus
 
-Understand the intuition behind:
+You usually do not need to solve long derivatives by hand for application engineering. Understand the intuition behind:
 
 - Derivatives
 - Gradients
 - Gradient descent
 - Loss functions
 - Learning rate
+
+### Practical checkpoint
+
+Be able to explain why gradient descent changes model weights, why a learning rate that is too high can make training unstable, and why correlation does not prove causation. If you can connect the math to model behavior, the phase has done its job.
 
 ---
 
@@ -225,16 +330,27 @@ Understand:
 
 ## Metrics
 
-Know:
+Know not only the formula name, but **when a metric is misleading**:
 
-- Accuracy
-- Precision
-- Recall
-- F1 Score
-- Confusion Matrix
-- MAE
-- MSE
-- RMSE
+| Metric | Typical use | Watch out for |
+|---|---|---|
+| Accuracy | Balanced classification | Misleading on heavily imbalanced classes |
+| Precision | Costly false positives | Can ignore missed positives |
+| Recall | Costly false negatives | Can increase false positives |
+| F1 | Balance precision and recall | Hides class-specific trade-offs |
+| Confusion matrix | Inspect error types | Must interpret per class |
+| MAE | Regression with interpretable average error | Treats all error linearly |
+| MSE/RMSE | Regression where larger errors should hurt more | Sensitive to outliers |
+
+### Mini-project
+
+Build one small classification project end to end:
+
+```text
+Raw CSV → cleaning → train/validation/test split → baseline → model → metrics → error analysis → saved model
+```
+
+Do not stop at “accuracy = 95%.” Inspect which examples fail and why. This habit transfers directly to LLM evaluation.
 
 ---
 
@@ -274,13 +390,37 @@ print(x)
 
 You do not need to build GPT from scratch.
 
-Your goal is to understand how neural networks and training work.
+Your goal is to understand how neural networks and training work. In particular, be able to follow this loop:
+
+```text
+Batch of inputs
+   ↓
+Forward pass
+   ↓
+Predictions
+   ↓
+Loss function
+   ↓
+Backpropagation computes gradients
+   ↓
+Optimizer updates weights
+   ↓
+Repeat for more batches/epochs
+```
+
+### PyTorch skills to practice
+
+Learn tensors, shapes/dtypes/devices, `Dataset`/`DataLoader`, `nn.Module`, loss functions, optimizers, `model.train()` vs `model.eval()`, `torch.no_grad()`/inference contexts, saving/loading weights, and moving tensors/models to a GPU when available.
+
+### Common mistake
+
+A model with falling training loss is not automatically good. Always inspect validation performance and learn the signs of overfitting.
 
 ---
 
 # 7. Phase 5 - Transformers
 
-Transformers are fundamental to modern LLM systems.
+Transformers are fundamental to modern LLM systems because attention lets a model build contextual representations by relating tokens to one another. You do not need to memorize every matrix equation before using transformers, but you should understand the data flow well enough to reason about context length, tokenization, attention cost, and model architecture.
 
 ## Learn
 
@@ -346,38 +486,51 @@ Examples:
 
 - T5
 
+### What to be able to explain
+
+- Why tokenization affects cost and context usage.
+- Why positional information is necessary.
+- Conceptually, how query/key/value attention determines which tokens influence one another.
+- Why decoder-only models naturally fit autoregressive text generation.
+- Why an LLM produces probabilities over next tokens rather than looking up a stored answer.
+
+A good learning exercise is to inspect tokenization for the same sentence across two tokenizers and then trace tensor shapes through a small pretrained transformer model.
+
 ---
 
 # 8. Phase 6 - LLM Fundamentals
 
-Know these terms very well.
+Know these terms well enough to explain them without relying on buzzwords.
 
-- LLM
-- SLM
-- Parameters
-- Tokens
-- Tokenizer
-- Context Window
-- Prompt
-- System Prompt
-- Temperature
-- Top-P
-- Inference
-- Training
-- Pretraining
-- Fine-tuning
-- Quantization
-- Distillation
-- Hallucination
-- Structured Output
-- Function Calling
-- Tool Calling
-- Multimodal Models
-- Vision Language Models
+| Term | Practical meaning |
+|---|---|
+| LLM | Large language model trained to model/generate token sequences |
+| SLM | Smaller language model, often chosen for lower cost/latency or local deployment |
+| Parameters | Learned numerical weights in the model |
+| Tokens | Units the tokenizer converts input/output into |
+| Tokenizer | Maps text to token IDs and back |
+| Context window | Maximum working input/history budget for a model request/session behavior |
+| Prompt | Task instruction/input supplied to the model |
+| System/developer instruction | Higher-priority behavioral guidance supplied by an application/provider |
+| Temperature / Top-P | Sampling controls; support varies by model |
+| Inference | Running a trained model to produce outputs |
+| Training / pretraining | Optimizing model weights from data; pretraining is the broad initial stage |
+| Fine-tuning | Further training for narrower behavior/task/domain objectives |
+| Quantization | Representing weights/activations at lower precision to reduce resource use |
+| Distillation | Training a smaller model to imitate useful behavior of a stronger system/model |
+| Hallucination | Confident-looking output not adequately supported by facts/context |
+| Structured output | Constraining output to a machine-readable schema |
+| Function/tool calling | Model selects a defined operation; application/runtime executes it |
+| Multimodal model | Works with more than one modality, such as text and images |
+| VLM | Vision-language model that jointly processes visual and language information |
+
+Also understand that model capabilities and supported controls are provider/model specific. Do not assume every LLM supports the same sampling parameters, tool schema, image input, or structured-output guarantees.
 
 ---
 
 # 9. Important LLM Company Mapping
+
+This mapping helps you distinguish **model families/brands** from the organizations that develop them. Product names, ownership, and available model generations can change, so verify current details before making procurement or architecture decisions.
 
 ```text
 GPT / Codex   -> OpenAI
@@ -401,7 +554,7 @@ MiniMax       -> MiniMax
 
 # 10. LLM Runtimes vs LLM Models
 
-Do not confuse model runners with models.
+Do not confuse model runners with models. A **model** is the learned artifact/weights and architecture; a **runtime or serving engine** loads a model, manages memory, token generation, batching, device placement, and exposes a CLI/API to applications.
 
 ## Model Runtimes
 
@@ -437,11 +590,13 @@ Ollama    = Model Runtime
 Llama 3.2 = Model
 ```
 
+A third concept is a **model format/quantization artifact**, such as a GGUF file. Do not use “GGUF,” “Ollama,” and “Llama” as synonyms; they describe different layers.
+
 ---
 
 # 11. Phase 7 - LLM Application Engineering
 
-Learn how to integrate LLMs into applications.
+Learn how to integrate LLMs into applications. This phase is where “I can chat with a model” becomes “I can build a service around a model.” Focus on contracts, errors, observability, and validation—not only the happy-path SDK call.
 
 ## Cloud Models
 
@@ -488,11 +643,33 @@ CPU / GPU
 - Cost optimization
 - Error handling
 
+### Production request pattern
+
+```text
+Validate input
+   ↓
+Choose model/config
+   ↓
+Call model with timeout
+   ↓
+Handle rate-limit/transient errors
+   ↓
+Validate structured response
+   ↓
+Apply business rules
+   ↓
+Log latency/tokens/result metadata
+   ↓
+Return application response
+```
+
+Never put a raw model response directly into an irreversible business action merely because the API call succeeded.
+
 ---
 
 # 12. Phase 8 - Embeddings
 
-Embeddings convert information into vectors.
+Embeddings convert information into vectors designed so that useful relationships can be measured numerically. For text retrieval, semantically similar passages tend to be closer under the similarity measure the model/index expects.
 
 Example:
 
@@ -517,23 +694,37 @@ Learn:
 - Semantic search
 - Nearest neighbors
 
+## Important practical rules
+
+- Use the **same embedding model/space** for indexed documents and queries unless a model explicitly supports asymmetric encoders.
+- Know the model's embedding dimension and the index's distance metric.
+- Normalize only when the chosen model/metric expects it.
+- Store source metadata so retrieved chunks can be filtered and cited.
+- Re-embed data when changing to an incompatible embedding model.
+
+Mini-project: embed 100 short documents, search them with five natural-language queries, and manually inspect both correct and incorrect nearest neighbors.
+
 ---
 
 # 13. Phase 9 - Vector Databases
 
 Learn at least one vector database properly.
 
-## Recommended Order
+## Recommended Learning Order
+
+A useful progression is:
 
 ```text
-FAISS
+FAISS (learn similarity/index basics locally)
   |
   v
-Qdrant
+Qdrant or another dedicated vector DB (learn service + metadata filtering)
   |
   v
-pgvector
+pgvector (learn how vector search fits an existing PostgreSQL system)
 ```
+
+This is a learning sequence, not a claim that one product is universally “better” than another. Choose based on scale, operational environment, filtering, consistency, latency, and whether you already depend on PostgreSQL.
 
 Other options:
 
@@ -552,13 +743,15 @@ Other options:
 - Filtering
 - Top-K
 
+Also learn **indexing trade-offs**: exact vs approximate nearest-neighbor search, recall vs latency, metadata filtering, persistence, backup, multi-tenancy, and how deletion/update of source documents propagates into the index.
+
 ---
 
 # 14. Phase 10 - RAG
 
-RAG means:
+RAG means **Retrieval-Augmented Generation**. It retrieves external evidence at request time and places that evidence in the model's working context so the answer can be grounded in data that may be private, recent, or too large to memorize in a prompt.
 
-**Retrieval-Augmented Generation**
+RAG is not “put PDFs in a vector database and trust the answer.” It is a pipeline whose extraction, chunking, retrieval, ranking, prompt construction, generation, and citation stages must each be evaluated.
 
 ## Document Ingestion
 
@@ -618,11 +811,23 @@ Answer
 - Grounding
 - Citations
 
+### Failure modes to practice
+
+| Failure | Typical cause | Possible improvement |
+|---|---|---|
+| Relevant document never retrieved | Poor chunking/query/index | Better chunks, query rewriting, hybrid search |
+| Correct chunk ranks too low | Weak first-stage ranking | Reranker or tuned retrieval |
+| Answer ignores evidence | Prompt/model behavior | Strong grounding instructions + answer evaluation |
+| Citation is wrong | Citation assembled after generation or IDs lost | Preserve chunk/source IDs through the pipeline |
+| Stale answer | Index not synchronized | Explicit ingestion/update/deletion workflow |
+
+Build an evaluation set of real questions with expected supporting passages. Measure retrieval separately from final answer quality; otherwise you will not know which stage failed.
+
 ---
 
 # 15. Phase 11 - AI Agents
 
-An AI agent can decide when and how to use tools.
+An AI agent is a system in which a model can choose actions—usually tool calls—based on a goal and the observations returned by previous actions. The model is only one component; the runtime controls actual execution, permissions, state, retries, and stopping.
 
 ## Agent Flow
 
@@ -681,13 +886,31 @@ Final Response
 - Retry handling
 - Tool permissions
 
+### Agent vs workflow
+
+Use a deterministic workflow when the sequence is known:
+
+```text
+validate → OCR → extract → validate → save
+```
+
+Use an agent when the next step genuinely depends on model judgment:
+
+```text
+inspect incident → choose diagnostic tool → observe → choose next diagnostic
+```
+
+Do not add autonomy when a normal function or state machine is clearer. For write/delete/publish/payment/production actions, design human approval and least privilege before adding more autonomy.
+
+### Practical checkpoint
+
+Build one agent with only 2–3 narrow tools. Log every tool call and result, define a maximum number of steps, handle tool failures, and require approval for one high-impact action.
+
 ---
 
 # 16. Phase 12 - MCP
 
-MCP means:
-
-**Model Context Protocol**
+MCP means **Model Context Protocol**. It standardizes how an AI application can discover and interact with external context/capabilities through an MCP server instead of inventing a one-off integration contract for every client.
 
 Understand:
 
@@ -716,11 +939,27 @@ LLM Application
       +--> Internal APIs
 ```
 
+## What MCP does not replace
+
+MCP does not replace the database, REST API, authentication system, or business authorization behind a tool. It is an integration protocol at the AI/application boundary. You still need normal security controls, input validation, auditability, and least-privilege credentials.
+
+Learn how capabilities are discovered, how schemas are described, how a client invokes a tool, how results return to the model, and how trust changes when you connect a new server.
+
 ---
 
 # 17. Phase 13 - OCR and Document AI
 
-Document AI can become a strong specialization.
+Document AI can become a strong specialization because real documents combine text recognition, layout, tables, images, business rules, and uncertain extraction. Treat OCR as one signal in a pipeline rather than assuming OCR alone understands a document.
+
+Useful distinction:
+
+| Layer | Main job | Example output |
+|---|---|---|
+| PDF text extraction | Read embedded text when present | characters/positions |
+| OCR | Recognize text from pixels | text + boxes/confidence |
+| Layout analysis | Identify regions/reading structure | header/table/paragraph regions |
+| VLM/LLM extraction | Map evidence to semantic fields | `invoice_number`, `total` |
+| Deterministic validation | Enforce schema/business rules | valid date, totals reconcile |
 
 ## Recommended Architecture
 
@@ -775,6 +1014,14 @@ Document AI can become a strong specialization.
 - Key-value extraction
 - Line-item extraction
 
+### Evaluation mindset
+
+Measure field-level exact/normalized accuracy, table row/cell accuracy, evidence correctness, document-level success rate, latency, and human-review rate. Keep the original bounding box/page or source span for important extracted fields so reviewers can verify where the value came from.
+
+### Common mistake
+
+Do not ask an LLM/VLM to “fix” an OCR value without retaining evidence. A plausible correction can become an undetectable hallucination.
+
 ---
 
 # 18. Phase 14 - Fine-Tuning
@@ -808,11 +1055,23 @@ Fine-Tuning
 - Training/validation
 - Quantization
 
+### Fine-tuning decision test
+
+Before training, ask:
+
+1. Is the problem missing knowledge? Try retrieval first.
+2. Is the problem inconsistent output shape? Try schema-constrained output and validation.
+3. Is the problem behavior/style/task performance that examples can teach? Fine-tuning may help.
+4. Do you have a representative, licensed, clean train/validation dataset? If not, fix the data first.
+5. Can you prove improvement on a held-out evaluation set? If not, you cannot know whether tuning helped.
+
+Fine-tuning does not guarantee factual freshness and should not be used as a replacement for an updatable knowledge source.
+
 ---
 
 # 19. Phase 15 - Evaluation
 
-AI systems must be measured.
+AI systems must be measured because model output is probabilistic and application quality is multi-dimensional. A system can be “more accurate” yet too slow, too expensive, unsafe, or bad on a critical subset.
 
 Do not evaluate systems with:
 
@@ -866,9 +1125,20 @@ total accuracy          = 99%
 line_item accuracy      = 91%
 ```
 
+### Build two evaluation layers
+
+- **Component evals:** OCR accuracy, retrieval recall, schema validity, tool-call correctness.
+- **End-to-end evals:** did the complete application satisfy the user's/business goal?
+
+Keep a fixed regression set for release comparisons and a growing failure set containing bugs found in production. Record dataset version, model/configuration, prompt/instruction version, and code version so results are reproducible.
+
+For subjective tasks, define a rubric and calibrate human/model graders against examples. Do not report a single “LLM accuracy” number without explaining what was measured.
+
 ---
 
 # 20. Phase 16 - AI Safety and Guardrails
+
+Guardrails are not one magic filter. Production safety is layered: identity, authorization, tool scope, input handling, model policy, output validation, application business rules, audit logs, and human review for high-impact actions.
 
 Learn:
 
@@ -917,9 +1187,15 @@ Confidence Check
 Accept / Human Review / Reject
 ```
 
+### Security rule
+
+Treat retrieved documents, webpages, emails, repository text, and tool output as potentially untrusted data. They may contain prompt-injection instructions. Data should not silently grant itself higher authority or broader tool permissions.
+
 ---
 
 # 21. Phase 17 - AI Backend Development
+
+The backend turns model calls into a service other applications can rely on. Learn normal backend engineering first: request validation, authentication, database transactions, concurrency, queues, idempotency, logs, metrics, and failure handling. AI does not remove these requirements.
 
 Learn:
 
@@ -955,6 +1231,14 @@ LLM          OCR   Vector DB
               v
        Database / Storage
 ```
+
+## When to use async, streaming, queues
+
+- Use **async I/O** when waiting on concurrent network/storage operations.
+- Use **streaming** when partial model output improves user experience.
+- Use a **background job/queue** when work may take longer than a normal HTTP request, needs retries, or should survive a web-worker restart.
+
+For every endpoint, define timeout behavior and what the client sees when the downstream model provider fails.
 
 ---
 
@@ -993,11 +1277,15 @@ CI/CD
 Kubernetes
 ```
 
-Do not start Kubernetes too early.
+Do not start Kubernetes too early. First be able to build a reproducible image, run it with configuration/secrets outside the image, add a health check, persist data correctly, inspect logs, and deploy one service safely.
+
+A production container should not contain hard-coded API keys. Prefer a non-root user where practical, pin dependencies/base images deliberately, scan dependencies/images, and separate build-time secrets from runtime secrets.
 
 ---
 
 # 23. Phase 19 - Cloud
+
+Learn the basics of at least one cloud deeply enough to deploy and operate a small AI service. The cloud-specific product names matter less initially than understanding the underlying capability and security boundary.
 
 Learn the basics of at least one:
 
@@ -1018,11 +1306,31 @@ Understand:
 - Autoscaling
 - GPU instances
 
+## Be able to design this path
+
+```text
+Internet / internal client
+        ↓
+TLS + authentication
+        ↓
+Load balancer / API service
+        ↓
+AI application
+   ├── managed model API
+   └── self-hosted model service
+        ↓
+Database / object storage / vector store
+        ↓
+Logs + metrics + traces + alerts
+```
+
+Learn cost controls, budgets, IAM/service identities, network exposure, backups, and region/data-governance requirements alongside deployment.
+
 ---
 
 # 24. Phase 20 - AI Inference Engineering
 
-Understand how models consume hardware.
+Understand how models consume hardware and how serving decisions change latency, throughput, memory use, quality, and cost. This matters when deciding whether a model can run locally, on a single GPU, or needs a serving cluster/API.
 
 Learn:
 
@@ -1058,6 +1366,16 @@ Lower Memory Usage
 Easier Local Deployment
 ```
 
+## Key trade-offs
+
+- **Quantization:** lower memory/cost, sometimes lower quality or different kernel support.
+- **Longer context:** higher memory/compute and often higher latency; more context is not automatically more useful.
+- **Batching:** improves throughput but can worsen per-request latency.
+- **KV cache:** speeds autoregressive generation but consumes memory that grows with active sequences/context.
+- **CPU vs GPU:** CPUs are flexible and inexpensive for small workloads; GPUs provide much higher parallel throughput for many neural operations.
+
+Measure **time to first token**, generation tokens/second, end-to-end latency percentiles, throughput, peak memory, and cost per successful task—not just a model's parameter count.
+
 ---
 
 # 25. Recommended 24-Week Learning Plan
@@ -1081,6 +1399,10 @@ Easier Local Deployment
 | 23 | Monitoring + Optimization |
 | 24 | Portfolio + Interview Preparation |
 
+This is a sequencing template, not a promise that every learner becomes production-ready in exactly 24 weeks. If Python, backend engineering, or ML foundations are new to you, extend those phases rather than rushing into agents. If you already have strong software experience, spend more time on evaluation, retrieval, security, and production operations.
+
+Each two-week block should include a tangible deliverable and a short retrospective: what worked, what failed, what metric improved, and what you would design differently.
+
 ---
 
 # 26. Recommended Learning Ratio
@@ -1092,13 +1414,15 @@ Easier Local Deployment
 
 Avoid spending months only watching courses.
 
-Every major topic should produce a small project.
+Every major topic should produce a small project. “Building” includes testing, debugging, measuring, documenting, and operating—not merely generating code until it runs once.
 
 ---
 
 # 27. Portfolio Projects
 
-Build 4 strong projects rather than many basic tutorials.
+Build 4 strong projects rather than many basic tutorials. A strong portfolio project should demonstrate a problem statement, architecture, reproducible setup, tests, evaluation dataset/metrics, failure analysis, security decisions, deployment, and a clear README.
+
+Avoid presenting a thin wrapper around a model API as a production AI project. Show the engineering around the model.
 
 ---
 
@@ -1266,6 +1590,8 @@ Possible models:
 
 # 28. Target AI Engineer Technology Stack
 
+Treat this as a **representative stack**, not a checklist of mandatory brands. Learn the capability deeply, then substitute equivalent tools when a project or employer uses something else.
+
 ## Programming
 
 ```text
@@ -1313,7 +1639,9 @@ JavaScript/TS      ★★★
 
 - Tool Calling
 - MCP
-- LangGraph
+- One orchestration approach/framework such as LangGraph when a stateful graph is actually useful
+
+Start framework-agnostic first so you understand the agent loop, state, tool schema, permissions, and failure handling beneath the framework.
 
 ## Document AI
 
@@ -1374,7 +1702,7 @@ Learn the core concepts and become very strong with a smaller set of tools.
 
 # 30. Interview Topics You Must Know
 
-You should be able to explain these clearly.
+You should be able to explain these clearly **and connect each answer to a design trade-off or failure case**. Interview strength comes from reasoning about systems, not memorizing definitions.
 
 ## LLM Fundamentals
 
@@ -1446,6 +1774,20 @@ You should be able to explain these clearly.
 - Key-value extraction
 - Line-item extraction
 - Evidence validation
+
+### Practice answer structure
+
+For an architecture question, answer in this order:
+
+```text
+1. Clarify requirements and risks
+2. Establish a simple baseline
+3. Describe components and data flow
+4. Explain trade-offs
+5. Describe failure handling/security
+6. Define evaluation and monitoring
+7. Explain how you would scale only when needed
+```
 
 ---
 
@@ -1559,7 +1901,7 @@ Vector DB         SQL Database
        Production Output
 ```
 
-The objective is not simply to know how to call an LLM API.
+The objective is not simply to know how to call an LLM API. A production-ready AI engineer should be able to explain **why the system can be trusted enough for its intended use**, how failures are detected, what happens when a dependency is unavailable, how data is protected, and how quality/cost/latency are measured over time.
 
 The objective is to become an engineer who can build:
 
@@ -1572,7 +1914,7 @@ The objective is to become an engineer who can build:
 
 ---
 
-# Checklist
+# 33. Mastery Checklist
 
 ## Foundation
 
@@ -1639,6 +1981,9 @@ The objective is to become an engineer who can build:
 
 ## Production
 
+- [ ] API authentication and authorization
+- [ ] Timeouts, retries, and idempotency
+- [ ] Background jobs / queues
 - [ ] FastAPI
 - [ ] Pydantic
 - [ ] PostgreSQL
@@ -1650,11 +1995,15 @@ The objective is to become an engineer who can build:
 - [ ] CI/CD
 - [ ] Logging
 - [ ] Monitoring
+- [ ] Tracing / request correlation
 - [ ] Evaluation
+- [ ] Versioned eval datasets
 - [ ] Guardrails
 - [ ] Security
 - [ ] Cost Optimization
 - [ ] Latency Optimization
+- [ ] Backups / recovery basics
+- [ ] Least-privilege secrets and IAM
 
 ## Portfolio
 
@@ -1666,6 +2015,8 @@ The objective is to become an engineer who can build:
 - [ ] Architecture Diagrams
 - [ ] Test Cases
 - [ ] Benchmarks
+- [ ] Failure analysis / known limitations
+- [ ] Reproducible setup and architecture decisions
 - [ ] Resume Update
 - [ ] Interview Preparation
 

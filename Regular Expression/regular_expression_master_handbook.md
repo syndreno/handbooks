@@ -218,7 +218,23 @@ Examples include:
 
 # 4. How Regex Engines Work
 
-A **Regex engine** is the software component that interprets a Regex pattern.
+A **Regex engine** is the software component that interprets a Regex pattern. Understanding the engine matters because Regex is not one perfectly universal language: features, Unicode behavior, replacement syntax, performance, and escaping rules vary.
+
+At a simplified level, a typical search works like this:
+
+```text
+Choose a starting position in the input
+    ↓
+Try to match the pattern
+    ↓
+If it fails, move to another allowed starting position
+    ↓
+Return the first match or continue for additional matches
+```
+
+Many mainstream engines are backtracking engines. They may temporarily choose one path and later back up to try another when the rest of the pattern fails. That flexibility enables powerful constructs, but ambiguous nested quantifiers can also create serious performance problems. Other engines use different matching strategies and intentionally omit some backtracking-dependent features.
+
+A **match** normally contains more than the visible text: engines may also expose the start/end position and captured groups.
 
 Different languages use different engines.
 
@@ -249,6 +265,17 @@ JavaScript uses:
 ```
 
 So always know which Regex engine you are targeting.
+
+## Search vs full-string validation
+
+A common beginner mistake is assuming that a successful search means the whole input is valid.
+
+```text
+Search:       find a matching substring anywhere
+Full match:   require the entire input to satisfy the pattern
+```
+
+Different APIs express this differently. Python has `re.search()` and `re.fullmatch()`, Java commonly combines `Matcher.matches()` with `find()`, and other platforms use anchors or dedicated methods. Choose the API intentionally.
 
 ---
 
@@ -666,6 +693,8 @@ ABC1234XYZ
 ```
 
 This is extremely important.
+
+> **Portability note:** `^` and `$` are widely used for validation, but their exact end-of-string behavior can vary by engine and flags. For example, `$` may also match before a final line terminator in some engines. When an API provides a dedicated whole-string operation—such as Python `re.fullmatch()` or Java `Matcher.matches()`—prefer it for strict validation. Otherwise, test trailing-newline cases explicitly for your target engine.
 
 Without anchors:
 
@@ -1193,7 +1222,9 @@ Regex can enforce structural password rules, but security systems should prefer 
 
 # 23. Lookbehind
 
-Lookbehind checks what appears before the current match.
+Lookbehind checks what appears before the current position without including that text in the consumed match.
+
+Lookbehind is useful when the left-side context identifies the value but you only want the value itself. However, lookbehind support and allowed pattern length differ between Regex engines, so it is less portable than basic groups and lookahead.
 
 ## Positive Lookbehind
 
@@ -1585,6 +1616,8 @@ Useful for normalizing OCR text.
 
 # 29. Regex in JavaScript
 
+JavaScript provides the `RegExp` object plus String methods that accept Regex patterns. Choose a **Regex literal** when the pattern is known in source code and `new RegExp()` when you must build a pattern dynamically.
+
 Create a Regex literal:
 
 ```javascript
@@ -1597,7 +1630,18 @@ Or dynamically:
 const regex = new RegExp("\\d+");
 ```
 
-## `.test()`
+## Core JavaScript Regex APIs
+
+| API | Input | Return value | Best use |
+|---|---|---|---|
+| `regex.test(text)` | string | `boolean` | Does a match exist? |
+| `regex.exec(text)` | string | match array or `null` | Need groups/index from one match |
+| `text.match(regex)` | Regex | match data/array or `null` | Convenient matching from a string |
+| `text.matchAll(regex)` | global Regex | iterator of match objects | Iterate matches with groups |
+| `text.replace(regex, replacement)` | Regex + replacement | new string | Search/replace |
+| `text.split(regex)` | Regex | array of strings | Split on a pattern |
+
+### `.test()`
 
 ```javascript
 const regex = /^\d+$/;
@@ -1606,7 +1650,7 @@ console.log(regex.test("12345")); // true
 console.log(regex.test("12A45")); // false
 ```
 
-## `.match()`
+### `.match()`
 
 ```javascript
 const text = "Invoice 123 Total 500";
@@ -1620,7 +1664,7 @@ Output:
 ["123", "500"]
 ```
 
-## Named Groups
+### Named Groups
 
 ```javascript
 const text = "2026-08-12";
@@ -1632,15 +1676,34 @@ const match = text.match(
 console.log(match.groups.year);
 ```
 
+### Important `g` flag state warning
+
+A global or sticky `RegExp` object can keep state in `lastIndex`. Reusing the same object with `.test()` or `.exec()` can therefore produce surprising results if you do not understand that state. For simple validation, avoid `g` unless you actually need global iteration.
+
 ---
 
 # 30. Regex in Python
 
-Python uses the `re` module.
+Python uses the standard-library `re` module. Raw string literals such as `r"\d+"` are usually preferred for patterns because they reduce Python-string escaping noise.
 
 ```python
 import re
 ```
+
+## Core `re` functions
+
+| Function | What it does | Return value | Typical use |
+|---|---|---|---|
+| `re.search(pattern, text)` | finds first match anywhere | `Match` or `None` | extraction/search |
+| `re.match(pattern, text)` | matches only at start | `Match` or `None` | start-anchored checks |
+| `re.fullmatch(pattern, text)` | requires whole string | `Match` or `None` | validation |
+| `re.findall(pattern, text)` | finds all matches | list | simple extraction |
+| `re.finditer(pattern, text)` | iterates match objects | iterator | positions/groups for many matches |
+| `re.sub(pattern, repl, text)` | replaces matches | new string | cleanup/transformation |
+| `re.split(pattern, text)` | splits on matches | list | patterned delimiters |
+| `re.compile(pattern, flags=0)` | compiles reusable pattern object | `Pattern` | repeated use/readability |
+
+For validation, prefer `re.fullmatch()` when you mean "the entire value must conform" rather than relying on a substring search.
 
 ## Search
 
@@ -1693,12 +1756,24 @@ Hello world
 
 # 31. Regex in Java
 
-Java uses:
+Java's standard Regex API separates the compiled pattern from the operation state:
 
 ```java
 java.util.regex.Pattern
 java.util.regex.Matcher
 ```
+
+`Pattern` represents the compiled Regex. `Matcher` applies it to one input and exposes match state.
+
+| Method | Purpose | Return/output |
+|---|---|---|
+| `Pattern.compile(regex)` | compile pattern | `Pattern` |
+| `pattern.matcher(text)` | create matcher for input | `Matcher` |
+| `matcher.find()` | find next substring match | `boolean` |
+| `matcher.matches()` | require entire region to match | `boolean` |
+| `matcher.group()` | get matched text | `String` |
+| `matcher.group(n)` | get capture group | `String` |
+| `matcher.replaceAll(repl)` | replace all matches | `String` |
 
 Example:
 
@@ -1729,13 +1804,23 @@ inside a Java string.
 
 # 32. Regex in PHP
 
-PHP commonly uses PCRE through functions such as:
+PHP commonly uses its PCRE integration through the `preg_*` functions. PHP patterns normally include delimiters such as `/.../`, followed by optional modifiers.
 
 ```php
 preg_match()
 preg_match_all()
 preg_replace()
 ```
+
+| Function | Main inputs | Return/output | Typical use |
+|---|---|---|---|
+| `preg_match($pattern, $subject, $matches)` | pattern + string | `1`, `0`, or `false`; captures via `$matches` | first match/validation |
+| `preg_match_all(...)` | pattern + string | match count or `false`; captures via array | all matches |
+| `preg_replace($pattern, $replacement, $subject)` | pattern + replacement + input | replaced string/array or `null` on error | transformation |
+| `preg_split($pattern, $subject)` | delimiter pattern + string | array or `false` | split text |
+| `preg_quote($str, $delimiter)` | literal text | escaped string | safely embed literal text in a pattern |
+
+Do not treat `preg_match()` as a pure boolean without considering its documented `1` / `0` / `false` outcomes when error handling matters.
 
 Example:
 
@@ -1765,11 +1850,23 @@ $clean = preg_replace('/\s+/', ' ', $text);
 
 # 33. Regex in .NET / C#
 
-C# uses:
+C# uses the .NET Regex API:
 
 ```csharp
 System.Text.RegularExpressions.Regex
 ```
+
+Common operations:
+
+| API | Purpose | Return value |
+|---|---|---|
+| `Regex.IsMatch(input, pattern)` | check whether a match exists | `bool` |
+| `Regex.Match(input, pattern)` | first match | `Match` |
+| `Regex.Matches(input, pattern)` | all matches | `MatchCollection` |
+| `Regex.Replace(input, pattern, replacement)` | replace matches | `string` |
+| `Regex.Split(input, pattern)` | split text | `string[]` |
+
+For repeated or security-sensitive matching, review constructor/options overloads rather than using only the shortest static call. .NET supports explicit match timeouts, and modern .NET also provides `RegexOptions.NonBacktracking` for compatible patterns.
 
 Example:
 
@@ -1802,7 +1899,9 @@ instead of:
 
 # 34. Regex in SQL and Databases
 
-Regex syntax varies greatly across databases.
+Regex syntax varies greatly across databases. The **SQL operator/function, Regex flavor, flags, collation, and index behavior** can all differ, so database Regex should be treated as database-specific syntax rather than portable SQL.
+
+Use database Regex when filtering/extracting close to the data is genuinely useful. Avoid moving complex validation rules into SQL merely because Regex is available; application code is often easier to test and reuse.
 
 ## MySQL
 
@@ -1833,6 +1932,16 @@ SQL Server historically does not provide the same native general-purpose Regex s
 ---
 
 # 35. Real-World Validation Examples
+
+Validation means deciding whether **the complete input** satisfies a rule. For that reason, examples in this section generally use whole-string boundaries. Structural Regex validation should still be followed by semantic/business validation when the value has deeper rules.
+
+Example:
+
+```text
+2026-02-31
+```
+
+can be date-shaped while still being an impossible calendar date.
 
 ## Only Digits
 
@@ -2668,6 +2777,8 @@ Regex may still help with lightweight pre-validation or cleanup.
 
 # 51. Common Regex Mistakes
 
+The most dangerous Regex mistakes are not always syntax errors. A pattern can compile successfully and still be logically wrong, too permissive, too slow, or incompatible with production data.
+
 ## Mistake 1 — Forgetting Anchors
 
 Bad validation:
@@ -2924,7 +3035,7 @@ Again, support varies by engine.
 
 # 53. Regex Security
 
-Regex can create security risks.
+Regex can create security risks when patterns run against large or attacker-controlled input. Treat Regex performance as part of input-validation design, not only as a micro-optimization.
 
 ## ReDoS
 
@@ -2949,16 +3060,28 @@ Example risky style:
 
 Use:
 
-- input length limits
-- safer patterns
-- Regex timeouts where supported
-- non-backtracking Regex engines when appropriate
-- tested libraries
-- fuzz tests for untrusted input
+- input length limits before matching;
+- precise character classes and bounded quantifiers;
+- Regex timeouts where the platform supports them;
+- non-backtracking modes/engines when the required pattern features are compatible;
+- unit tests containing long near-miss inputs;
+- fuzz/property tests for important untrusted-input patterns;
+- application-level cancellation or isolation where appropriate.
 
-.NET can support Regex timeouts.
+### .NET example: explicit timeout
 
-Other platforms may provide different protection mechanisms.
+```csharp
+bool ok = Regex.IsMatch(
+    input,
+    pattern,
+    RegexOptions.None,
+    TimeSpan.FromMilliseconds(250)
+);
+```
+
+The right timeout depends on the application and expected input size. A timeout is a safety control, not a substitute for fixing a pathological pattern.
+
+Modern .NET also provides `RegexOptions.NonBacktracking` for patterns that do not require unsupported backtracking-dependent constructs. Other platforms provide different controls, so check the runtime you actually deploy.
 
 ---
 
@@ -3200,18 +3323,34 @@ Always select the correct engine/dialect.
 
 Do not assume all Regex flavors support the same features.
 
-| Feature | JavaScript | Python | Java | PHP/PCRE | .NET |
+| Feature | JavaScript (ECMAScript) | Python `re` | Java | PHP / PCRE | .NET |
 |---|---:|---:|---:|---:|---:|
 | Capturing groups | Yes | Yes | Yes | Yes | Yes |
 | Named groups | Yes | Yes | Yes | Yes | Yes |
 | Lookahead | Yes | Yes | Yes | Yes | Yes |
-| Lookbehind | Modern engines | Yes | Yes | Yes | Yes |
-| Atomic groups | Engine/version dependent | Modern Python supports atomic groups | Yes | Yes | Yes |
-| Possessive quantifiers | Modern JS support varies by runtime/features; verify | Modern Python supports | Yes | Yes | Yes |
-| Unicode properties | Yes with appropriate mode | Via built-ins / engine features | Yes | Yes | Yes |
+| Lookbehind | Yes in modern runtimes | Yes | Yes | Yes | Yes |
+| Atomic groups `(?>...)` | **No** in ECMAScript 2026 | Python 3.11+ | Yes | Yes | Yes |
+| Possessive quantifiers `*+`, `++`, etc. | **No** in ECMAScript 2026 | Python 3.11+ | Yes | Yes | **No** Java-style syntax; use atomic groups or `NonBacktracking` where appropriate |
+| Unicode property escapes | Yes with `u`/`v` mode | Standard `re` has no JavaScript-style `\p{...}` syntax | Yes | Yes | Yes |
 | Inline flags | Limited/different | Yes | Yes | Yes | Yes |
 
 **Important:** Exact support can change by runtime version. Always check the documentation for the engine you deploy on.
+
+## Portability strategy
+
+If the same logical rule must run in several languages, prefer a conservative subset:
+
+```text
+literals
+character classes
+bounded quantifiers
+groups
+alternation
+basic anchors
+simple lookahead only when all targets support it
+```
+
+Keep engine-specific patterns in separate tested files rather than forcing one clever pattern to behave identically everywhere.
 
 ---
 
@@ -4119,7 +4258,7 @@ If you remember only a few patterns at first, remember these:
 \s+                 one or more whitespace characters
 [A-Z]+              uppercase letters
 [^,]+               everything until a comma
-^...$                entire string validation
+^...$                common start/end validation pattern; check engine newline rules
 (...)                capture
 (?:...)              group without capture
 a|b                  OR

@@ -155,7 +155,7 @@ CSS can control:
 - themes
 - component appearance
 
-### Real-world scenario
+## Real-world scenario
 
 Suppose you build an invoice application.
 
@@ -197,6 +197,23 @@ A browser roughly performs these steps:
 7. Composites visual layers.
 
 This explains why changing CSS can affect layout, painting, or animation performance.
+
+
+## A more useful mental model
+
+HTML and CSS are processed separately and then combined by the browser. HTML contributes the **DOM tree**; CSS contributes style rules. The browser matches selectors to DOM elements, resolves competing declarations through the cascade, computes each element's final values, performs layout, paints the result, and may place some painted parts on separate compositing layers.
+
+This distinction helps when debugging:
+
+```text
+Wrong element/structure?      → inspect HTML/DOM
+Rule does not match?          → inspect selector
+Rule matches but loses?       → inspect cascade/specificity
+Correct style but bad layout? → inspect box sizes/layout context
+Animation feels slow?         → inspect rendering/performance
+```
+
+Changing a property does not always have the same cost. A color change usually affects painting, while changing dimensions can require layout. Do not optimize blindly; use browser DevTools when performance is actually a problem.
 
 ---
 
@@ -255,6 +272,27 @@ body {
 
 This is usually the preferred method for ordinary websites and applications.
 
+
+## How to choose
+
+For a normal multi-page site or application, prefer an external stylesheet or the stylesheet system provided by your framework/build tool. It keeps styling reusable and allows the browser to cache CSS independently of the HTML.
+
+Inline styles have an important limitation: they are hard to reuse and have high cascade priority. They are sometimes reasonable for values that are truly data-driven, such as a runtime CSS custom property:
+
+```html
+<div class="progress" style="--progress: 72%">...</div>
+```
+
+```css
+.progress {
+  width: var(--progress);
+}
+```
+
+Internal `<style>` blocks are useful for demos, prototypes, or page-specific critical styles, but large applications become easier to maintain when styles are organized outside individual HTML documents.
+
+**Common mistake:** choosing inline CSS to "fix specificity." That usually hides the cascade problem instead of solving it.
+
 ---
 
 # 4. CSS Syntax
@@ -291,6 +329,34 @@ Inside the declaration:
 - `width` = property
 - `320px` = value
 
+
+## Declaration blocks, parsing, and invalid values
+
+A rule can contain many declarations:
+
+```css
+.card {
+  width: 20rem;
+  padding: 1rem;
+  color: #1f2937;
+}
+```
+
+A semicolon separates declarations. The final semicolon is optional in many cases, but keeping it is safer when another declaration is added later.
+
+Browsers are fault tolerant. If one declaration is invalid, the browser normally ignores that declaration rather than discarding the whole stylesheet:
+
+```css
+.card {
+  color: definitely-not-a-color; /* ignored */
+  padding: 1rem;                 /* still applied */
+}
+```
+
+Use DevTools when a property appears crossed out or has a warning icon. That often means the syntax/value is invalid, the property does not apply in the current context, or another declaration won the cascade.
+
+**Best practice:** format one declaration per line in maintained code. It makes diffs, debugging, and reviews easier.
+
 ---
 
 # 5. Comments
@@ -318,6 +384,24 @@ Better:
   color: var(--color-danger);
 }
 ```
+
+
+## What comments are good for
+
+Comments are most valuable when they preserve context that the code cannot express by itself:
+
+```css
+/* Keep above the sticky table header used by the vendor grid. */
+.invoice-toolbar {
+  z-index: 30;
+}
+```
+
+They are also useful for section boundaries in a small stylesheet, compatibility notes, and temporary migration guidance.
+
+Avoid leaving secrets, credentials, internal URLs, or sensitive operational details in CSS comments. Production CSS is downloaded by the browser and can be read by users even when it is minified.
+
+**Maintenance rule:** when code changes, update or delete the related comment. An outdated comment is often more dangerous than no comment because future developers may trust it.
 
 ---
 
@@ -484,6 +568,36 @@ h2 ~ p {
 ```
 
 Targets later sibling paragraphs.
+
+
+## Choosing the right relationship
+
+Use the narrowest relationship that reflects the actual HTML structure.
+
+```html
+<ul class="menu">
+  <li><a href="/">Home</a></li>
+</ul>
+```
+
+```css
+.menu > li { ... }  /* direct list items only */
+.menu a { ... }     /* links anywhere inside the menu */
+```
+
+A descendant selector such as `.card p` is intentionally broad: it also matches paragraphs inside nested components. A child selector such as `.card > p` is more precise when only direct children should be styled.
+
+Sibling combinators are useful for "element after element" patterns:
+
+```css
+.form-field + .form-field {
+  margin-top: 1rem;
+}
+```
+
+This adds spacing only when one field follows another.
+
+**Common mistake:** encoding the entire DOM path in selectors. Deep selectors become fragile when markup changes. Prefer stable component classes when the relationship is not semantically important.
 
 ---
 
@@ -661,6 +775,35 @@ input::placeholder {
 }
 ```
 
+
+## Pseudo-element vs real content
+
+Pseudo-elements are generated presentation boxes; they are not a substitute for meaningful HTML.
+
+```css
+.external-link::after {
+  content: " ↗";
+}
+```
+
+This is fine as a decorative cue, but essential instructions, form errors, prices, or accessible labels should live in the document rather than only in `content`.
+
+`::before` and `::after` normally require `content` to generate a box:
+
+```css
+.badge::before {
+  content: "";
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+```
+
+Use pseudo-elements for decorative shapes, icons that are non-essential, overlays, and visual affordances.
+
+**Common mistake:** absolutely positioning a pseudo-element without establishing the intended containing block. If it should be positioned relative to a component, that component often needs `position: relative`.
+
 ---
 
 # 10. The Cascade
@@ -690,6 +833,32 @@ p {
 When priority is otherwise equal, the later rule wins.
 
 Result: red.
+
+
+## How to reason about a conflict
+
+Do not reduce the cascade to "the last rule wins." Source order is only one step. A practical debugging order is:
+
+```text
+1. Is the declaration relevant to this element/property?
+2. Which origin and importance wins?
+3. Which cascade layer wins?
+4. Which selector has greater specificity?
+5. If still tied, which declaration appears later?
+```
+
+For example, a later low-specificity selector does not automatically beat an earlier ID selector:
+
+```css
+#save { color: red; }
+button { color: blue; }
+```
+
+The button remains red if both rules apply.
+
+Cascade layers (`@layer`) can deliberately order groups of CSS without increasing selector specificity. This is useful when combining resets, third-party CSS, components, and utilities.
+
+**Best practice:** use DevTools' Styles/Computed panels to see exactly which declaration won instead of guessing.
 
 ---
 
@@ -744,6 +913,27 @@ Better:
 }
 ```
 
+
+## Specificity is not a score to maximize
+
+Specificity only participates after higher-priority cascade decisions such as origin, importance, and layer ordering. Within comparable rules, think of selector components in groups rather than as a decimal number.
+
+```css
+#app .button       /* includes an ID: difficult to override */
+.button.is-active  /* two class-like components */
+button             /* one type component */
+```
+
+Modern selectors also have special behavior. For example, `:where(...)` contributes zero specificity, which makes it useful for low-priority defaults:
+
+```css
+:where(.prose) a {
+  color: var(--link-color);
+}
+```
+
+**Common mistake:** fixing every conflict by adding more selectors or `!important`. This produces a specificity arms race. Prefer a clear architecture, controlled source order/layers, and selectors that are as specific as necessary—but no more.
+
 ---
 
 # 12. Inheritance
@@ -784,6 +974,42 @@ property: initial;
 property: unset;
 property: revert;
 ```
+
+
+## Inherited, initial, and computed values
+
+Inheritance is evaluated per property. Text-oriented properties often inherit because that produces useful defaults; box-model and layout properties generally do not.
+
+```css
+.card {
+  color: #334155;
+}
+
+.card strong {
+  /* inherits #334155 unless another rule changes color */
+}
+```
+
+CSS custom properties inherit by default too, which makes them especially useful for component theming:
+
+```css
+.panel {
+  --accent: rebeccapurple;
+}
+
+.panel .button {
+  background: var(--accent);
+}
+```
+
+Useful reset keywords have different meanings:
+
+- `inherit` — explicitly take the parent's computed value.
+- `initial` — use the property's specification-defined initial value.
+- `unset` — inherit if the property normally inherits; otherwise use its initial value.
+- `revert` — roll back to the value from an earlier cascade origin/layer.
+
+Use these intentionally; they are not interchangeable.
 
 ---
 
@@ -941,6 +1167,31 @@ Build semantic color variables:
 
 Avoid scattering raw color values everywhere.
 
+
+## Choosing a color format
+
+No single color syntax is always best. Hex is compact for fixed RGB values; modern `rgb()` is readable and supports alpha; HSL can be intuitive for hue-based adjustments; newer color spaces such as `oklch()` can be valuable in design systems that need more perceptually consistent scales.
+
+For application code, **semantic tokens** matter more than the literal syntax:
+
+```css
+:root {
+  --surface: #ffffff;
+  --text: #111827;
+  --action: #2563eb;
+}
+
+.button {
+  background: var(--action);
+}
+```
+
+This lets the design change without searching for every copy of a raw value.
+
+**Accessibility:** never assume that "red" automatically means an accessible error color. Foreground/background contrast and non-color cues still need to be checked.
+
+**Common mistake:** mixing dozens of nearly identical raw colors instead of defining a deliberate palette.
+
 ---
 
 # 15. CSS Custom Properties
@@ -980,7 +1231,7 @@ Scoped variables:
 }
 ```
 
-### Real-world theme scenario
+## Real-world theme scenario
 
 ```css
 :root {
@@ -998,6 +1249,40 @@ body {
   color: var(--text);
 }
 ```
+
+
+## Runtime variables, not text substitution
+
+A custom property participates in the normal cascade and is resolved by the browser at runtime. That makes it different from a preprocessor variable.
+
+```css
+.card {
+  --card-accent: #2563eb;
+  border-color: var(--card-accent);
+}
+
+.card--danger {
+  --card-accent: #dc2626;
+}
+```
+
+The modifier changes one token and every descendant using that token can update.
+
+Custom properties are also useful with JavaScript:
+
+```js
+document.documentElement.style.setProperty("--sidebar-width", "320px");
+```
+
+Use a fallback when the variable may not exist:
+
+```css
+color: var(--text-color, #111827);
+```
+
+A fallback does **not** repair every invalid value; it is primarily used when the referenced custom property is missing or resolves invalidly in the relevant context.
+
+**When not to use them:** do not turn every one-off literal into a variable. Create variables for values with real reuse, semantics, configuration, or runtime variability.
 
 ---
 
@@ -1036,6 +1321,23 @@ Then:
 
 The declared 300px includes padding and border.
 
+
+## Why `border-box` is easier
+
+With the default `content-box`, a declared width applies only to the content box. Padding and borders are then added outside it:
+
+```text
+rendered width = declared content width + left/right padding + left/right border
+```
+
+With `box-sizing: border-box`, the declared width includes content, padding, and border. This makes components easier to size predictably.
+
+Margin sits outside the border and is never included in `width`.
+
+Use DevTools' box-model diagram when an element is unexpectedly larger or smaller than expected. It shows the computed content, padding, border, and margin values.
+
+**Edge case:** `box-sizing` does not mean every element will have exactly the declared width. Min/max constraints, intrinsic sizing, flex/grid algorithms, and available space can still affect final layout.
+
 ---
 
 # 17. Width and Height
@@ -1065,7 +1367,7 @@ min-height
 max-height
 ```
 
-### Scenario: centered page container
+## Scenario: centered page container
 
 ```css
 .container {
@@ -1073,6 +1375,25 @@ max-height
   margin-inline: auto;
 }
 ```
+
+
+## Prefer constraints over unnecessary fixed sizes
+
+Fixed dimensions are appropriate when the design truly requires them, but content-driven interfaces are usually more robust with constraints:
+
+```css
+.dialog {
+  width: min(32rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+}
+```
+
+This allows the dialog to fit narrow viewports while limiting its desktop size.
+
+`min-width`/`min-height` establish a lower bound; `max-width`/`max-height` establish an upper bound. Percentage sizes depend on the relevant containing block and can be surprising when the parent's size is indefinite.
+
+**Common mistake:** giving text cards a fixed `height` to make them equal. Longer translations or zoomed text can overflow. Prefer Grid/Flexbox equal-height behavior or `min-height` when appropriate.
 
 ---
 
@@ -1104,6 +1425,33 @@ Center a block:
 }
 ```
 
+
+## Margin behavior worth knowing
+
+Vertical margins of block elements can **collapse** in normal flow, so two adjacent margins do not always add together. Flex and grid item margins do not collapse in the same way.
+
+Prefer `gap` when spacing items inside a flex or grid layout:
+
+```css
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+```
+
+This expresses "space between children" directly instead of placing margin on each child.
+
+Logical properties improve writing-direction support:
+
+```css
+.card {
+  margin-block: 1rem;
+  margin-inline: auto;
+}
+```
+
+**Common mistake:** using negative margins as a routine layout tool. They can be useful, but if they are compensating for misunderstood container spacing, fix the underlying layout first.
+
 ---
 
 # 19. Padding
@@ -1124,6 +1472,24 @@ Button example:
 }
 ```
 
+
+## Padding changes the clickable/content area
+
+Padding belongs inside an element's border, so it is especially useful for buttons, form controls, cards, and other surfaces:
+
+```css
+.button {
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+}
+```
+
+Unlike margin, padding cannot be negative and does not collapse. The element's background is painted through the padding box by default.
+
+When `box-sizing: border-box` is active, padding is included inside an explicitly declared width/height. Without it, padding increases the rendered size beyond the content-box dimension.
+
+**Best practice:** use logical properties (`padding-inline`, `padding-block`) when left/right or top/bottom semantics are not important. They adapt more naturally to writing direction.
+
 ---
 
 # 20. Borders
@@ -1141,6 +1507,38 @@ border-top: 2px solid;
 border-inline-start: 4px solid;
 ```
 
+
+## Border anatomy
+
+A visible border needs a width, style, and color:
+
+```css
+.panel {
+  border: 1px solid #cbd5e1;
+}
+```
+
+You can set logical sides for internationalized layouts:
+
+```css
+.notice {
+  border-inline-start: 4px solid var(--accent);
+}
+```
+
+Borders participate in the box model. With `border-box`, their thickness is included in declared dimensions; with `content-box`, it is added outside the content width/height.
+
+Use `currentColor` when the border should follow the element's text color:
+
+```css
+.icon-button {
+  color: #2563eb;
+  border: 1px solid currentColor;
+}
+```
+
+**Border vs outline:** borders affect box geometry; outlines generally do not and are often better for focus indication.
+
 ---
 
 # 21. Outline
@@ -1157,6 +1555,32 @@ button:focus-visible {
 ```
 
 Do not remove focus outlines without providing an accessible replacement.
+
+
+## Why outlines are ideal for focus
+
+An outline is drawn around the element without taking up normal layout space, so adding a keyboard focus ring does not push nearby content.
+
+```css
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+```
+
+`:focus-visible` lets browsers show the focus treatment when it is useful for the user's interaction method, commonly keyboard navigation.
+
+**Do not write** `outline: none` globally unless you provide an equally visible alternative focus indicator. Removing focus visibility can make an interface very difficult to use without a mouse.
+
+Outlines can also be useful temporarily while debugging layout:
+
+```css
+* {
+  outline: 1px solid rgb(255 0 0 / 0.15);
+}
+```
+
+Remove diagnostic rules before production.
 
 ---
 
@@ -1186,6 +1610,32 @@ Pill:
 }
 ```
 
+
+## How radius behaves
+
+`border-radius` rounds the border box and also affects clipping of backgrounds. It can accept one to four corner values, and each corner may have horizontal/vertical radii.
+
+```css
+.card {
+  border-radius: 1rem 1rem 0 0;
+}
+```
+
+For a circular avatar, make the box square and use `50%`:
+
+```css
+.avatar {
+  inline-size: 4rem;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+```
+
+A very large fixed radius such as `9999px` is a common way to create a pill when the element's height can vary.
+
+**Common mistake:** applying `overflow: hidden` only to make child media follow a radius, then accidentally clipping focus rings or positioned content. Clip deliberately, not automatically.
+
 ---
 
 # 23. Box Shadows
@@ -1209,6 +1659,27 @@ input {
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.08);
 }
 ```
+
+
+## Reading the shadow syntax
+
+For:
+
+```css
+box-shadow: 0 8px 24px -8px rgb(15 23 42 / 0.25);
+```
+
+the values mean:
+
+```text
+x offset | y offset | blur radius | spread radius | color
+```
+
+Multiple shadows can be comma-separated. `inset` draws the shadow inside the border box.
+
+Shadows are useful for elevation cues, but a large blurred shadow over a large animated region can increase painting/compositing cost. Use them based on the design, not as the only way to communicate hierarchy.
+
+**Accessibility/design tip:** do not rely on a subtle shadow as the only boundary between controls and their background. Borders, spacing, and contrast may communicate structure more reliably.
 
 ---
 
@@ -1243,6 +1714,25 @@ Flows inline while allowing box dimensions.
 
 Removes the element from layout.
 
+
+## Display has an outer and inner role
+
+A useful modern mental model is that `display` influences both how the element participates in its parent layout and how its children are laid out.
+
+```css
+.toolbar {
+  display: flex;
+}
+```
+
+The toolbar itself participates as a box in its parent; its children become flex items.
+
+`display: none` removes the element and its descendants from visual layout and, in normal browser accessibility behavior, from the accessibility tree. Do not use it for content that must remain available to assistive technology.
+
+`inline-block` is still useful for inline-flow elements that need dimensions, but Flexbox and Grid are usually better for multi-item layout.
+
+**Debugging:** when width, margin, or alignment seems ignored, check the element's display type and the layout context created by its parent.
+
 ---
 
 # 25. Normal Document Flow
@@ -1254,6 +1744,25 @@ Block elements naturally stack vertically.
 Inline content naturally flows horizontally within text.
 
 Good CSS often works **with** normal flow rather than forcing everything with absolute positioning.
+
+
+## Why normal flow is your default layout engine
+
+In normal flow, block-level boxes generally follow one another in the block direction, while inline content flows into line boxes. This provides a resilient baseline: content can grow, translations can become longer, and the page can scroll naturally.
+
+Before adding `position: absolute`, ask whether normal flow plus margin/gap, Flexbox, or Grid can solve the layout. Absolute positioning removes an element from normal flow, so following content no longer reserves space for it.
+
+A simple article often needs very little layout CSS:
+
+```css
+article {
+  max-width: 70ch;
+  margin-inline: auto;
+  padding: 1rem;
+}
+```
+
+Working with normal flow usually produces fewer overlap bugs and better behavior when content changes.
 
 ---
 
@@ -1284,6 +1793,26 @@ Scrollable table wrapper:
 ```
 
 Avoid applying `overflow: hidden` casually because it may clip focus indicators, shadows, popovers, or sticky children.
+
+
+## Overflow creates important side effects
+
+`overflow: auto` adds scrolling only when needed; `scroll` reserves a scrolling mechanism even when content fits in many environments; `hidden` clips overflow and establishes special scrolling/formatting behavior; `clip` clips without providing scrolling.
+
+For wide data:
+
+```css
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+```
+
+Keep the table itself semantically intact inside the wrapper.
+
+Overflow can also affect `position: sticky`, focus rings, box shadows, and absolutely positioned descendants. If a sticky element "doesn't work," inspect the overflow values on its ancestors and identify the actual scrolling container.
+
+**Best practice:** solve the cause of accidental overflow—such as an unbreakable URL or inflexible grid track—instead of hiding it globally on `body`.
 
 ---
 
@@ -1358,6 +1887,29 @@ Behaves normally until a scroll threshold is reached.
 }
 ```
 
+
+## Containing blocks and offsets
+
+For an absolutely positioned child, the reference box is determined by CSS containing-block rules. A common pattern is to deliberately create that reference with a positioned ancestor:
+
+```css
+.card {
+  position: relative;
+}
+
+.card__badge {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+}
+```
+
+Use `inset`, `inset-inline-*`, and `inset-block-*` when logical directions are useful.
+
+`fixed` is excellent for viewport-level UI such as a floating help action, but transformed/containing ancestors can affect its reference behavior in advanced cases. `sticky` needs a scroll threshold such as `top: 0` (or logical equivalent) and enough scrollable space.
+
+**Common mistake:** using absolute positioning for primary page layout. It does not reserve normal-flow space and becomes fragile when text size or content changes.
+
 ---
 
 # 28. Z-index and Stacking Context
@@ -1394,6 +1946,34 @@ Create a sensible layer scale:
 }
 ```
 
+
+## Why a larger number sometimes does nothing
+
+`z-index` values are compared **inside stacking contexts**. A child cannot escape its ancestor's stacking context merely by using a huge number.
+
+Conceptual example:
+
+```text
+Parent A (z-index: 1)
+  └── child (z-index: 9999)
+
+Parent B (z-index: 2)
+```
+
+The child under A can still appear beneath B because the ancestor contexts are ordered first.
+
+Properties such as `transform`, `filter`, `opacity < 1`, `isolation: isolate`, and certain positioned elements can create stacking contexts. Use DevTools to inspect ancestors when layering behaves unexpectedly.
+
+A named layer scale is easier to maintain than arbitrary numbers:
+
+```css
+--z-dropdown: 10;
+--z-sticky: 20;
+--z-modal: 100;
+```
+
+Keep the scale small and document exceptional cases.
+
 ---
 
 # 29. Float and Clear
@@ -1418,6 +1998,34 @@ Clear:
   clear: both;
 }
 ```
+
+
+## What float is still for
+
+`float` was designed to let inline content wrap around a floated box, which is still a legitimate editorial pattern:
+
+```css
+.article__figure {
+  float: inline-start;
+  max-width: 40%;
+  margin-inline-end: 1rem;
+  margin-block-end: 0.75rem;
+}
+```
+
+For application navigation, card rows, sidebars, or page columns, Flexbox and Grid express layout intent more clearly.
+
+Historically, developers used clearfix patterns because floated children could escape a parent's normal height calculation. If maintaining old CSS, you may still encounter:
+
+```css
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+```
+
+Do not introduce float-based layout into new code unless text wrapping is actually the behavior you need.
 
 ---
 
@@ -1756,6 +2364,32 @@ Useful when multiple cards need aligned internal rows such as:
 
 Always confirm browser requirements for your target environment when using newer layout features.
 
+
+## How subgrid differs from a new nested grid
+
+A normal nested grid creates its own independent tracks. `subgrid` lets a descendant grid reuse tracks defined by an ancestor grid.
+
+A common card pattern is:
+
+```css
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.card {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+}
+```
+
+Now corresponding internal rows can align across sibling cards when the surrounding grid structure is designed for it.
+
+Use subgrid when alignment must cross component boundaries. Do not use it just because a component is nested; an ordinary grid is simpler when the child should size itself independently.
+
+Test the actual layout and your supported browsers, especially if maintaining older enterprise browser targets.
+
 ---
 
 # 33. Responsive Web Design
@@ -1770,6 +2404,27 @@ Core principles:
 4. use media queries where the layout truly needs a breakpoint
 5. use container queries for reusable components
 6. design mobile-first when practical
+
+
+## Responsive means more than screen width
+
+A robust interface adapts to content, available space, user preferences, input methods, text zoom, and sometimes writing direction—not only a few device widths.
+
+Start with intrinsic sizing:
+
+```css
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: 1rem;
+}
+```
+
+This may need fewer breakpoints because the layout responds to available space itself.
+
+Choose breakpoints where **content needs them**, not by memorizing device model widths. Resize slowly and watch for the point where the design becomes cramped or visually unbalanced.
+
+Also test long names, translated text, 200% zoom, keyboard focus, landscape phones, and narrow containers. Responsive quality is a behavior, not a list of three screenshots.
 
 ---
 
@@ -1828,6 +2483,24 @@ Reduced motion:
 }
 ```
 
+
+## Media query inputs
+
+Media queries can respond to more than viewport width:
+
+```css
+@media (hover: hover) { ... }
+@media (pointer: coarse) { ... }
+@media (prefers-reduced-motion: reduce) { ... }
+@media (prefers-contrast: more) { ... }
+```
+
+Use capability/preference queries when the design decision is about that capability rather than width. For example, do not assume every wide device has hover.
+
+Keep related responsive rules close enough to their component that future developers can understand the whole behavior.
+
+**Common mistake:** creating many tiny breakpoints to force a pixel-perfect screenshot. Prefer flexible layout primitives and add a breakpoint only when the content/layout actually needs a structural change.
+
 ---
 
 # 35. Container Queries
@@ -1851,7 +2524,7 @@ Container queries inspect the size of a component's container.
 }
 ```
 
-### Why useful
+## Why useful
 
 The same component may be:
 
@@ -1860,6 +2533,39 @@ The same component may be:
 - inside a dashboard tile elsewhere
 
 Container queries let the component adapt to its own available space.
+
+
+## Container setup and units
+
+A size query needs an appropriate query container:
+
+```css
+.widget-shell {
+  container-type: inline-size;
+}
+```
+
+Then descendants can react to that container:
+
+```css
+@container (width >= 30rem) {
+  .widget {
+    grid-template-columns: auto 1fr;
+  }
+}
+```
+
+Container query units such as `cqi` can size values relative to a query container in supporting browsers:
+
+```css
+.widget__title {
+  font-size: clamp(1rem, 4cqi, 1.5rem);
+}
+```
+
+Use media queries for page/environment-level decisions and container queries for reusable components whose layout depends on where they are placed.
+
+**Common mistake:** trying to query an element's own size and style that same element in a way that creates circular sizing. Usually query a parent container and style its descendants.
 
 ---
 
@@ -1886,6 +2592,28 @@ Responsive spacing:
   padding-block: clamp(2rem, 6vw, 6rem);
 }
 ```
+
+
+## Choosing units deliberately
+
+Useful unit categories include:
+
+- `rem` — relative to the root font size; good for scalable type/spacing.
+- `em` — relative to the element's font-size (or parent font-size for the `font-size` property); useful for component-relative sizing.
+- `%` — relative to a property-specific reference size.
+- `vw`/`vh` — viewport-relative; useful but can become too small/large without constraints.
+- `dvh`/`svh`/`lvh` — viewport variants that help with mobile browser UI behavior.
+- `ch` — roughly based on the width of the `0` glyph; useful for readable text measure.
+
+Fluid values are strongest when bounded:
+
+```css
+.page-title {
+  font-size: clamp(2rem, 1.5rem + 2vw, 4rem);
+}
+```
+
+This gives responsive behavior without unlimited growth.
 
 ---
 
@@ -1926,6 +2654,31 @@ p {
 }
 ```
 
+
+## Build a readable type system
+
+Typography is not just `font-size`. Line length, line height, weight, spacing, font fallback, and hierarchy work together.
+
+A practical body baseline:
+
+```css
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.prose {
+  max-inline-size: 70ch;
+}
+```
+
+Use relative units so browser/user text settings can participate. Avoid shrinking important text just to make a layout fit; fix the layout instead.
+
+Headings should communicate document hierarchy in HTML, while CSS controls their visual size. Do not choose `<h3>` merely because it "looks smaller."
+
+**Common mistake:** using light font weights or low-contrast gray text everywhere. A fashionable appearance is not useful if reading becomes difficult.
+
 ---
 
 # 38. Web Fonts
@@ -1955,6 +2708,27 @@ Best practices:
 - provide fallback fonts
 - use `font-display`
 - consider loading performance
+
+
+## Loading strategy
+
+Each font file adds network and rendering cost, so ship only the families, styles, scripts, and weights the product actually needs. A variable font can sometimes replace multiple static files, but measure its real size.
+
+A stronger `@font-face` definition may include descriptors that match the file:
+
+```css
+@font-face {
+  font-family: "App Sans";
+  src: url("/fonts/app-sans.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+```
+
+`font-display: swap` allows fallback text to render while the web font loads. Choose fallbacks with reasonably similar metrics to reduce layout shift.
+
+**Do not** embed fonts you are not licensed to redistribute. Performance and licensing both matter in production.
 
 ---
 
@@ -1996,6 +2770,24 @@ Long text handling:
 }
 ```
 
+
+## Separate content semantics from visual treatment
+
+CSS can transform appearance without changing the underlying text. For example, `text-transform: uppercase` displays uppercase letters but does not replace the original DOM string.
+
+Use `line-height` generously enough for readable multi-line text and test longer content:
+
+```css
+.description {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+```
+
+`white-space` is powerful but easy to misuse. `white-space: nowrap` can force controls or labels to overflow narrow screens. Use it only where a single line is truly required.
+
+For truncation, make sure the complete value remains obtainable when it matters—for example through expansion, a details view, or another accessible presentation. Visual neatness should not hide critical data.
+
 ---
 
 # 40. Lists
@@ -2019,6 +2811,34 @@ Custom marker:
 ```
 
 Do not remove semantic `<ul>` / `<ol>` structure just for visual design.
+
+
+## Keep list semantics when the content is a list
+
+Navigation menus, feature lists, steps, and grouped options are often semantically lists even when bullets are not desired.
+
+```css
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+```
+
+Removing markers changes only presentation; the HTML can remain `<ul>` or `<ol>`.
+
+`::marker` can style markers without replacing list semantics:
+
+```css
+.steps li::marker {
+  color: var(--accent);
+  font-weight: 700;
+}
+```
+
+Use an ordered list when sequence/order carries meaning. Use an unordered list when it does not.
+
+**Common mistake:** using `div` elements purely because the default bullets are unwanted. Reset the presentation with CSS instead of discarding meaningful structure.
 
 ---
 
@@ -2058,6 +2878,39 @@ thead th {
 }
 ```
 
+
+## Table CSS should preserve table semantics
+
+Use tables for genuinely tabular relationships, not general page layout. CSS can make a semantic table easier to read without changing its structure.
+
+```css
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  font-weight: 600;
+}
+
+.data-table :is(th, td) {
+  padding: 0.75rem 1rem;
+}
+```
+
+For narrow screens, horizontal scrolling is often safer than converting every row into visually unrelated blocks:
+
+```css
+.table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+```
+
+If you make headers sticky, give them an opaque background and appropriate stacking so body cells do not paint through them.
+
+**Accessibility:** CSS cannot replace `<caption>`, proper `<th>`, and `scope`/header relationships where needed.
+
 ---
 
 # 42. Backgrounds
@@ -2077,6 +2930,27 @@ Shorthand:
 ```css
 background: #111827 url("hero.jpg") center / cover no-repeat;
 ```
+
+
+## Background layers do not affect document semantics
+
+Background images are decorative by default. They do not provide accessible alternative text, so do not use a CSS background as the only representation of meaningful content.
+
+Multiple backgrounds are layered from first to last:
+
+```css
+.hero {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.45)),
+    url("/images/hero.jpg") center / cover no-repeat;
+}
+```
+
+The gradient is painted above the image.
+
+Useful related properties include `background-origin`, `background-clip`, `background-attachment`, and `background-blend-mode`.
+
+**Common mistake:** using `background-size: cover` and assuming the whole image remains visible. `cover` may crop; use real `<img>` content or `contain` when the complete image matters.
 
 ---
 
@@ -2104,6 +2978,28 @@ Gradient overlay:
 }
 ```
 
+
+## Gradients are generated images
+
+A CSS gradient produces an image that can be used anywhere an image value is accepted. It can include multiple color stops and transparency.
+
+```css
+.badge {
+  background: linear-gradient(
+    90deg,
+    #2563eb 0%,
+    #7c3aed 60%,
+    #db2777 100%
+  );
+}
+```
+
+Gradients are useful for decorative surfaces, overlays, masks, and subtle depth. They should not make text contrast unpredictable.
+
+For a text overlay on photography, test the worst part of the image—not just the mockup. A gradient overlay can improve readability, but it is still your responsibility to ensure sufficient contrast.
+
+**Maintainability:** if the same gradient is reused, consider a semantic custom property rather than duplicating a long function everywhere.
+
 ---
 
 # 44. Images and Replaced Elements
@@ -2119,6 +3015,30 @@ video {
 ```
 
 Avoid forcing image dimensions without considering aspect ratio.
+
+
+## What "replaced element" means
+
+Some elements, such as `<img>`, `<video>`, and many form controls, have intrinsic content/dimensions that CSS lays out as an external object rather than ordinary child boxes. This is why properties such as `object-fit` apply to images/video but not to a normal `<div>`.
+
+A resilient media baseline is:
+
+```css
+img,
+svg,
+video {
+  max-inline-size: 100%;
+}
+
+img,
+video {
+  block-size: auto;
+}
+```
+
+For layout stability, supply intrinsic `width` and `height` attributes in HTML when you know them. CSS can still resize the image responsively while the browser reserves the correct aspect-ratio space before it loads.
+
+Do not use CSS background images for content that needs alt text or document meaning.
 
 ---
 
@@ -2151,6 +3071,35 @@ Control crop position:
 }
 ```
 
+
+## When these properties matter
+
+`object-fit` controls how the intrinsic media is fitted **inside a box whose dimensions have been established**.
+
+```css
+.product-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+```
+
+- `cover` fills the box and may crop.
+- `contain` shows the entire object and may leave empty space.
+- `fill` stretches to the box and may distort.
+- `none` keeps intrinsic sizing behavior within the object box.
+- `scale-down` chooses a smaller result from `none`/`contain`.
+
+`object-position` changes which part stays visible when cropping occurs:
+
+```css
+.product-photo {
+  object-position: 50% 20%;
+}
+```
+
+Use it for focal-point adjustment, not as a substitute for serving appropriately composed images.
+
 ---
 
 # 46. Aspect Ratio
@@ -2170,6 +3119,24 @@ Square:
 ```
 
 Useful for preventing layout shifts and maintaining consistent media dimensions.
+
+
+## Aspect ratio participates in sizing
+
+`aspect-ratio` supplies a preferred width-to-height relationship when at least one dimension can be derived automatically.
+
+```css
+.video-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+```
+
+A declared width plus ratio lets the browser calculate height. If both width and height are definite, those dimensions normally control the box and the ratio may not change the result.
+
+For replaced elements such as images, intrinsic dimensions may already provide an aspect ratio. An explicit CSS ratio is useful for consistent card media or placeholders.
+
+**Layout stability:** HTML `width` and `height` attributes are still valuable for images because browsers can reserve space before CSS and the image resource finish loading.
 
 ---
 
@@ -2220,6 +3187,33 @@ input:invalid:not(:placeholder-shown) {
 }
 ```
 
+
+## Styling cannot replace form semantics
+
+Keep real labels, input types, names, descriptions, and error relationships in HTML. CSS should make those states visible.
+
+A good field pattern distinguishes focus, error, disabled, and readonly states:
+
+```css
+.field-control:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 0.25);
+  outline-offset: 1px;
+}
+
+.field-control[aria-invalid="true"] {
+  border-color: #dc2626;
+}
+
+.field-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+```
+
+Be careful with `:invalid`: native form controls can match it before the user has interacted, which may make a new form look full of errors. Modern selectors such as `:user-invalid` can improve timing where supported, or your application can add an explicit validation state class/attribute.
+
+Never use placeholder text as the only label.
+
 ---
 
 # 48. Buttons
@@ -2269,6 +3263,34 @@ Disabled:
 }
 ```
 
+
+## Style the correct element
+
+Use `<button>` for actions and `<a href>` for navigation. CSS can make them look similar, but their semantics and keyboard behavior are different.
+
+Build states deliberately:
+
+```css
+.button:hover { ... }
+
+.button:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 0.35);
+  outline-offset: 2px;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.55;
+}
+```
+
+A disabled native `<button>` is not submitted/activated like an enabled control. A visual class named `.disabled` does not create the same behavior by itself.
+
+**Common mistake:** removing the focus ring because the mouse design looks cleaner. Keep a strong keyboard-visible focus state and test the control at zoomed text sizes.
+
 ---
 
 # 49. Transforms
@@ -2287,6 +3309,31 @@ transform: translateY(-2px) scale(1.02);
 ```
 
 Transforms are useful for visual movement without changing normal document flow.
+
+
+## Transforms change the visual coordinate system
+
+Transforms affect how a box is rendered without moving surrounding normal-flow content.
+
+```css
+.card:hover {
+  transform: translateY(-0.25rem);
+}
+```
+
+The original layout space remains reserved, so nearby items do not reflow around the transformed position.
+
+Transforms are applied as a composed transform operation; order can matter because operations use coordinate systems:
+
+```css
+transform: translateX(2rem) rotate(10deg);
+```
+
+may not produce the same visual result as the reversed sequence.
+
+Transforms can also create stacking/containing-block effects, which matters for `z-index` and positioned descendants.
+
+Use them for visual movement, scaling, rotation, and performant UI animation—but avoid scaling text so aggressively that it becomes blurry or difficult to read.
 
 ---
 
@@ -2314,6 +3361,36 @@ transition: all 0.3s;
 ```
 
 Prefer listing only the properties you intend to animate.
+
+
+## What can transition
+
+A transition interpolates a property from one computed value to another when the value changes.
+
+```css
+.button {
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+```
+
+Not every property animates in the same way, and some values are discrete rather than smoothly interpolated.
+
+Prefer transitions for small state changes such as hover, expansion cues, and color changes. For repeated/keyframed motion, an animation may be clearer.
+
+Respect motion preferences:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition-duration: 0.01ms;
+  }
+}
+```
+
+**Common mistake:** `transition: all`. It can animate a property you did not intend, making later CSS changes surprising. Name the properties deliberately.
 
 ---
 
@@ -2349,6 +3426,31 @@ animation-fill-mode
 animation-play-state
 ```
 
+
+## Animation shorthand and lifecycle
+
+A complete animation can be written with longhands or shorthand:
+
+```css
+.loading {
+  animation: pulse 1.5s ease-in-out 0s infinite alternate;
+}
+```
+
+Animation does not automatically communicate application state to assistive technology. A spinning icon may visually indicate loading, but the UI may still need suitable text/status semantics in HTML.
+
+Use animation for purposeful feedback or storytelling. Avoid continuous decorative motion on large areas when it distracts users or wastes rendering resources.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .loading {
+    animation: none;
+  }
+}
+```
+
+When an animation should finish in a specific final visual state, understand `animation-fill-mode`; when JavaScript needs to react to completion, use the relevant animation events rather than a guessed timeout.
+
 ---
 
 # 52. Filters
@@ -2370,6 +3472,32 @@ Backdrop effect:
 ```
 
 Use effects carefully for readability and performance.
+
+
+## Filter vs backdrop-filter
+
+`filter` changes the rendering of the element itself and its contents:
+
+```css
+.preview--disabled {
+  filter: grayscale(1) opacity(0.7);
+}
+```
+
+`backdrop-filter` changes what is visible **behind** a partially transparent element:
+
+```css
+.frosted {
+  background: rgb(255 255 255 / 0.65);
+  backdrop-filter: blur(12px);
+}
+```
+
+Backdrop effects require content behind the element to be visible through it, so an opaque background hides the effect.
+
+These effects can create new stacking/compositing behavior and may be expensive when used over large moving regions.
+
+**Accessibility:** blur, contrast, or opacity effects can reduce readability. Do not apply them to important text unless you have tested the result.
 
 ---
 
@@ -2396,6 +3524,25 @@ Background blend:
 
 These are useful for artistic visual treatments but can complicate contrast and compositing.
 
+
+## How blending differs from opacity
+
+A blend mode changes how colors are mathematically combined with content/background beneath them. It is not simply transparency.
+
+`mix-blend-mode` blends an element with what is behind it; `background-blend-mode` blends an element's own multiple background layers.
+
+Because the result depends on surrounding colors, contrast can change unexpectedly as content moves or themes change. This makes blend modes best suited to controlled decorative artwork rather than essential text or controls.
+
+If a blended component should not interact with unrelated content outside itself, `isolation: isolate` on an appropriate parent can create a separate stacking/blending context:
+
+```css
+.artwork {
+  isolation: isolate;
+}
+```
+
+Always test light/dark themes and real imagery, not only a single mockup.
+
 ---
 
 # 54. Clipping and Masking
@@ -2420,6 +3567,25 @@ Masking can create more complex transparency-based shapes.
 
 Because feature requirements can vary by browser, verify compatibility before using advanced masking in production.
 
+
+## Clip vs mask
+
+`clip-path` defines the visible geometric region of an element. Content outside that region is clipped.
+
+A mask controls visibility using an image/gradient's alpha or luminance information, which allows softer transparency effects than a hard clip.
+
+```css
+.fade-edge {
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+```
+
+These are visual effects; they do not change document semantics or remove hidden source content from the DOM.
+
+**Interaction caution:** complex clipping can create a visible shape that differs from what users expect as the hit target. Test pointer interaction and keyboard focus indication.
+
+Provide a simple fallback when the shape is decorative and advanced masking is not available in a target browser.
+
 ---
 
 # 55. CSS Functions
@@ -2440,6 +3606,30 @@ url()
 attr()
 counter()
 ```
+
+
+## Functions compute values
+
+A CSS function accepts arguments and produces a value used by a property. Different functions belong to different value types.
+
+```css
+.card {
+  width: min(30rem, 100%);
+  padding: calc(1rem + 1vw);
+  color: rgb(15 23 42 / 0.9);
+  background-image: linear-gradient(white, #f8fafc);
+}
+```
+
+Functions can be nested:
+
+```css
+width: min(100%, calc(40rem + 2vw));
+```
+
+Do not assume every function is valid for every property. `url()` returns an image/resource reference in contexts that accept one; `var()` substitutes a custom-property value; math functions work where compatible numeric types can be resolved.
+
+When a function expression is invalid, the declaration can become invalid at computed-value time. Inspect the Computed panel when a variable/function chain produces surprising output.
 
 ---
 
@@ -2485,6 +3675,37 @@ counter()
 
 Excellent for fluid design.
 
+
+## Think of them as constraints
+
+These math functions let layout express relationships instead of hard-coded breakpoint jumps.
+
+```css
+.container {
+  width: min(70rem, 100% - 2rem);
+}
+```
+
+means "use the smaller of 70rem and the available width minus gutters."
+
+`clamp(min, preferred, max)` is especially useful for fluid design:
+
+```css
+.page-title {
+  font-size: clamp(2rem, 1rem + 3vw, 4rem);
+}
+```
+
+The middle value can grow, but never below the first value or above the third.
+
+`calc()` can combine compatible units:
+
+```css
+min-height: calc(100dvh - var(--header-height));
+```
+
+The browser performs the calculation at runtime, so viewport/custom-property changes can update the result without recompiling CSS.
+
 ---
 
 # 57. Logical Properties
@@ -2521,6 +3742,30 @@ Benefits:
 - writing-mode support
 - more semantic spacing
 
+
+## Map styles to flow, not physical directions
+
+Physical properties say "left/right/top/bottom." Logical properties say "inline start/end" and "block start/end," which adapt to writing mode and text direction.
+
+```css
+.callout {
+  padding-inline: 1rem;
+  padding-block: 0.75rem;
+  border-inline-start: 4px solid var(--accent);
+}
+```
+
+In a typical English horizontal writing mode, inline start is left. In an RTL language it becomes right automatically.
+
+Logical sizing also exists:
+
+```css
+max-inline-size: 70ch;
+min-block-size: 3rem;
+```
+
+Use physical directions when the physical side itself matters (for example an effect tied to the actual top of the viewport). Use logical properties for content-flow spacing and alignment that should internationalize naturally.
+
 ---
 
 # 58. Writing Modes and Internationalization
@@ -2532,6 +3777,32 @@ Benefits:
 ```
 
 When building multilingual applications, prefer logical properties so the layout can adapt more naturally to right-to-left languages.
+
+
+## Direction and writing mode are different concepts
+
+`direction: rtl` changes inline text direction for languages such as Arabic or Hebrew. `writing-mode` changes how lines of text themselves are laid out, including vertical writing systems.
+
+Do not force `direction` merely to move UI elements to the other side; use layout/logical properties for visual positioning.
+
+A component designed with logical properties adapts more easily:
+
+```css
+.message {
+  margin-inline-start: 1rem;
+  text-align: start;
+}
+```
+
+Also test:
+
+- longer translated strings,
+- different fonts/scripts,
+- bidirectional text such as an Arabic sentence containing an invoice number,
+- icon placement,
+- truncation behavior.
+
+Internationalization problems are often content-and-layout problems together. CSS should support the document's real language/direction rather than simulating them.
 
 ---
 
@@ -2565,6 +3836,40 @@ page -> section -> card -> body -> text -> span -> icon
 
 Deep nesting increases coupling and specificity.
 
+
+## What nesting expands to
+
+Nesting keeps related selectors together, but the browser still applies the resulting selector relationships.
+
+```css
+.card {
+  color: #334155;
+
+  & > .title {
+    color: #0f172a;
+  }
+}
+```
+
+Conceptually targets:
+
+```css
+.card > .title { ... }
+```
+
+Nesting is most useful for states, variants, and closely related descendants. It is not a reason to mirror every level of the DOM tree.
+
+```css
+.button {
+  &:hover { ... }
+  &[aria-pressed="true"] { ... }
+}
+```
+
+**Best practice:** keep selectors shallow and inspect their effective specificity. If a nested block is becoming difficult to understand, move the child into its own component rule.
+
+When supporting older browsers/build pipelines, confirm whether native nesting is accepted directly or must be transformed.
+
 ---
 
 # 60. Cascade Layers
@@ -2597,6 +3902,29 @@ Cascade layers let you explicitly control groups of styles.
 
 Useful in large applications and design systems because it can reduce specificity conflicts.
 
+
+## Layer order beats selector specificity between layers
+
+Once layer order is established, a declaration in a later-priority layer can beat a more specific selector in an earlier layer without a specificity contest.
+
+```css
+@layer reset, base, components, utilities;
+```
+
+This order is part of your CSS architecture. For example, low-priority reset rules can stay low even if their selectors are somewhat specific.
+
+Unlayered normal author styles have different cascade placement than layered styles, so introduce layers deliberately when integrating existing CSS.
+
+A practical architecture might be:
+
+```text
+reset → base → components → utilities → project overrides
+```
+
+Use layers to model responsibility, not to create dozens of microscopic priority groups.
+
+**Debugging:** DevTools in modern browsers can show cascade layers, which is often the fastest way to understand why a rule lost.
+
 ---
 
 # 61. @scope
@@ -2616,6 +3944,25 @@ Conceptual example:
 This can help prevent styles leaking into unrelated areas.
 
 When relying on newer CSS features, verify support requirements for your project's browser matrix.
+
+
+## Scope controls where selectors are allowed to match
+
+`@scope` lets you define a scoping root and, optionally, a lower boundary. This can make component or content-region CSS less dependent on globally unique selector names.
+
+```css
+@scope (.article) {
+  h2 {
+    margin-block-start: 2em;
+  }
+}
+```
+
+The rule targets `h2` elements inside `.article` without changing the HTML class of every heading.
+
+Scoping and shadow DOM are not the same. `@scope` is still ordinary CSS operating in the document's cascade; it does not create the strong encapsulation boundary of a shadow root.
+
+Use it when a region needs locally targeted styles. For widely distributed production code, verify browser support against your supported-browser policy before making it a required baseline.
 
 ---
 
@@ -2638,6 +3985,32 @@ Respect reduced-motion preferences:
   }
 }
 ```
+
+
+## Smooth scrolling is presentation, not navigation logic
+
+`scroll-behavior: smooth` affects programmatic/anchor scrolling performed by the scroll container, but it does not make every user scroll gesture animate.
+
+Use it as an enhancement:
+
+```css
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--sticky-header-height);
+}
+```
+
+`scroll-padding-top` can prevent an anchored heading from ending up underneath a sticky header.
+
+Motion preferences matter. A user asking for reduced motion should not be forced through long animated scrolls:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+```
+
+For focus/navigation changes, make sure the destination is also semantically and keyboard-accessibly appropriate; smooth movement alone does not manage focus.
 
 ---
 
@@ -2667,6 +4040,32 @@ Useful for:
 
 Do not make scrolling difficult or trap users.
 
+
+## Snap the scroll container, then align children
+
+The parent defines the snapping axis/strictness; children define their alignment.
+
+```css
+.scroller {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(80%, 22rem);
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+
+.scroller > * {
+  scroll-snap-align: start;
+}
+```
+
+`mandatory` snapping is stronger than `proximity`. Prefer `proximity` when strict snapping would make it difficult to stop at arbitrary content.
+
+Useful companion properties include `scroll-padding`, `scroll-margin`, and `scroll-snap-stop`.
+
+**Accessibility/UX:** preserve normal scrolling controls, keyboard reachability, and content visibility. CSS scroll snap should improve navigation, not imitate a carousel that traps the user.
+
 ---
 
 # 64. Sticky UI Patterns
@@ -2694,6 +4093,30 @@ th:first-child {
 
 Sticky can fail if an ancestor's overflow/layout behavior prevents the expected scroll context.
 
+
+## Sticky is constrained by its scroll container
+
+A sticky element behaves like a normal-flow element until a threshold is crossed, then stays within the bounds of its containing/scrolling context.
+
+```css
+.section-nav {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+}
+```
+
+In grid/flex layouts, stretching can leave no room for visible sticky movement, so `align-self: start` is sometimes important.
+
+Common reasons sticky appears broken:
+
+- no inset such as `top`,
+- an ancestor is the unexpected scroll container,
+- the sticky element is as tall as its container,
+- layout/stretching leaves no travel range.
+
+Use sticky for headers, section navigation, or key table columns when persistent context helps users. Avoid covering too much of a small screen.
+
 ---
 
 # 65. Multi-column Layout
@@ -2708,6 +4131,36 @@ Useful for article-like content:
 ```
 
 Avoid for UI layouts where row alignment matters.
+
+
+## Columns are for flowing content
+
+Multi-column layout automatically flows content from one column into the next, similar to newspaper columns:
+
+```css
+.article {
+  column-width: 18rem;
+  column-gap: 2rem;
+}
+```
+
+This is different from Grid. You generally do not place independent cards into exact row/column coordinates.
+
+Control awkward breaks when useful:
+
+```css
+.article h2 {
+  break-after: avoid;
+}
+
+.figure {
+  break-inside: avoid;
+}
+```
+
+Multi-column text can be hard to read on short viewports because users may need to scroll down and then back up to the next column. Test the real reading experience before using many columns.
+
+Use Grid/Flexbox for application UI; use multicol for continuous editorial content.
 
 ---
 
@@ -2739,6 +4192,30 @@ Useful for:
 - reports
 - receipts
 - printable forms
+
+
+## Print is a different output medium
+
+A page that works on screen may waste paper or hide useful link destinations when printed. Print styles can simplify navigation, remove interactive-only controls, and avoid awkward page breaks.
+
+```css
+@media print {
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+
+  table,
+  figure {
+    break-inside: avoid;
+  }
+}
+```
+
+Only add printed URLs when they are actually useful; internal anchors or very long tracking URLs can create noise.
+
+Useful print-related properties include `break-before`, `break-after`, and `break-inside`. Browser print engines differ, so test the output for invoices/reports that are operationally important.
+
+**Security note:** hiding something with print CSS does not make sensitive data private. Control sensitive content at the application/data level.
 
 ---
 
@@ -2777,6 +4254,29 @@ System preference:
   }
 }
 ```
+
+
+## Separate preference from explicit user choice
+
+A common strategy is:
+
+1. use semantic custom properties;
+2. provide a light set;
+3. provide a dark set;
+4. optionally initialize from `prefers-color-scheme`;
+5. let an explicit application preference override the system setting.
+
+```css
+:root {
+  color-scheme: light dark;
+}
+```
+
+`color-scheme` can also tell the browser which color schemes the page supports so built-in UI such as form controls can render appropriately.
+
+Do not create dark mode by simply inverting colors. Re-evaluate surfaces, borders, muted text, images, charts, focus rings, shadows, and status colors.
+
+**Common mistake:** defining both system dark mode and `[data-theme]` rules without a clear priority model. Decide which source wins when the user explicitly chooses a theme.
 
 ---
 
@@ -2845,6 +4345,32 @@ CSS grid/flex order can create a mismatch between visual order and keyboard/scre
 
 Keep DOM order meaningful.
 
+
+## CSS accessibility is part of component correctness
+
+Test more than color contrast. A component should still work when:
+
+- browser zoom is increased,
+- text size is enlarged,
+- content becomes longer,
+- focus moves by keyboard,
+- high-contrast/forced-color modes are active where relevant,
+- animation is reduced.
+
+Avoid CSS that hides overflow around focused controls:
+
+```css
+.panel {
+  overflow: visible; /* or provide enough focus-ring space */
+}
+```
+
+Do not use `order`, grid placement, or absolute positioning to create a visual reading order that contradicts the DOM's logical order.
+
+For state, combine visual and semantic signals. CSS can style `[aria-invalid="true"]`, `[aria-current="page"]`, or `[aria-expanded="true"]`, but JavaScript/HTML must set those states correctly.
+
+Accessibility is not a final polish step; it changes how layout and states should be designed.
+
 ---
 
 # 69. Reduced Motion
@@ -2863,6 +4389,29 @@ Keep DOM order meaningful.
 ```
 
 A more refined implementation can selectively preserve useful state changes while removing decorative motion.
+
+
+## Prefer targeted reduction over a universal kill switch
+
+The common "set every duration to 0.01ms" snippet is useful as a defensive baseline, but a production design can be more intentional.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .decorative-parallax,
+  .ambient-spinner {
+    animation: none;
+    transform: none;
+  }
+
+  .accordion {
+    transition-duration: 0.01ms;
+  }
+}
+```
+
+Some motion communicates a state change; removing it entirely may make the interface harder to understand. The goal is to remove or reduce non-essential movement, especially large, continuous, parallax, or zooming effects.
+
+Also remember that JavaScript animation libraries need to respect the same preference; CSS media queries do not automatically disable script-driven motion.
 
 ---
 
@@ -2892,6 +4441,34 @@ Common approaches:
 - CSS Modules
 - component-scoped CSS
 - design tokens
+
+
+## Architecture is about change cost
+
+A CSS architecture succeeds when a developer can safely answer:
+
+```text
+Where should this rule live?
+What can it affect?
+How do I override it?
+Can I delete it?
+Which values are shared?
+```
+
+Do not choose BEM, ITCSS, utilities, or modules because the acronym sounds professional. Choose conventions that match the team, codebase size, framework, and component boundaries.
+
+A small site may need only:
+
+```text
+tokens.css
+base.css
+components.css
+utilities.css
+```
+
+A large design system may justify layers, package boundaries, linting, and documented public component APIs.
+
+**Best practice:** keep specificity predictable, make global rules rare and intentional, and treat generated/third-party CSS separately from application-owned CSS.
 
 ---
 
@@ -2933,6 +4510,27 @@ Avoid:
 
 BEM elements belong to the block, not to a chain of parent element names.
 
+
+## When BEM helps
+
+BEM is useful in global CSS codebases because a class name carries the component relationship without depending on DOM depth.
+
+```css
+.invoice-card {}
+.invoice-card__total {}
+.invoice-card--overdue {}
+```
+
+A modifier describes a variation/state of the block or element; it normally appears alongside the base class:
+
+```html
+<article class="invoice-card invoice-card--overdue">
+```
+
+BEM does not require every descendant to have a class. Semantic elements can remain unclassed when no styling hook is needed.
+
+**Common mistake:** reproducing DOM nesting in class names such as `.card__header__title__icon`. Prefer `.card__icon` if that is still an element of the card block, or split a genuinely independent subcomponent into its own block.
+
 ---
 
 # 72. OOCSS
@@ -2969,6 +4567,25 @@ Then combine:
 </div>
 ```
 
+
+## The two classic ideas
+
+OOCSS is commonly summarized as:
+
+1. separate structure from skin;
+2. separate container from content.
+
+A reusable media object's spacing/layout should not depend on whether it appears in a sidebar, modal, or main page.
+
+```css
+.media { display: flex; gap: 1rem; }
+.surface--raised { box-shadow: var(--shadow-md); }
+```
+
+Composition can reduce duplication, but too many tiny classes can drift toward a utility system. That is not inherently bad; the team should be explicit about the chosen abstraction style.
+
+Use OOCSS ideas when repeated visual objects share layout behavior across contexts. Do not force every style into a reusable "object" if it only belongs to one component.
+
 ---
 
 # 73. SMACSS
@@ -2994,6 +4611,33 @@ styles/
 
 Useful when teams want category-based CSS organization.
 
+
+## The categories answer "what kind of rule is this?"
+
+A SMACSS-style codebase separates concerns:
+
+```text
+Base    → element defaults
+Layout  → major page regions
+Module  → reusable UI components
+State   → temporary/interactive states
+Theme   → visual theme differences
+```
+
+For example:
+
+```css
+/* Module */
+.card { ... }
+
+/* State */
+.card.is-loading { ... }
+```
+
+The value of SMACSS is not the exact folder names; it is the discipline of recognizing that a global element rule, a page-shell rule, and a component state have different responsibilities.
+
+Use it when category-based organization helps a team navigate a large global stylesheet. In component-scoped ecosystems, some of these boundaries may already be enforced by tooling.
+
 ---
 
 # 74. ITCSS
@@ -3013,6 +4657,27 @@ utilities
 ```
 
 This can make the cascade easier to control in large codebases.
+
+
+## The triangle idea
+
+ITCSS arranges CSS from broad, low-specificity, far-reaching concerns toward narrow, more explicit concerns. Earlier layers should generally be easier for later layers to override.
+
+A common sequence:
+
+```text
+Settings   → tokens/variables
+Tools      → mixins/functions (preprocessor)
+Generic    → resets
+Elements   → unclassed element defaults
+Objects    → layout abstractions
+Components → concrete UI
+Utilities  → narrow overrides
+```
+
+The exact names can vary. The important idea is **dependency direction and cascade control**.
+
+ITCSS is most useful in large global CSS/preprocessor codebases. If CSS Modules or shadow DOM already isolates most components, you may use only parts of the model rather than reproducing the entire structure.
 
 ---
 
@@ -3054,6 +4719,22 @@ Tradeoffs:
 - requires conventions
 - abstraction strategy differs from semantic component CSS
 
+
+## Utilities move composition into markup
+
+A utility is intentionally small and reusable:
+
+```css
+.stack-sm { gap: 0.5rem; }
+.text-muted { color: var(--text-muted); }
+```
+
+A mature utility system needs a constrained design scale; otherwise developers create endless one-off classes and lose consistency.
+
+Utilities are excellent for spacing, display, alignment, and common design tokens. Component classes can still be valuable for complex or repeated domain-specific visuals. Many real systems combine both approaches.
+
+**Common mistake:** judging utility-first only by class-list length. The real tradeoff is where the styling API lives—markup vs stylesheet—and how reuse, consistency, state variants, and design constraints are managed.
+
 ---
 
 # 76. CSS Modules and Scoped Styles
@@ -3071,6 +4752,26 @@ A build tool can generate a scoped class name so `.card` does not collide global
 Useful in component frameworks.
 
 Other ecosystems may provide framework-specific scoped styles.
+
+
+## What problem they solve
+
+Global CSS shares one selector namespace across the page. In a large component application, two unrelated `.title` rules can collide.
+
+CSS Modules solve this at build time by mapping local class names to generated identifiers:
+
+```js
+import styles from "./Card.module.css";
+
+// conceptual usage
+<div className={styles.card}>...</div>
+```
+
+The source can stay readable while the emitted class name is scoped.
+
+"Scoped styles" in frameworks are implementation-specific; some rewrite selectors with generated attributes, while shadow DOM provides a different browser-level boundary. Learn the behavior of your framework rather than assuming all scoping systems are identical.
+
+Global styles are still appropriate for resets, tokens, typography defaults, and truly global utilities.
 
 ---
 
@@ -3110,6 +4811,37 @@ Semantic mapping:
 
 This makes redesigns much easier.
 
+
+## Raw tokens vs semantic tokens
+
+Raw/primitives describe the palette/scale:
+
+```css
+--blue-600: #2563eb;
+--space-4: 1rem;
+```
+
+Semantic tokens describe intent:
+
+```css
+--color-action: var(--blue-600);
+--space-card-padding: var(--space-4);
+```
+
+Components should prefer semantic intent when possible:
+
+```css
+.button--primary {
+  background: var(--color-action);
+}
+```
+
+Then a brand or theme can remap the semantic token without rewriting the component.
+
+Tokens can represent color, spacing, radius, typography, shadow, motion, and z-index. Do not create a token for every literal automatically; a token is most useful when the value is shared, constrained, themeable, or part of a deliberate design decision.
+
+Document token meaning so names do not become another set of unexplained magic values.
+
 ---
 
 # 78. Reusable Component Patterns
@@ -3145,6 +4877,35 @@ Example:
   border-color: #fecaca;
 }
 ```
+
+
+## Define a stable component API
+
+A maintainable CSS component makes its variations predictable:
+
+```text
+base      .alert
+element   .alert__icon
+variant   .alert--danger
+state     .is-loading or [aria-busy="true"]
+```
+
+Keep the base responsible for shared structure; variants should change only what is different.
+
+```css
+.alert {
+  --alert-accent: #2563eb;
+  border-inline-start: 4px solid var(--alert-accent);
+}
+
+.alert--danger {
+  --alert-accent: #dc2626;
+}
+```
+
+This token-based variant avoids duplicating the whole component.
+
+Test components with missing optional content, long text, narrow containers, disabled/loading states, and different themes. A component is reusable only if its assumptions are clear and its edge cases do not require ad-hoc overrides everywhere.
 
 ---
 
@@ -3205,6 +4966,36 @@ Responsive:
 }
 ```
 
+
+## Choose the recipe by layout intent
+
+Use Grid for page/track relationships and Flexbox for alignment/distribution along one main axis.
+
+For example, a toolbar is naturally flex-based:
+
+```css
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+```
+
+A dashboard card region is naturally grid-based:
+
+```css
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: 1rem;
+}
+```
+
+Avoid copying a recipe without understanding its constraints. `minmax(0, 1fr)` is often used in application shells so long content can shrink rather than force overflow. `min(260px, 100%)` keeps a minimum-track recipe from overflowing containers narrower than 260px.
+
+Treat recipes as starting points, then test real content.
+
 ---
 
 # 80. Navigation Patterns
@@ -3238,6 +5029,33 @@ Responsive wrapping:
 
 Do not hide important navigation solely based on hover because touch devices do not have reliable hover interaction.
 
+
+## Styling navigation also means styling states
+
+A usable navigation component usually needs:
+
+- default links,
+- hover,
+- keyboard focus,
+- current/active state,
+- wrapping or an intentional mobile strategy.
+
+```css
+.nav a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration-thickness: 0.15em;
+}
+
+.nav a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+```
+
+CSS should not turn a long navigation into an inaccessible hover-only dropdown. Menus with disclosure behavior need appropriate HTML/JavaScript state and keyboard handling.
+
+When navigation wraps, verify that spacing works between rows as well as columns (`gap` is useful). On small screens, prefer a deliberately designed pattern rather than simply shrinking text until everything fits.
+
 ---
 
 # 81. Card Patterns
@@ -3270,6 +5088,30 @@ Do not hide important navigation solely based on hover because touch devices do 
 }
 ```
 
+
+## Cards are a visual pattern, not an HTML element
+
+Choose the HTML based on meaning: a product card might be `<article>`, a navigation card may contain a link, and a purely visual grouping may be a `<div>`.
+
+For equal-height action alignment:
+
+```css
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card__actions {
+  margin-block-start: auto;
+}
+```
+
+But do not force equal heights if it creates excessive empty space or hides variable content.
+
+If the whole card is clickable, be careful not to nest interactive controls inside an enclosing link. Often it is better to make the title link the primary navigation target and style the card hover/focus state around it.
+
+Test card grids with long titles, missing images, and localized text.
+
 ---
 
 # 82. Modal Pattern
@@ -3299,6 +5141,32 @@ Visual CSS example:
 
 Important: modal accessibility cannot be solved with CSS alone. You also need correct semantics, focus handling, keyboard behavior, and appropriate scripting.
 
+
+## CSS is only the visual layer
+
+A production modal also needs behavior:
+
+```text
+open → move focus appropriately
+while open → prevent confusing background interaction as required
+Escape/close control → close
+close → restore focus to the trigger when appropriate
+```
+
+Use the native `<dialog>` element when it fits the product/browser requirements because it provides useful platform behavior, but you still need correct labeling and application logic.
+
+For CSS, allow small-screen overflow:
+
+```css
+.modal {
+  width: min(40rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+}
+```
+
+**Common mistake:** giving the modal a fixed height or hiding overflow, which can make fields/buttons unreachable when text grows or the on-screen keyboard reduces the viewport.
+
 ---
 
 # 83. Tooltip Pattern
@@ -3318,6 +5186,24 @@ Basic visual styling:
 ```
 
 Tooltips need more than CSS for complete accessible interaction behavior in many real applications.
+
+
+## Decide whether a tooltip is the right pattern
+
+A tooltip is supplementary information attached to a trigger. Essential instructions should be visible without requiring hover.
+
+A robust implementation needs to consider:
+
+- keyboard focus as well as pointer hover,
+- touch interaction,
+- accessible association with the trigger,
+- positioning near viewport edges,
+- dismissal behavior,
+- keeping the tooltip available long enough to read.
+
+CSS handles the appearance; JavaScript or a well-tested UI primitive often handles positioning and interaction.
+
+If the content is interactive or contains multiple actions, it is no longer a simple tooltip; a popover/disclosure pattern is usually more appropriate.
 
 ---
 
@@ -3350,6 +5236,27 @@ Use this for:
 - purchase order details
 - registration forms
 
+
+## Let field content determine row height
+
+Grid is excellent for multi-column forms, but keep logical reading/tab order in the DOM. Do not visually rearrange fields into an order that differs from keyboard navigation.
+
+A responsive pattern can avoid a hard-coded breakpoint:
+
+```css
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: 1rem;
+}
+```
+
+Use explicit full-width spans for fields such as addresses or notes when needed.
+
+Keep labels and error/help text in the same field component, and allow errors to wrap without overlapping neighboring fields.
+
+**Common mistake:** fixing row heights to keep a pristine mockup. Validation messages and translations are variable content; the layout should expand naturally.
+
 ---
 
 # 85. Dashboard Layout Pattern
@@ -3374,6 +5281,28 @@ Use this for:
 ```
 
 `min-width: 0` is important when charts/tables or long content would otherwise force overflow.
+
+
+## Build the shell and content regions separately
+
+A dashboard shell often has a navigation region and a fluid main region, but the main region itself should establish sensible overflow behavior.
+
+```css
+.dashboard__main {
+  min-width: 0;
+}
+
+.chart-card,
+.table-card {
+  min-width: 0;
+}
+```
+
+Without `min-width: 0`, grid/flex items can honor their min-content size and force the entire page wider than the viewport.
+
+On small screens, a sidebar may become an off-canvas/disclosure interface. CSS can change visibility/layout, but opening/closing a modal-like drawer needs accessible interaction behavior.
+
+Avoid a single giant `overflow: hidden` on the dashboard root; it can hide focus rings and prevent expected document scrolling.
 
 ---
 
@@ -3407,6 +5336,25 @@ Responsive version:
 }
 ```
 
+
+## Why Grid fits this pattern
+
+The "Holy Grail" layout historically meant header/footer plus main content and two sidebars. Old techniques used floats and complex source-order tricks; Grid can name regions directly.
+
+Named areas are especially readable:
+
+```css
+.page__header { grid-area: header; }
+.page__left   { grid-area: left; }
+.page__main   { grid-area: main; }
+.page__right  { grid-area: right; }
+.page__footer { grid-area: footer; }
+```
+
+Keep the DOM in a meaningful reading order even when the visual grid changes.
+
+Do not assume both sidebars are always present. Real components may need conditional layouts or a simpler `minmax()` track definition. Test long main content so side columns do not unexpectedly expand.
+
 ---
 
 # 87. Responsive Sidebar Pattern
@@ -3429,6 +5377,25 @@ Responsive version:
 ```
 
 In a real accessible navigation drawer, JavaScript may control open/close state, focus management, and ARIA attributes.
+
+
+## Hiding is not the only mobile strategy
+
+`display: none` is fine when the sidebar content is genuinely optional at that breakpoint. Navigation and filters often remain important, so they usually need a trigger that reveals the same content as a drawer/disclosure.
+
+A CSS layout can switch tracks:
+
+```css
+@media (width < 48rem) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+Then application state can control whether a drawer is open.
+
+Do not maintain separate desktop and mobile copies of the same navigation unless you have a strong reason; duplicated DOM can create inconsistent state, duplicate IDs, and extra maintenance. Prefer one semantic source that changes presentation where practical.
 
 ---
 
@@ -3453,6 +5420,35 @@ Breaking long values:
 ```
 
 For multi-line clamping, browser-specific behavior may be needed depending on the project requirements. Always keep critical information accessible rather than relying on visual truncation alone.
+
+
+## Truncation requires a product decision
+
+Ellipsis is useful when users can identify an item from the visible prefix and the complete value is available elsewhere. It is dangerous for invoice numbers, filenames, email addresses, or other values where the hidden ending may distinguish records.
+
+For flexible layouts, also allow children to shrink:
+
+```css
+.row__content {
+  min-width: 0;
+}
+
+.row__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+```
+
+Without `min-width: 0`, a flex/grid child may refuse to shrink and the ellipsis never appears.
+
+For long URLs/IDs that should wrap, prefer:
+
+```css
+overflow-wrap: anywhere;
+```
+
+Test copy/select behavior and accessible names before truncating operational data.
 
 ---
 
@@ -3499,6 +5495,38 @@ A reset removes or standardizes defaults.
 
 A normalization approach tries to preserve useful defaults while making browser behavior more consistent.
 
+
+## Reset vs normalize vs project baseline
+
+A reset aggressively removes browser defaults; normalization keeps useful defaults while smoothing inconsistencies; a project baseline adds your own opinionated foundations.
+
+A small modern baseline often includes:
+
+```css
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+```
+
+Do not blindly remove every default style. Native margins, focus indicators, list markers, and form-control behavior often carry usability value.
+
+If using a framework, understand whether it already includes a reset/reboot. Adding a second global reset can produce confusing differences.
+
+Keep baseline rules low-specificity so components can override them without a cascade fight.
+
 ---
 
 # 90. Browser Compatibility
@@ -3525,6 +5553,25 @@ Example fallback:
 }
 ```
 
+
+## Compatibility is a project requirement, not a universal list
+
+Define the browsers/versions your product supports based on users, contractual requirements, analytics, and organizational policy. Then evaluate features against that matrix.
+
+Use three strategies:
+
+```text
+fallback              → older browser gets a simpler value
+progressive enhancement → advanced feature only when supported
+transformation/polyfill → build/runtime tool supplies compatibility
+```
+
+`@supports` is useful when support can be detected with a CSS condition, but it cannot represent every behavioral browser bug.
+
+Keep compatibility tests in real target browsers or a reliable browser-testing service. "Works in my Chrome" is not a compatibility strategy.
+
+When a new feature is only decorative, a graceful fallback may be much cheaper than shipping a complex polyfill.
+
 ---
 
 # 91. Progressive Enhancement
@@ -3548,6 +5595,35 @@ Then add advanced styling where supported.
 
 Your page should remain usable even when a decorative enhancement is unavailable.
 
+
+## Start from the required outcome
+
+Progressive enhancement asks: "What is the simplest version that still lets the user complete the task?" Then richer layout/effects are layered on.
+
+For a product grid:
+
+```css
+.products > * + * {
+  margin-top: 1rem;
+}
+
+@supports (display: grid) {
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem;
+  }
+
+  .products > * + * {
+    margin-top: 0;
+  }
+}
+```
+
+The baseline remains readable if Grid is unavailable.
+
+This principle also applies to motion, container queries, masks, and other newer features. Decide whether the feature is **required for function** or merely an enhancement; that determines how much fallback work is necessary.
+
 ---
 
 # 92. CSS Performance
@@ -3568,7 +5644,7 @@ Good practices:
 - avoid massive DOM + CSS combinations
 - profile rather than guessing
 
-### Animation example
+## Animation example
 
 Often preferable:
 
@@ -3583,6 +5659,27 @@ Often preferable:
 ```
 
 Rather than repeatedly animating layout dimensions when not required.
+
+
+## Measure the actual bottleneck
+
+"Complex selector" micro-optimizations are rarely the first place to look in a normal application. More common costs include large DOMs, heavy paint effects, layout thrashing caused by script, oversized/unnecessary CSS, and animations that trigger repeated layout/paint work.
+
+A useful investigation flow:
+
+```text
+1. reproduce the slowdown
+2. record a Performance trace
+3. identify layout/paint/composite work
+4. reduce the expensive cause
+5. record again
+```
+
+Properties such as `transform` and `opacity` are often animation-friendly, but they are not magically free. Large layers, blur/filter effects, and excessive `will-change` can consume memory.
+
+Use `content-visibility`/containment only when you understand the layout/accessibility implications and have measured a benefit.
+
+Optimize delivery too: minify, compress, cache, and remove CSS that the application never uses.
 
 ---
 
@@ -3827,6 +5924,39 @@ Better:
 .sidebar {}
 .page-title {}
 ```
+
+
+## Organize around ownership and deletion
+
+A folder tree is useful only if developers can predict where a change belongs. Pick one primary organizing idea—components, layers, routes, or packages—and document it.
+
+For component-oriented CSS:
+
+```text
+components/
+  button.css
+  card.css
+  invoice-table.css
+```
+
+Each file should ideally be removable with the component. Shared tokens/base rules live elsewhere.
+
+Naming should describe purpose rather than accidental appearance:
+
+```css
+.status--danger   /* semantic */
+.mt-2             /* deliberate utility */
+```
+
+is generally clearer than:
+
+```css
+.red-text-left
+```
+
+Avoid creating both a global class and a component-scoped class with the same responsibility. Duplication makes future changes inconsistent.
+
+Use linting/formatting where it helps enforce agreed conventions, but keep the rules understandable to the team.
 
 ---
 

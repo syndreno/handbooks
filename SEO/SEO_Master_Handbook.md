@@ -3,7 +3,7 @@
 > **A single-file, beginner-to-advanced learning guide for Search Engine Optimization**  
 > Covers strategy, keyword research, on-page SEO, content, technical SEO, links, local SEO, ecommerce SEO, international SEO, JavaScript SEO, structured data, analytics, audits, migrations, programmatic SEO, AI search, real-world scenarios, checklists, exercises, and troubleshooting.
 >
-> **Last reviewed:** August 2026  
+> **Last reviewed:** August 17, 2026  
 > **Audience:** Beginners, developers, marketers, content writers, founders, SEO specialists, and technical teams.
 
 ---
@@ -723,6 +723,52 @@ SERP analysis helps you understand the current result landscape. It does **not**
 
 Your goal is to satisfy the user better with real value.
 
+## A Repeatable SERP Analysis Workflow
+
+A SERP is a **snapshot of what the search engine currently believes may satisfy a query**. It is useful evidence, but it is not a permanent rule and it is not the algorithm itself.
+
+For an important query, record the following before deciding what to publish:
+
+| Question | What to inspect | Why it matters |
+|---|---|---|
+| What does the user appear to want? | informational, commercial, transactional, local, navigational | Determines the page's primary job |
+| What page type dominates? | guide, category, product, tool, homepage, forum, video | A mismatch can be harder to overcome than weak copy |
+| What format dominates? | list, comparison, tutorial, calculator, definition, video | Suggests how users prefer to consume the answer |
+| What result features appear? | map pack, images, video, shopping, snippets, AI features | Changes click opportunity and content requirements |
+| How fresh are the results? | publication/update dates where meaningful | Helps determine whether freshness is part of the intent |
+| What do ranking pages do well? | evidence, depth, UX, media, firsthand experience | Reveals the current quality bar |
+| What is still missing? | unanswered subquestions, poor examples, weak tools | Creates an opportunity to add unique value |
+
+### Example: turning observations into a decision
+
+Suppose the query is:
+
+```text
+best invoicing software for freelancers
+```
+
+You inspect the results and find that most strong pages are comparison guides with pricing, platform support, pros/cons, screenshots, and a clear methodology. A single product landing page may therefore be a poor match for the broad comparison intent.
+
+A better plan might be:
+
+```text
+Query intent: commercial investigation
+Page type: comparison guide
+Useful assets: comparison table + screenshots + selection methodology
+Business action: product trial or product-detail click
+```
+
+### Common mistakes
+
+- checking only one keyword and generalizing to an entire topic;
+- copying the headings of ranking pages without adding original value;
+- assuming the current top result defines a fixed word count;
+- ignoring local/device/language differences;
+- treating a volatile SERP as permanent evidence.
+
+**Best practice:** save a dated SERP snapshot for important projects so later changes can be compared with the original assumptions.
+
+
 ---
 
 # 8. Competitor Research
@@ -761,6 +807,30 @@ A small accounting software company may compete in search against:
 
 Do not clone a competitor's page. Identify what the searcher still needs.
 
+## Competitor Research as Gap Analysis
+
+Competitor research is most useful when it answers **what should we improve?**, not when it produces a list of pages to imitate.
+
+Separate gaps into categories:
+
+- **coverage gap** — a useful topic or intent is missing from your site;
+- **quality gap** — you cover the topic, but the competitor explains it better;
+- **format gap** — users benefit from a calculator, template, video, comparison table, or other format you do not provide;
+- **authority gap** — competitors have stronger legitimate references, mentions, or links;
+- **technical gap** — your page is slower, blocked, duplicated, or harder to crawl/index;
+- **conversion gap** — your page gets traffic but does not guide the right user to the next action.
+
+### Practical comparison worksheet
+
+| Page / topic | Competitor strength | Your current state | Opportunity | Priority |
+|---|---|---|---|---|
+| Pricing guide | clear comparison table | scattered pricing details | build transparent comparison | High |
+| Integration docs | deep examples | basic list | add setup examples | Medium |
+| Glossary | broad coverage | none | create only if useful to audience | Low |
+
+Do not assume a competitor's backlink count, word count, or publishing frequency is a causal ranking formula. Use competitor data to generate hypotheses, then validate those hypotheses against user needs, your analytics, and search results.
+
+
 ---
 
 # 9. Topic Clusters and Topical Coverage
@@ -796,6 +866,39 @@ They can improve:
 - topical clarity.
 
 Do not create thin cluster pages only to manufacture internal links.
+
+## How to Build a Useful Topic Cluster
+
+Start with a real subject that deserves multiple pages. Then decide which questions need their own URL and which belong as subsections of one page.
+
+Example:
+
+```text
+Pillar: /power-bi/
+  ├── /power-bi/dax/
+  ├── /power-bi/power-query/
+  ├── /power-bi/data-modeling/
+  └── /power-bi/performance/
+```
+
+The pages should link to one another **when the link helps the reader continue the task**. A cluster is not successful merely because every page links to every other page.
+
+### One page or multiple pages?
+
+Use one page when the subtopics share essentially the same intent and would otherwise create near-duplicate pages. Split into separate pages when each subtopic has enough distinct purpose, depth, examples, and search/user demand to stand independently.
+
+### Common failure: manufactured topical authority
+
+Creating hundreds of shallow pages such as:
+
+```text
+best crm for 5 users
+best crm for 6 users
+best crm for 7 users
+```
+
+without meaningful differences creates poor user value and can lead to large amounts of redundant content. Build coverage around genuine user needs, not around mechanically generated keyword permutations.
+
 
 ---
 
@@ -839,6 +942,36 @@ if they do not help users.
 - Does navigation reflect user mental models?
 - Can crawlers reach the pages through normal HTML links?
 
+## Architecture vs URL Depth
+
+Do not confuse **click depth** with the number of folders in a URL. A page can have a short URL and still be orphaned, or a longer URL and still be easy to discover through navigation.
+
+What matters operationally is whether users and crawlers can reach important pages through ordinary links and whether the hierarchy makes sense.
+
+### Hub-and-detail example
+
+```text
+/products/                  ← hub
+/products/accounting/       ← category
+/products/accounting/a1/    ← detail
+/products/accounting/a2/    ← detail
+```
+
+The category page can explain the group and link to its detail pages. Breadcrumbs can expose the hierarchy on deeper pages.
+
+### Architecture audit
+
+1. Identify money/lead-critical pages.
+2. Find their internal-link sources.
+3. Locate orphan or weakly linked pages.
+4. Check whether navigation creates thousands of low-value parameter URLs.
+5. Confirm important links are normal crawlable HTML links.
+6. Verify breadcrumbs and category relationships reflect how users browse.
+7. Remove dead-end paths that exist only because of the CMS.
+
+**Best practice:** design architecture around user tasks and business entities first; optimize crawl efficiency within that sensible structure.
+
+
 ---
 
 # 11. URL Design
@@ -876,6 +1009,34 @@ https://example.com/index.php?id=8427&cat=19&session=abc123
 ### Do keywords in URLs matter?
 
 Descriptive URLs can help users and systems understand context, but URL wording is not a substitute for useful content.
+
+## Parameters, Tracking URLs, and URL Changes
+
+Query parameters are not automatically bad. They are often required for filtering, sorting, analytics, or application state. The SEO problem appears when many parameter combinations expose the same or near-identical content and create unnecessary crawl/index variants.
+
+Example variants:
+
+```text
+/products/shoes/?color=black
+/products/shoes/?sort=price
+/products/shoes/?utm_source=newsletter
+```
+
+Decide which variants should be indexable based on whether they represent a useful, distinct search page. Use canonicalization, linking rules, sitemap choices, robots controls, or application design as appropriate; no single control solves every parameter problem.
+
+### When changing a URL
+
+A URL change is a migration, even for one important page. Normally:
+
+1. choose the new stable URL;
+2. update internal links;
+3. redirect the old URL to the most relevant replacement when appropriate;
+4. update canonical and sitemap references;
+5. test the redirect and final status;
+6. monitor indexing and traffic afterward.
+
+Do not change URLs merely to insert an extra keyword if the existing URL is already stable and understandable.
+
 
 ---
 
@@ -977,6 +1138,33 @@ How Canonical Tags Work: Practical SEO Guide
 
 Avoid obsessing over one exact character limit. Search-result display is not a fixed-width text database.
 
+## Title Element vs Visible Page Heading
+
+The HTML `<title>` and the visible `<h1>` can be similar, but they perform different jobs:
+
+- the **title element** is document metadata and is one input a search engine may use for a search-result title;
+- the **H1/page heading** helps users understand the content after they arrive and contributes to document structure.
+
+They do not need to be character-for-character identical.
+
+Example:
+
+```html
+<title>Power BI DAX Tutorial: Beginner to Advanced | Example</title>
+<h1>Learn DAX from First Measure to Advanced Context</h1>
+```
+
+### A practical title-writing process
+
+1. State the page's actual topic.
+2. Match the searcher's intent without exaggeration.
+3. Put distinguishing information where it is easy to scan.
+4. Keep repetitive brand/template boilerplate under control.
+5. Check that important pages do not all use the same title.
+
+Search engines can generate a different displayed title when other page signals appear more useful. Therefore, measure performance rather than treating an exact pixel/character formula as a guarantee.
+
+
 ---
 
 # 14. Meta Descriptions
@@ -1000,6 +1188,30 @@ A meta description can help search engines generate the result snippet, but they
 ## Do meta descriptions directly guarantee ranking improvement?
 
 No. Treat them primarily as search presentation and user communication, not a magic ranking field.
+
+## How to Write Meta Descriptions at Scale
+
+For a small set of important pages, write descriptions manually. For a large database-driven site, well-designed templates can be practical when they produce accurate, human-readable summaries.
+
+Example product template concept:
+
+```text
+{ProductName} by {Brand}: {KeyBenefit}. View {VariantCount} options, current specifications, availability, and delivery information.
+```
+
+The template should gracefully handle missing fields. Do not output awkward text such as `Available in  colors` when `VariantCount` is null.
+
+### When a custom description matters most
+
+Prioritize pages where:
+
+- search impressions are high;
+- the current snippet communicates the page poorly;
+- multiple similar pages need clearer differentiation;
+- the user needs specific context before clicking.
+
+A search engine may still select on-page text instead of your description for a particular query. That is normal; the description is a useful input, not a guaranteed snippet.
+
 
 ---
 
@@ -1039,6 +1251,30 @@ H2 Best for service businesses
 H2 Comparison table
 H2 How to choose
 ```
+
+## Heading Hierarchy as Information Design
+
+A beginner-friendly rule is to treat headings like the outline of a document:
+
+```text
+H1: Main page subject
+  H2: Major section
+    H3: Subsection within that major section
+  H2: Next major section
+```
+
+Do not choose a heading level because it looks visually larger or smaller. Use CSS for appearance and HTML heading levels for structure.
+
+### Common mistakes
+
+- using headings for every decorative sentence;
+- skipping hierarchy purely for visual styling;
+- repeating the exact target keyword in every heading;
+- hiding the actual answer under vague headings such as `More Information`;
+- creating an outline that does not match the reading flow.
+
+Good headings should help a user scan the page and predict what each section contains.
+
 
 ---
 
@@ -1235,6 +1471,26 @@ Use external links when they:
 
 Do not automatically add `nofollow` to every normal editorial external link.
 
+## Choosing the Correct Link Relationship
+
+The `rel` value describes the relationship or handling intent; it should not be used as a generic attempt to "keep SEO value on the site."
+
+| Situation | Typical treatment |
+|---|---|
+| Normal editorial citation you trust | ordinary link is usually appropriate |
+| Advertisement, sponsorship, paid placement | `rel="sponsored"` |
+| User-posted link in comments/forums | `rel="ugc"` where appropriate |
+| You do not want to associate with or endorse a linked page in the normal way | `rel="nofollow"` may be appropriate |
+
+Multiple values can be combined when a relationship genuinely has more than one characteristic.
+
+```html
+<a href="https://partner.example" rel="sponsored nofollow">Partner offer</a>
+```
+
+Do not sell ordinary ranking links or disguise paid placements as editorial recommendations. Link decisions should reflect the real relationship and user value.
+
+
 ---
 
 # 20. Technical SEO Fundamentals
@@ -1273,6 +1529,25 @@ index status
    ↓
 search performance
 ```
+
+## Crawlability, Indexability, and Ranking Are Different
+
+These concepts are often mixed together:
+
+| Stage | Core question | Example problem |
+|---|---|---|
+| Discovery | Can the engine find the URL? | orphan page |
+| Crawlability | Can it fetch the URL/resources? | robots block, server failure |
+| Renderability | Can meaningful content be processed? | critical JS fails |
+| Indexability | Is indexing allowed and is the page eligible? | `noindex`, duplicate/canonical handling |
+| Ranking/serving | Is the indexed result useful for this query? | intent or quality mismatch |
+
+A page may be crawlable but not indexed. It may be indexed but receive almost no impressions. It may rank but receive few clicks because the query is low volume or the SERP contains stronger result features.
+
+### Debug in order
+
+When a page "doesn't rank," do not begin by rewriting keywords. First determine **which stage is failing**. This prevents spending hours on content when the real issue is a `noindex`, a redirect, a rendering failure, or a canonical pointing elsewhere.
+
 
 ---
 
@@ -1454,6 +1729,40 @@ Sorry, product does not exist.
 ```
 
 Depending on the situation, an actual 404/410 or relevant replacement strategy is more appropriate.
+
+## Choosing a Response for Removed or Moved Content
+
+Use status codes to communicate what actually happened.
+
+| Situation | Common response |
+|---|---|
+| Page exists normally | `200` |
+| Resource moved permanently to a clear replacement | `301` or `308` |
+| Move is genuinely temporary | `302` or `307` |
+| Resource is missing | `404` |
+| Resource intentionally removed and gone | `410` can be appropriate |
+| Server temporarily fails | suitable `5xx` |
+
+### Example: discontinued product
+
+There is no single correct answer for every discontinued product:
+
+- If an equivalent replacement exists, a permanent redirect may help users.
+- If the old page still provides useful specifications/support, keeping a useful `200` page may be reasonable.
+- If it is permanently gone with no useful replacement, `404` or `410` can accurately represent that state.
+
+Do **not** redirect every missing page to the homepage. That usually creates a confusing destination and hides the real content relationship.
+
+### Debugging command
+
+A header request can help inspect the response chain:
+
+```bash
+curl -I https://example.com/old-page
+```
+
+Check the status, `Location` header for redirects, and the final destination rather than assuming the browser-visible URL tells the whole story.
+
 
 ---
 
@@ -1688,6 +1997,28 @@ If important content disappears on mobile, search systems may have less informat
 
 Responsive design usually simplifies maintenance, though other architectures can work when implemented correctly.
 
+## What Mobile-First Means in Practice
+
+Mobile-first indexing is primarily about **content and signals available in the mobile version**, not about obtaining a special "mobile SEO score."
+
+For responsive sites, the same URL and HTML often adapt through CSS, which reduces parity problems. Separate mobile URLs or heavily different mobile rendering require more careful testing.
+
+### Mobile parity checklist
+
+Compare desktop and mobile for:
+
+- main text and product/service details;
+- important images and their alt text;
+- internal links and navigation paths;
+- title/meta robots/canonical/hreflang signals;
+- structured data that describes the primary content;
+- error messages and login/interstitial behavior.
+
+### Lazy loading warning
+
+Lazy loading is useful for performance, but important content should not require unusual user interactions that a crawler cannot reproduce. Test the rendered page, not only the source HTML.
+
+
 ---
 
 # 30. JavaScript SEO
@@ -1807,6 +2138,38 @@ Monitor regressions
 ```
 
 Do not treat a perfect lab score as a guaranteed ranking boost. Performance is one part of a strong search/user experience.
+
+## Current Good Thresholds and How to Read Them
+
+For Google's Core Web Vitals guidance, a good experience is generally evaluated at the **75th percentile** of page loads. The current good thresholds are:
+
+| Metric | Good threshold | What the user feels |
+|---|---:|---|
+| LCP | **2.5 seconds or less** | main content appears promptly |
+| INP | **200 milliseconds or less** | interactions respond promptly |
+| CLS | **0.1 or less** | layout remains visually stable |
+
+### Field data vs lab data
+
+- **Field data** comes from real users and is what Core Web Vitals assessment is designed around.
+- **Lab data** comes from controlled tests and is excellent for reproducing and diagnosing problems.
+
+A lab run may be fast while real mobile users on slower devices are not. Use both: field data to understand actual experience and lab/devtools traces to locate the cause.
+
+### Optimization workflow
+
+```text
+1. Identify the failing metric/template
+2. Segment by page type and device
+3. Reproduce the problem
+4. Find the largest technical cause
+5. Fix the template/component
+6. Re-test in the lab
+7. Wait for sufficient field data to validate the change
+```
+
+Do not sacrifice useful content or accessibility merely to chase a perfect score. Performance is part of the experience, not the entire SEO strategy.
+
 
 ---
 
@@ -1963,6 +2326,31 @@ Give the main watch page:
 - unique descriptive content;
 - strong internal links;
 - consistent structured information.
+
+## Video Page Strategy
+
+Decide whether the video is the **primary reason to visit the page** or merely supporting content.
+
+For a dedicated watch/tutorial page, give the video enough surrounding context that users and search systems can understand:
+
+- what the video covers;
+- who it is for;
+- a descriptive title/heading;
+- a useful description or transcript when appropriate;
+- a stable thumbnail;
+- crawlable supporting text and links;
+- valid `VideoObject` structured data when the page and content meet the requirements.
+
+Structured data can make content eligible for supported search features, but it does not guarantee that a rich result or video result will be shown.
+
+### Common mistakes
+
+- embedding the same video on hundreds of thin pages;
+- hiding essential information only inside the video;
+- using a thumbnail URL crawlers cannot fetch;
+- adding video schema that does not match visible page content;
+- assuming a transcript automatically makes a weak page valuable.
+
 
 ---
 
@@ -2293,6 +2681,23 @@ News publishers should also pay close attention to:
 - article structured data where appropriate;
 - news sitemap when useful.
 
+## News/Discover Is Not a Separate Shortcut Around Quality
+
+A publication should first get the fundamentals right: clear article pages, stable URLs, accurate dates/bylines, accessible images, crawlable content, and transparent editorial practices.
+
+### Editorial and technical workflow
+
+1. Publish on a stable canonical URL.
+2. Make headline, visible title, and article subject consistent without clickbait mismatch.
+3. Provide original reporting, analysis, or other real value.
+4. Use high-quality representative imagery that users are allowed to see.
+5. Keep structured data consistent with the visible article when used.
+6. Correct errors transparently and update material facts when needed.
+7. Measure actual Search/Discover performance instead of assuming every article is eligible for exposure.
+
+Discover traffic can be volatile. Treat it as an additional discovery surface, not as a guaranteed traffic source around which the entire business must be engineered.
+
+
 ---
 
 # 41. Programmatic SEO
@@ -2392,6 +2797,38 @@ Traffic grows; pipeline does not.
 
 SEO strategy must align with revenue intent.
 
+## B2B Search Journey Example
+
+A B2B buyer often performs several searches before contacting sales:
+
+```text
+Problem:        reduce invoice processing time
+Category:       accounts payable automation software
+Comparison:     tool A vs tool B
+Validation:     tool A SAP integration
+Decision:       tool A pricing / demo
+```
+
+Map these to the pages that naturally answer them instead of forcing every query to the homepage.
+
+### Useful B2B assets
+
+Depending on the product, valuable pages can include:
+
+- integration documentation;
+- security/compliance information;
+- pricing or pricing methodology;
+- implementation guides;
+- migration documentation;
+- comparison pages with fair methodology;
+- case studies with measurable outcomes;
+- calculators/templates that solve part of the buyer's problem.
+
+### Measurement
+
+Do not judge B2B SEO only by raw sessions. Track qualified actions such as demo requests, trial starts, sales-accepted leads, influenced pipeline, and conversions from high-intent landing pages where your analytics stack can support that measurement.
+
+
 ---
 
 # 43. Service / Lead Generation SEO
@@ -2428,6 +2865,31 @@ Each page should explain:
 - technologies/process;
 - FAQs;
 - conversion path.
+
+## Service-Page and Location-Page Decisions
+
+A service business commonly needs to distinguish between:
+
+```text
+/service/              → what the company does
+/location/             → where it operates
+/location/service/     → only when this is a genuinely useful distinct page
+```
+
+Do not create hundreds of city pages that merely swap the city name in otherwise identical text. A useful local/service page should contain information that matters to that location or service, such as availability, process, proof, relevant examples, service boundaries, staff, pricing context, or local FAQs where truthful.
+
+### Lead tracking
+
+SEO success for lead generation may include:
+
+- qualified form submissions;
+- phone calls;
+- booked consultations;
+- direction requests for local businesses;
+- downstream lead quality.
+
+Make sure tracking does not count spam submissions or every button click as a successful lead.
+
 
 ---
 
@@ -2470,6 +2932,27 @@ Noindex
 Delete (404/410)
 ```
 
+## Publisher Content Lifecycle
+
+Publishers need a maintenance decision for old content. Avoid the simplistic rule "old page = delete."
+
+For each declining/old article, ask:
+
+```text
+Is the topic still useful?
+  ├─ Yes → Is the page accurate and competitive?
+  │          ├─ No → update/consolidate where appropriate
+  │          └─ Yes → keep and monitor
+  └─ No  → Does it have useful historical/reference value?
+             ├─ Yes → retain/archive with context
+             └─ No  → remove or redirect only if a relevant replacement exists
+```
+
+### Syndication and duplicates
+
+If content is republished through partners, define a syndication policy rather than assuming duplicate copies will always behave exactly as desired. Keep ownership, canonical strategy, linking, licensing, and business goals explicit.
+
+
 ---
 
 # 45. Marketplace SEO
@@ -2499,6 +2982,45 @@ Mitigate with:
 - `rel="ugc"` or `nofollow` where appropriate;
 - quality thresholds before indexing;
 - removal of spam pages.
+
+## Marketplace SEO Architecture
+
+Marketplaces combine several difficult SEO systems at once:
+
+```text
+category pages
++ seller/provider pages
++ item/listing pages
++ location pages
++ search/filter pages
++ user-generated content
+```
+
+The main design question is **which combinations deserve durable, indexable landing pages**.
+
+### Example
+
+A jobs marketplace may have useful pages for:
+
+```text
+/software-engineer-jobs/
+/software-engineer-jobs/mumbai/
+```
+
+but automatically indexing every combination of salary, experience, sort order, date filter, remote option, and tracking parameter can create a huge low-value URL space.
+
+### Marketplace quality controls
+
+- prevent empty/near-empty indexable pages;
+- handle expired listings intentionally;
+- moderate spam and unsafe user-generated content;
+- keep internal search/filter URLs under control;
+- surface useful category/location hubs;
+- update inventory signals promptly;
+- keep structured data aligned with visible, current listings.
+
+A marketplace's SEO architecture should be designed together with product, engineering, trust/safety, and data teams—not added after the URL system is already unbounded.
+
 
 ---
 
@@ -2876,6 +3398,43 @@ trial_start
 
 Prefer meaningful business events over vanity metrics.
 
+## A Practical Organic Measurement Model
+
+Start from the landing page and connect search visibility to a business outcome:
+
+```text
+Search impression
+   ↓
+Click
+   ↓
+Organic landing session
+   ↓
+Engaged/productive visit
+   ↓
+Conversion event
+   ↓
+Qualified lead / revenue / retention outcome
+```
+
+No analytics tool observes every step perfectly. Search Console and web analytics use different data models and should not be expected to match row-for-row.
+
+### Useful analysis dimensions
+
+Segment performance by:
+
+- landing page;
+- query/theme where available;
+- country/device;
+- brand vs non-brand where your methodology can classify it;
+- page type/template;
+- new vs updated content;
+- conversion type.
+
+### Attribution warning
+
+A user may discover the company organically and convert later through direct traffic, email, or another channel. Therefore, "last-click organic revenue" can understate SEO's influence. Use a measurement model your organization understands and document its limitations.
+
+
 ---
 
 # 52. SEO KPIs and Reporting
@@ -3164,6 +3723,40 @@ If Search Console reports one:
 - document cleanup;
 - submit reconsideration when appropriate.
 
+## Algorithmic Change vs Your Own Change
+
+When traffic moves around the date of a known search update, correlation alone does not prove causation. Check whether your own site also changed.
+
+A disciplined incident timeline can include:
+
+```text
+Date/time
+Search-engine update window
+Deployment/release
+Robots/canonical changes
+CMS/template changes
+Server/CDN incidents
+Content migration
+Tracking changes
+Observed Search Console change
+Observed analytics change
+```
+
+### Recovery mindset
+
+Do not attempt to "reverse engineer" an update from a handful of ranking movements. Look for durable weaknesses:
+
+- intent mismatch;
+- poor or derivative content;
+- weak trust/evidence for the topic;
+- intrusive UX;
+- technical/indexing problems;
+- large-scale low-value pages;
+- manipulative link/spam practices.
+
+If there is a manual action, use the explicit Search Console information and remedy the policy issue. If there is no manual action, avoid describing an algorithmic decline as a penalty without evidence.
+
+
 ---
 
 # 56. SEO Spam / Black-Hat Risks
@@ -3346,6 +3939,48 @@ Track:
 - changes in informational-query click patterns.
 
 Avoid treating a manually checked chatbot answer as a stable rank tracker. Generative answers can vary.
+
+## 57.8 Google Search AI Features vs Broader LLM Visibility
+
+Keep two goals separate:
+
+1. **Google Search generative features** — governed by Google's Search crawling, indexing, serving, and quality systems.
+2. **Other LLM/assistant ecosystems** — each provider may have different crawling, licensing, retrieval, citation, and product behavior.
+
+A tactic documented for one system should not automatically be generalized to every AI product.
+
+For Google Search specifically, current official guidance says the same foundational SEO requirements apply to AI features; there is no additional technical requirement or special schema solely for appearing in them. Google's current documentation also states that `llms.txt` is not used by Google Search.
+
+## 57.9 Current Google Measurement Note
+
+Google's current Search documentation describes a **Generative AI performance report** in Search Console for supported generative AI features. Where that report is available to your property, prefer first-party reporting over manually counting whether a brand appears in a few generated answers.
+
+Measurement practices will continue to evolve, so verify current product documentation before building a long-term dashboard around a specific report name or field.
+
+## 57.10 AI-Visibility Experiment Template
+
+```text
+Question:
+Which audience/question are we trying to serve?
+
+Baseline:
+Current Search visibility, referrals, conversions, and brand/entity references.
+
+Change:
+What useful content, technical accessibility, or evidence are we improving?
+
+Primary outcome:
+Qualified visibility or business outcome—not merely "AI mentions".
+
+Guardrails:
+No invented facts, no fake citations, no mass low-value pages.
+
+Review:
+Compare over an appropriate period and record external changes.
+```
+
+This keeps AI-search work connected to user value and measurable business outcomes instead of becoming a separate collection of speculative hacks.
+
 
 ---
 
@@ -3550,7 +4185,7 @@ What evidence supports the recommendation?
 ## 60.2 Content brief template
 
 ```markdown
-# Content Brief
+### Content Brief
 
 ## Audience
 
@@ -3586,7 +4221,7 @@ What evidence supports the recommendation?
 ## 60.3 Technical SEO ticket template
 
 ```markdown
-# SEO Technical Issue
+### SEO Technical Issue
 
 ## Summary
 
@@ -3612,7 +4247,7 @@ What evidence supports the recommendation?
 ## 60.4 SEO experiment template
 
 ```markdown
-# SEO Experiment
+### SEO Experiment
 
 Hypothesis:
 If we improve X, Y should change because Z.
@@ -3635,6 +4270,53 @@ Result:
 
 Decision:
 ```
+
+## How to Use an SOP Without Creating Checklist SEO
+
+An SOP makes repeatable work safer, but it should include **decision points**, not only boxes to tick.
+
+For example, `Add structured data` should mean:
+
+```text
+Does this page represent a supported content/entity type?
+    ↓ yes
+Does the visible content satisfy the requirements?
+    ↓ yes
+Implement and validate appropriate markup
+```
+
+It should not mean "add random schema to every URL."
+
+### Quality gates for publishing
+
+Before publishing an important page, verify:
+
+- the page has a clear audience and purpose;
+- factual claims have appropriate evidence;
+- the page type matches the intended user task;
+- links, canonicals, status codes, and index directives behave as expected;
+- mobile rendering contains the important information;
+- analytics/conversion tracking is ready when required;
+- an owner or review date exists for content that can become stale.
+
+### Ticket-writing best practice
+
+A technical SEO ticket should be testable. Instead of:
+
+```text
+Fix canonicals.
+```
+
+write an acceptance criterion such as:
+
+```text
+For every indexable product URL in template X, the rendered canonical points to
+that page's normalized HTTPS URL without tracking parameters, and QA covers
+representative variants A, B, and C.
+```
+
+That gives engineering and QA a clear expected output.
+
 
 ---
 
@@ -3971,7 +4653,7 @@ Also update analytics, external profiles, structured data, hreflang, and importa
 
 # 63. 30-60-90 Day SEO Learning Roadmap
 
-# Days 1–30: Foundation
+## Days 1–30: Foundation
 
 ## Week 1
 
@@ -4036,7 +4718,7 @@ Analyze a real property if available or use demo/sample data.
 
 ---
 
-# Days 31–60: Applied SEO
+## Days 31–60: Applied SEO
 
 ## Week 5
 
@@ -4066,7 +4748,7 @@ Produce a full SEO audit with:
 
 ---
 
-# Days 61–90: Advanced SEO
+## Days 61–90: Advanced SEO
 
 ## Week 9
 
@@ -4104,6 +4786,22 @@ Include:
 - authority plan;
 - KPI dashboard;
 - 90-day execution roadmap.
+
+The roadmap below is designed to move from **concepts → implementation → diagnosis → strategy**. Do not wait 90 days to practice: each learning block should produce a small artifact you can inspect or test.
+
+### Suggested portfolio evidence
+
+By the end of the roadmap, try to have concrete examples of:
+
+- a keyword-to-page map;
+- a technical crawl/audit with prioritized issues;
+- an optimized content brief and finished page;
+- a redirect/canonical/robots test site or lab;
+- a Search Console/analytics interpretation exercise;
+- one complete SEO strategy with business KPIs.
+
+The goal is not to claim mastery of every specialization in 90 days. It is to build enough foundation to reason correctly, recognize risks, and know what to verify in official documentation.
+
 
 ---
 
@@ -4573,6 +5271,18 @@ Generative AI Search optimization guidance:
 
 ```text
 https://developers.google.com/search/docs/fundamentals/ai-optimization-guide
+```
+
+Google Search AI features and website guidance:
+
+```text
+https://developers.google.com/search/docs/appearance/ai-features
+```
+
+Google guidance on generative AI content:
+
+```text
+https://developers.google.com/search/docs/fundamentals/using-gen-ai-content
 ```
 
 Search Central updates:

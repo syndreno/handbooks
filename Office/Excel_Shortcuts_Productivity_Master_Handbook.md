@@ -83,6 +83,29 @@ The goal is:
 
 > Complete common Excel work with the fewest reliable actions.
 
+## Learn Actions, Not Isolated Keys
+
+A shortcut is useful only when you know **what Excel will act on**.
+
+For example:
+
+```text
+Ctrl + D
+```
+
+means "fill the selected range downward from the top row." It is not simply "copy formula down." If you select the wrong range, you can overwrite data.
+
+Practice shortcuts in three parts:
+
+```text
+Select the correct context
+→ press the shortcut
+→ verify the result
+```
+
+This habit is more valuable than memorizing a long list.
+
+
 ---
 
 # 2. Shortcut Notation and Compatibility
@@ -116,6 +139,13 @@ Fn + F2
 ```
 
 or change your laptop's function-key mode.
+
+## Shortcut Verification Rule
+
+This handbook primarily targets **Excel for Windows desktop**. For web, Mac, remote-desktop, non-US keyboard layouts, or laptop function-key modes, verify the shortcut in your installed environment before depending on it for a critical workflow.
+
+Two shortcuts can also share the same keys but behave differently because the active context is different—for example, a worksheet cell, chart, dialog box, formula edit mode, or PivotTable.
+
 
 ---
 
@@ -179,6 +209,15 @@ Ctrl + W   Close
 ```
 
 Learning these removes unnecessary Ribbon navigation from every work session.
+
+## `Ctrl + W` vs Closing Excel
+
+`Ctrl + W` closes the active workbook window. If other workbooks are open, Excel itself can remain open.
+
+This is useful when you are reviewing several files and want to close only the current workbook.
+
+Before closing, watch for the save prompt. Keyboard speed should never replace checking whether your changes were saved.
+
 
 ---
 
@@ -581,6 +620,21 @@ Ctrl + 0
 
 Some unhide combinations can be intercepted by operating-system settings; Ribbon KeyTips are a reliable fallback.
 
+## Selection Context Matters
+
+`Ctrl + Shift + +` and `Ctrl + -` can open an Insert/Delete choice or directly insert/delete rows/columns depending on what is selected.
+
+Examples:
+
+```text
+Select an entire row    → insert/delete a row
+Select an entire column → insert/delete a column
+Select cells             → Excel may ask how surrounding cells should shift
+```
+
+Use `Ctrl + Z` immediately if an insert/delete operation affects the wrong structure.
+
+
 ---
 
 # 11. Worksheet Management
@@ -598,6 +652,20 @@ Some unhide combinations can be intercepted by operating-system settings; Ribbon
 When multiple sheets are selected, edits may affect all selected sheets.
 
 Always check whether your workbook is in grouped-sheet mode before making major changes.
+
+## Grouped Sheets: High-Risk Context
+
+When multiple worksheet tabs are grouped, typing a value, formatting a cell, or editing a formula can apply the same change to several sheets.
+
+After using:
+
+```text
+Ctrl + Shift + Page Up
+Ctrl + Shift + Page Down
+```
+
+check the sheet tabs and **ungroup** them when the multi-sheet action is complete.
+
 
 ---
 
@@ -804,6 +872,29 @@ Common Flash Fill uses:
 
 Always verify results when source patterns are inconsistent.
 
+## Static Date/Time vs Formula Date/Time
+
+These shortcuts enter a fixed value:
+
+```text
+Ctrl + ;          Current date
+Ctrl + Shift + ;  Current time
+```
+
+The entered value does not automatically change tomorrow.
+
+By contrast:
+
+```excel
+=TODAY()
+=NOW()
+```
+
+are formulas that recalculate.
+
+Use shortcuts for timestamps that should stay fixed; use formulas when the value should update.
+
+
 ---
 
 # 15. Find, Replace, Go To, and Go To Special
@@ -905,6 +996,51 @@ Alt + F1
 
 You instantly get a chart for exploratory analysis.
 
+## What the Two Main Chart Shortcuts Do
+
+```text
+Alt + F1
+```
+
+creates an **embedded chart** on the current worksheet using the selected/current data region.
+
+```text
+F11
+```
+
+creates a chart on a **separate chart sheet** in desktop Excel.
+
+Both use Excel's default chart choice; the automatically selected chart type may not be the best communication choice.
+
+## Reliable Workflow
+
+```text
+1. Select clean headers + data.
+2. Press Alt + F1 for a quick embedded chart.
+3. Verify series/categories.
+4. Change chart type if the default is inappropriate.
+5. Add a message-driven title.
+6. Remove unnecessary visual clutter.
+```
+
+### Example
+
+For:
+
+```text
+Month | Revenue
+Jan   | 100
+Feb   | 130
+Mar   | 125
+```
+
+`Alt + F1` gives a quick chart for exploration. For a final report, you still need to verify that the chart type, title, axis formatting, and labels communicate the intended insight.
+
+## When Not to Use the Shortcut
+
+Do not treat `Alt + F1` as "make the correct chart." It is a fast starting point. If your selection contains totals, blank columns, unrelated fields, or multiple scales, select the proper source range first or use the Insert chart workflow deliberately.
+
+
 ---
 
 # 17. PivotTable Productivity
@@ -931,6 +1067,45 @@ Tab / Shift+Tab
 ```
 
 Using a Table as the Pivot source is usually easier to maintain than a fixed range.
+
+## Why There Is No Single Universal PivotTable Shortcut to Memorize
+
+PivotTable creation and field commands are highly context-sensitive. Ribbon KeyTips are therefore more reliable than memorizing a long `Alt` sequence that can vary by version and UI state.
+
+Use this mental model:
+
+```text
+Structure source data
+→ create PivotTable
+→ place fields
+→ set aggregation
+→ format values
+→ filter/slice
+→ refresh
+```
+
+## Keyboard-Friendly Habits
+
+- Convert source data to a Table with `Ctrl + T`.
+- Press `Alt` and follow the displayed KeyTips for Pivot commands.
+- Use `Tab`, `Shift + Tab`, arrow keys, and `Space`/`Enter` as appropriate in dialogs and panes.
+- Use `Alt + F5` when you intentionally want to refresh the selected PivotTable/connection context.
+- Use `Ctrl + Alt + F5` when you need a workbook-wide refresh.
+
+### Important check after refresh
+
+Refresh does not prove the report is correct. Verify:
+
+```text
+Source row count
+Grand total
+Date coverage
+Expected categories
+No "(blank)" surprises
+```
+
+especially in financial or operational reporting.
+
 
 ---
 
@@ -961,6 +1136,27 @@ Dashboard → Detail sheet
 Report → Source page
 Workbook → Documentation
 ```
+
+## Comment vs Note
+
+Modern Excel distinguishes collaborative **threaded comments** from simple **notes**.
+
+| Shortcut | Action in Windows desktop Excel |
+|---|---|
+| `Shift + F2` | Insert or edit a note |
+| `Ctrl + Shift + F2` | Insert a threaded comment or open/reply to one |
+| `Ctrl + K` | Insert/edit a hyperlink |
+
+A note is best for a short annotation that does not need replies. A threaded comment is better when reviewers need a conversation.
+
+### Posting a comment
+
+After opening a threaded comment and typing, the interface may support keyboard posting such as `Ctrl + Enter`; exact behavior can depend on the current comment UI.
+
+## Hyperlink Safety
+
+`Ctrl + K` is fast, but verify where a link goes before sharing the workbook. External file links can break when folders move, and hyperlinks can point outside your organization.
+
 
 ---
 
@@ -994,6 +1190,24 @@ Supporting calculations
 ```
 
 Do not use hidden content as a substitute for proper security.
+
+## Unhide Shortcuts
+
+Common Windows desktop shortcuts include:
+
+```text
+Ctrl + Shift + 9   Unhide rows
+Ctrl + Shift + 0   Unhide columns
+```
+
+`Ctrl + Shift + 0` can be intercepted or disabled by operating-system/keyboard settings on some systems. If it does not work, use the Ribbon or context menu rather than assuming the workbook is damaged.
+
+## Hidden Is Not Deleted
+
+Hiding rows/columns changes visibility, not the underlying formulas or values.
+
+Before copying, printing, exporting, or auditing a model, ask whether hidden content should be included. Never use hiding as a security control.
+
 
 ---
 
@@ -1119,6 +1333,30 @@ Calculate active worksheet
 Insert new worksheet
 ```
 
+## Function Keys Are Context-Sensitive
+
+A function key can have several meanings.
+
+Example:
+
+```text
+F4
+```
+
+- while editing a formula reference: cycles relative/absolute reference styles,
+- after many ordinary commands: can repeat the last supported action.
+
+Likewise:
+
+```text
+F9
+```
+
+is related to calculation, while its meaning changes in the VBA editor.
+
+Learn the **context + key** pair, not just the key.
+
+
 ---
 
 # 22. Formula Debugging
@@ -1181,6 +1419,24 @@ Ctrl + `
 
 to inspect formulas across the worksheet.
 
+## Evaluate Small Parts Carefully
+
+When editing a formula, selecting a subexpression and using calculation/evaluation techniques can help isolate errors. Do not accidentally confirm a partially replaced formula.
+
+A safer debugging workflow is:
+
+```text
+1. Copy the formula to a scratch cell if necessary.
+2. Check references with F2.
+3. Use F4 to verify locking.
+4. Show formulas with Ctrl + ` when useful.
+5. Recalculate deliberately.
+6. Inspect precedents/dependents with Formula Auditing tools.
+```
+
+Keyboard speed is useful only when the debugging result remains understandable.
+
+
 ---
 
 # 23. Refresh and External Data
@@ -1207,6 +1463,43 @@ Other refreshable sources
 ```
 
 Always validate totals after refresh in important business reports.
+
+## What "Refresh" Means
+
+Refresh asks Excel to update a refreshable object from its configured source. Depending on the workbook, that can include Power Query output, external connections, PivotTables, or other data connections.
+
+Common Windows desktop commands:
+
+```text
+Alt + F5          Refresh selected data / current connection context
+Ctrl + Alt + F5   Refresh all workbook data
+Esc               Attempt to stop a refresh
+```
+
+Microsoft also documents `Ctrl + F5` in refresh workflows for refreshing worksheet data in some contexts.
+
+## Refresh Is Not Rebuild
+
+A successful refresh can still load:
+
+- fewer source rows than expected,
+- changed columns,
+- duplicate transactions,
+- missing master data,
+- different date ranges.
+
+For important reporting, pair refresh shortcuts with validation:
+
+```text
+Refresh
+→ check row count
+→ check totals
+→ check exceptions
+→ save/export
+```
+
+Do not automate a refresh-and-send process without control totals.
+
 
 ---
 
@@ -1241,6 +1534,35 @@ Behavior can depend on:
 3. Use web-specific Ribbon access keys.
 4. Expect some browser shortcut conflicts.
 ```
+
+## Browser vs Excel Shortcut Ownership
+
+Excel for the web runs inside a browser, so some key combinations belong to the browser or operating system before Excel can receive them.
+
+Examples of differences include:
+
+- function keys may trigger browser actions,
+- `Ctrl + O` can be interpreted by the browser,
+- navigation between Excel UI areas can use different combinations,
+- Ribbon access can use `Alt + Windows logo key` combinations on Windows.
+
+If a desktop shortcut does not work in the web version, do not keep repeating it. Check the web-specific shortcut/help surface.
+
+## Best Cross-Platform Strategy
+
+Memorize portable concepts first:
+
+```text
+Copy / paste
+Undo / redo
+Find
+Cell editing
+Selection
+Navigation
+```
+
+Then learn platform-specific Ribbon and function-key shortcuts only for the environment you use frequently.
+
 
 ---
 
@@ -1722,6 +2044,33 @@ Alt
 
 Then follow the displayed letters.
 
+## Build "Shortcut Chains"
+
+Memory improves when shortcuts are attached to a real workflow.
+
+Instead of memorizing:
+
+```text
+Ctrl+T
+Ctrl+Shift+L
+Ctrl+Alt+V
+Ctrl+PageDown
+```
+
+in isolation, practice:
+
+```text
+Raw CSV
+→ Ctrl+T structure data
+→ Ctrl+Shift+L filter exceptions
+→ Ctrl+C
+→ Ctrl+Alt+V, V paste values
+→ Ctrl+PageDown move to report
+```
+
+The workflow becomes the memory cue.
+
+
 ---
 
 # 31. 7-Day Bootcamp
@@ -2168,3 +2517,15 @@ Shortcut behavior can still vary by Excel release, keyboard layout, OS settings,
 ---
 
 **End of Excel Shortcuts Productivity Master Handbook**
+
+## Accuracy Notes
+
+Shortcut behavior in this handbook is intentionally scoped to the platform stated in each section. Microsoft 365 can evolve, browsers can intercept shortcuts, and keyboard layouts can change key combinations.
+
+For production training material:
+
+1. verify the shortcut in the target Excel version,
+2. test it on the target operating system/keyboard layout,
+3. record a Ribbon fallback for context-sensitive commands,
+4. avoid teaching undocumented `Alt` sequences as permanent shortcuts when visible KeyTips can be followed instead.
+

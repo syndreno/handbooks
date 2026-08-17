@@ -1,7 +1,7 @@
 # AI CLI Master Handbook
 ## A Beginner-to-Advanced Guide to AI in the Terminal, Agentic Coding, Local Models, Automation, and Everyday Work
 
-**Edition:** August 2026  
+**Edition:** August 17, 2026  
 **Purpose:** A single, practical learning handbook for understanding and using AI command-line tools from beginner level through advanced agentic workflows.
 
 > **Important:** AI CLI tools evolve quickly. Commands and product names in this handbook were checked against official documentation available in August 2026, but you should still run `<tool> --help` and check the official documentation before relying on a version-specific flag in production.
@@ -66,6 +66,11 @@
 54. [Glossary](#54-glossary)
 55. [Master Cheat Sheet](#55-master-cheat-sheet)
 56. [Official References](#56-official-references)
+57. [Final Learning Principles](#57-final-learning-principles)
+58. [Suggested Practice Projects](#58-suggested-practice-projects)
+59. [Appendix A — Bash vs PowerShell Quick Reference](#59-appendix-a--bash-vs-powershell-quick-reference)
+60. [Appendix B — Recommended AI CLI Folder Strategy](#60-appendix-b--recommended-ai-cli-folder-strategy)
+61. [Appendix C — Your Personal AI CLI Operating Procedure](#61-appendix-c--your-personal-ai-cli-operating-procedure)
 
 ---
 
@@ -312,7 +317,21 @@ OpenCode/Aider
 
 # 4. Terminal Foundations You Need
 
-You do not need to be a Linux expert, but AI CLI productivity improves dramatically when you understand the shell.
+You do not need to be a Linux expert, but AI CLI productivity improves dramatically when you understand the shell. The agent can suggest commands, but **you remain responsible for understanding their effect**—especially commands that delete files, rewrite Git history, install software, change permissions, or contact production systems.
+
+A useful beginner mental model is:
+
+| Shell concept | Why an AI CLI user needs it |
+|---|---|
+| Current directory | Determines which project and files the agent can see or change |
+| Paths | Prevents editing the wrong file or workspace |
+| Pipes | Lets deterministic tools filter data before AI sees it |
+| Redirection | Saves generated output, but can also overwrite files |
+| Environment variables | Common way to provide configuration and credentials |
+| Exit codes | Tell automation whether a command succeeded or failed |
+| Quoting | Prevents spaces, special characters, or shell expansion from changing a command |
+
+> **Safety habit:** Before approving an unfamiliar command, ask the agent to explain what it reads, writes, deletes, downloads, or sends over the network.
 
 ## 4.1 Essential commands
 
@@ -410,7 +429,17 @@ Example:
 git diff | some-ai-cli "Review this diff"
 ```
 
-This is one of the most powerful AI CLI concepts.
+This is one of the most powerful AI CLI concepts because it lets normal command-line tools do precise filtering while the model handles interpretation.
+
+For example, instead of sending an entire log file to an AI:
+
+```bash
+rg "ERROR|FATAL|Exception" app.log | tail -n 200 | some-ai-cli "Group these failures by likely root cause"
+```
+
+Here `rg` and `tail` perform deterministic filtering; the AI performs semantic analysis. This is usually cheaper, faster, and easier to verify.
+
+> **Shell portability:** Bash pipes pass text streams. PowerShell passes rich objects between many native cmdlets. A pipeline copied from Bash may therefore need adaptation rather than literal translation.
 
 ---
 
@@ -434,7 +463,14 @@ Example:
 some-ai-cli "Write release notes" > RELEASE_NOTES.md
 ```
 
-Use this carefully when overwriting files.
+Use this carefully when overwriting files. `>` replaces the destination; `>>` appends. For important generated files, write to a temporary filename first, inspect it, and then move it into place.
+
+Example safer pattern:
+
+```bash
+some-ai-cli "Write release notes" > RELEASE_NOTES.generated.md
+# inspect the file before replacing the real release notes
+```
 
 ---
 
@@ -580,7 +616,9 @@ open webpage
 call MCP tool
 ```
 
-A tool call is an action, not merely generated text.
+A tool call is an action, not merely generated text. The model usually **proposes** a tool call; the CLI/runtime validates permissions, executes the tool, captures the result, and returns that result to the model.
+
+That separation matters because the model should not be treated as the security boundary. The runtime, operating system, sandbox, credentials, and approval policy decide what can actually happen.
 
 ---
 
@@ -616,7 +654,9 @@ Revise
 Return result
 ```
 
-That loop is why agentic CLIs are powerful.
+That loop is why agentic CLIs are powerful. A good agent loop also needs **stop conditions**. It should stop when the goal is satisfied, when validation fails repeatedly, when required permission is unavailable, when the task leaves the allowed scope, or when a human decision is required.
+
+Without stop conditions, an agent can keep retrying, broaden the change unnecessarily, or spend tokens without improving the result.
 
 ---
 
@@ -634,7 +674,7 @@ LLMs are probabilistic:
 same prompt -> possibly different wording/approach
 ```
 
-Therefore critical workflows need validation.
+Therefore critical workflows need validation. Prefer deterministic checks—tests, linters, type checkers, schema validation, SQL constraints, checksums, exit codes—whenever they can objectively verify the model's work.
 
 ---
 
@@ -702,11 +742,53 @@ The safest default is:
 Give the minimum permission needed for the current task.
 ```
 
+## 6.1 The execution lifecycle
+
+A practical agentic CLI turn usually looks like this:
+
+```text
+1. User gives goal and constraints
+2. CLI assembles instructions + relevant context
+3. Model proposes an answer or tool call
+4. Runtime checks permission/policy
+5. Tool executes
+6. Runtime captures stdout/stderr/result
+7. Model interprets the observation
+8. Agent continues, asks for approval, or stops
+9. Final result is validated and summarized
+```
+
+This explains an important troubleshooting rule: a failure may come from the **model**, the **CLI runtime**, the **shell**, the **tool being called**, authentication, network policy, or the application under test. Do not label every failure an “AI problem.”
+
+## 6.2 A sandbox is not the same as approval
+
+These controls solve different problems:
+
+- **Approval** decides whether the user must authorize an action.
+- **Sandboxing** limits what an action can affect even after it is allowed.
+- **Authentication** establishes identity.
+- **Authorization** determines which resources that identity may access.
+
+A tool that asks before running `rm` is not necessarily sandboxed. A sandboxed tool may still be dangerous if you give it production credentials. Use multiple layers.
+
 ---
 
 # 7. Choosing the Right AI CLI
 
-Use this decision pattern.
+Use this decision pattern. The “best” CLI is not just the model with the highest benchmark score. Choose based on the **workflow boundary** you need: repository editing, provider flexibility, GitHub integration, local inference, scripted text processing, or reusable prompt patterns.
+
+Before adopting a CLI for a team, compare:
+
+| Question | Why it matters |
+|---|---|
+| What can it read/write/execute? | Defines blast radius |
+| Does it support approvals and sandboxing? | Controls agent actions |
+| How does it load project instructions? | Affects repeatability |
+| Can it run non-interactively? | Matters for CI/automation |
+| Which providers/models can it use? | Affects quality, cost, lock-in |
+| How are secrets stored? | Security and compliance |
+| Can sessions be resumed/audited? | Debugging and governance |
+| Does it support MCP/tools? | Integration capability |
 
 ## I want a polished terminal coding agent tightly integrated with OpenAI
 
@@ -814,7 +896,13 @@ Official macOS/Linux standalone installer:
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
 ```
 
-npm package:
+Official Windows PowerShell installer:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"
+```
+
+npm package (cross-platform):
 
 ```bash
 npm install -g @openai/codex
@@ -826,7 +914,13 @@ Then:
 codex
 ```
 
-Follow the current official docs for native Windows installation options.
+Homebrew is another supported option:
+
+```bash
+brew install --cask codex
+```
+
+After installation, run `codex` and use the supported sign-in flow or API-key setup for your account. Because authentication and plan entitlements can change, prefer the login flow shown by your installed version rather than copying old credential tutorials.
 
 ---
 
@@ -861,9 +955,11 @@ Current Codex versions expose commands such as:
 /permissions
 /model
 /review
+/compact
+/mcp
 ```
 
-`/init` can help create project instructions such as `AGENTS.md`.
+`/init` can create project guidance such as `AGENTS.md`; `/permissions` controls approval behavior; `/review` reviews the working tree; `/status` shows session configuration and usage; `/compact` helps reduce long-conversation context; and `/mcp` shows configured MCP tools. Use `/` in the installed TUI to discover the exact command set for that release.
 
 ---
 
@@ -888,7 +984,9 @@ Use non-interactive mode when you need:
 - batch processing;
 - repeatable checks.
 
-For production CI, prefer vendor-supported integrations rather than casually exposing API keys in shell steps.
+The important output of a CI agent is not only prose. Automation should also have a meaningful **exit status**, bounded runtime, predictable permissions, and machine-readable output where supported. Pin or deliberately manage CLI versions in critical pipelines so an automatic upgrade does not silently change behavior.
+
+For production CI, prefer vendor-supported integrations and approved secret stores rather than casually exposing API keys in shell steps.
 
 ---
 
@@ -1351,10 +1449,32 @@ Kiro can:
 - use project guidance/steering;
 - integrate with MCP and agent workflows.
 
+Install examples from the current Kiro documentation include:
+
+macOS:
+
+```bash
+curl -fsSL https://cli.kiro.dev/install | bash
+```
+
+Windows PowerShell:
+
+```powershell
+irm 'https://cli.kiro.dev/install.ps1' | iex
+```
+
+Linux also has AppImage, archive, and Ubuntu package paths documented for supported distributions.
+
 Launch:
 
 ```bash
 kiro-cli
+```
+
+If installation or runtime behavior is broken, current Kiro CLI provides a diagnostic command:
+
+```bash
+kiro-cli doctor
 ```
 
 ---
@@ -1418,9 +1538,11 @@ Spec-oriented engineering
 
 OpenCode is an open-source AI coding agent that can work with multiple providers.
 
-This makes it attractive when you do not want your workflow tied to only one model vendor.
+This makes it attractive when you do not want your workflow tied to only one model vendor. Provider flexibility still requires you to understand each provider's authentication, pricing, data-handling, and model capabilities; a common CLI does not make providers operationally identical.
 
 ## 14.1 Install
+
+Stable OpenCode installation examples include:
 
 ```bash
 curl -fsSL https://opencode.ai/install | bash
@@ -1432,7 +1554,9 @@ or:
 npm install -g opencode-ai
 ```
 
-Launch:
+> **Version note (August 2026):** OpenCode also documents a separate OpenCode 2 beta using an `opencode2` binary and `@opencode-ai/cli@next`. Treat beta instructions as a different track; do not mix them into a stable installation without intending to test the beta.
+
+Launch stable OpenCode:
 
 ```bash
 opencode
@@ -1530,7 +1654,7 @@ ask
 help
 ```
 
-The exact behavior may vary by version.
+The exact options can evolve, but current Aider documentation distinguishes `code`, `ask`, `architect`, and `help`. In `ask` mode it discusses the code without editing files; `code` edits directly; `architect` separates a higher-level proposed change from the editor model that applies file edits.
 
 A useful mental model:
 
@@ -1545,6 +1669,8 @@ code      -> modify implementation
 ## 15.3 Add files intentionally
 
 Aider supports commands for controlling which files are in context.
+
+Use `/add` or launch Aider with selected files when you know what needs direct editing. Aider can also use its repository map to bring in relevant context, so “more files in chat” is not automatically better.
 
 This is important because blindly adding an entire repository can be:
 
@@ -1576,16 +1702,18 @@ It allows you to run models locally and expose them through a local API.
 ## 16.1 Run a model
 
 ```bash
-ollama run gemma4
+ollama run gemma3
 ```
 
-Your available model names depend on the Ollama library and your installed models.
+Your available model names depend on the Ollama library and the models you have installed or can access. Do not copy a model tag from a tutorial without checking that it exists for your installation.
 
 List models:
 
 ```bash
-ollama list
+ollama ls
 ```
+
+`ollama list` may be familiar from older examples, but use `ollama --help` / the current CLI reference as the source of truth for aliases supported by your version.
 
 Show running models:
 
@@ -1611,11 +1739,13 @@ PowerShell
 Terminal
 ```
 
-The local API commonly listens on:
+The local API is served by default under:
 
 ```text
-http://localhost:11434
+http://localhost:11434/api
 ```
+
+For example, `/api/chat`, `/api/generate`, and `/api/ps` provide programmatic access. Local API access normally does not require authentication, so do not expose the service broadly on an untrusted network without designing an appropriate security boundary.
 
 ---
 
@@ -1666,15 +1796,21 @@ Ollama
 Local/open model
 ```
 
-Some agent tools support Ollama or OpenAI-compatible local endpoints.
+Some agent tools support Ollama or OpenAI-compatible local endpoints. Current Ollama releases also document `ollama launch` integrations for tools such as Codex, Claude Code, and OpenCode. That convenience does **not** turn Ollama itself into the coding agent—the launched tool still provides the agent loop, file tools, permissions, and editing workflow.
 
 ---
 
 # 17. LLM CLI by Simon Willison
 
-`llm` is a general-purpose command-line tool for interacting with multiple language-model providers.
+`llm` is a general-purpose command-line tool and Python library for interacting with multiple language-model providers, storing prompt/response history, working with embeddings, extracting structured content, and extending functionality through plugins.
 
-It is excellent for Unix-style AI workflows.
+It is excellent for Unix-style AI workflows where you want a composable model command rather than a repository-editing agent.
+
+Common installation options include `pip`, `pipx`, `uv`, and Homebrew. For example:
+
+```bash
+pipx install llm
+```
 
 Basic usage:
 
@@ -1767,16 +1903,17 @@ OpenAI CLI
 = direct command-line access to OpenAI API capabilities
 ```
 
-The OpenAI CLI can be useful for:
+The OpenAI CLI is useful when you want command-line access to API capabilities and request parameters rather than an autonomous repository-editing loop.
 
-- Responses API experimentation;
-- structured outputs;
-- images;
-- speech;
-- shell workflows;
-- API prototyping.
+Typical uses include:
 
-Use it when you want to build or test API calls rather than delegate repository work to an agent.
+- API experimentation;
+- inspecting request/response behavior;
+- shell-based prototyping;
+- testing structured or multimodal API workflows supported by the current CLI;
+- learning the underlying API before moving the call into application code.
+
+Use `openai --help` and the current official OpenAI CLI documentation for the installed version's exact subcommands. Use Codex CLI when the goal is delegated software-engineering work across a repository.
 
 ---
 
@@ -1812,7 +1949,13 @@ Generate questions
 Analyze security concepts
 ```
 
-Fabric is particularly useful when you want to stop rewriting the same prompt repeatedly.
+Fabric is particularly useful when you want to stop rewriting the same prompt repeatedly. Modern Fabric is a Go-based CLI and supports installation through its official installer, binaries, package managers, or source builds. After setup, a typical pattern invocation looks like:
+
+```bash
+echo "long text here" | fabric --pattern summarize
+```
+
+The value is not that a pattern is magically more capable than a model; it is that a useful instruction can be **named, versioned, reused, reviewed, and composed** instead of retyped inconsistently.
 
 ---
 
@@ -1882,6 +2025,8 @@ This is dramatically better than:
 ```text
 fix csv bug
 ```
+
+Not every task needs the full template. For a one-line explanation, a short prompt is fine. Add structure when the task has meaningful scope, risk, ambiguity, validation requirements, or multiple steps.
 
 ---
 
@@ -1956,7 +2101,7 @@ If you are uncertain, state the uncertainty rather than guessing.
 
 Prompt engineering is about the instruction.
 
-Context engineering is about what information the model receives.
+Context engineering is about **what information, tools, and state the model receives at the moment it must make a decision**. A perfect prompt cannot compensate for stale logs, the wrong branch, missing schema information, or an agent that cannot access the required test command.
 
 A strong agent workflow controls:
 
@@ -3605,6 +3750,10 @@ Never paste secrets, private keys, or sensitive internal topology into an unappr
 
 # 44. Security, Privacy, and Permission Safety
 
+An AI CLI operates where source code, credentials, shells, package managers, and external instructions can meet. Treat security as an architecture concern, not as a sentence in the prompt.
+
+A repository itself can contain untrusted instructions—for example, malicious text in documentation, issue content, generated files, or tool output that tells an agent to reveal secrets or run commands. This is a form of **prompt injection**. Instructions found in data should not automatically outrank your task policy or authorization rules.
+
 This is one of the most important chapters.
 
 ## 44.1 Treat AI agents like junior automation with shell access
@@ -3966,6 +4115,20 @@ Do not perform cleanup or formatting outside the requested scope.
 
 # 48. Troubleshooting
 
+Before searching old tutorials, capture the environment you are actually running:
+
+```text
+1. CLI name and exact version
+2. Operating system and shell
+3. Installation method
+4. Current working directory
+5. Authentication method (never paste the secret)
+6. Exact command or prompt
+7. Exact error/exit code
+```
+
+Then run the tool's own `--help`, version command, or built-in help. AI CLI products change quickly, and a current local help screen is often more reliable than a months-old blog post.
+
 ## 48.1 Command not found
 
 Example:
@@ -3994,14 +4157,14 @@ Restart the terminal after installation.
 
 ## 48.2 Node package installed but CLI unavailable
 
-Check:
+Check the npm prefix and your shell path:
 
 ```bash
 npm config get prefix
-npm bin -g
+npm list -g --depth=0
 ```
 
-Depending on your Node/npm version, global binary locations may differ.
+Then verify whether the expected executable directory under that prefix is on `PATH`. Some older tutorials use `npm bin -g`; that command is not available in every modern npm version, so do not depend on it as a universal diagnostic.
 
 Use a version manager where appropriate.
 
@@ -4918,7 +5081,7 @@ ollama run MODEL_NAME
 
 # 56. Official References
 
-Because AI CLI products evolve rapidly, use their current official documentation as the source of truth.
+Because AI CLI products evolve rapidly, use their current official documentation as the source of truth. Product-specific commands in this handbook were re-checked against primary documentation on **August 17, 2026**; still re-check before relying on a flag in production.
 
 ## OpenAI Codex CLI
 
@@ -4955,8 +5118,9 @@ Check current account eligibility and transition guidance before installation.
 
 ## Kiro CLI
 
-- https://kiro.dev/cli/
-- https://kiro.dev/docs/cli/setup/
+- https://kiro.dev/docs/cli/
+- https://kiro.dev/docs/cli/installation/
+- https://kiro.dev/docs/cli/quick-start/
 
 ## OpenCode
 
@@ -4988,7 +5152,7 @@ Check current account eligibility and transition guidance before installation.
 
 ---
 
-# Final Learning Principles
+# 57. Final Learning Principles
 
 If you remember only ten ideas from this handbook, remember these:
 
@@ -5005,7 +5169,7 @@ If you remember only ten ideas from this handbook, remember these:
 
 ---
 
-# Suggested Practice Projects
+# 58. Suggested Practice Projects
 
 To turn this handbook into practical skill, build these projects in order.
 
@@ -5098,7 +5262,7 @@ one consolidated report
 
 ---
 
-# Appendix A — Bash vs PowerShell Quick Reference
+# 59. Appendix A — Bash vs PowerShell Quick Reference
 
 | Task | Bash | PowerShell |
 |---|---|---|
@@ -5117,7 +5281,7 @@ one consolidated report
 
 ---
 
-# Appendix B — Recommended AI CLI Folder Strategy
+# 60. Appendix B — Recommended AI CLI Folder Strategy
 
 Use a dedicated structure:
 
@@ -5145,7 +5309,7 @@ Benefits:
 
 ---
 
-# Appendix C — Your Personal AI CLI Operating Procedure
+# 61. Appendix C — Your Personal AI CLI Operating Procedure
 
 Use this every time you start important agentic work:
 
@@ -5158,9 +5322,12 @@ Use this every time you start important agentic work:
 [ ] I stated the task scope.
 [ ] I stated non-goals.
 [ ] I stated validation criteria.
+[ ] I know whether network access is allowed.
+[ ] I know what credentials/tools the agent can reach.
+[ ] I defined when the agent must stop and ask.
 [ ] I will review the diff.
-[ ] I will run tests.
-[ ] Production changes require human approval.
+[ ] I will run tests/linters/type checks that apply.
+[ ] Production or irreversible changes require human approval.
 ```
 
 ---

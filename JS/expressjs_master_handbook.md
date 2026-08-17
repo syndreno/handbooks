@@ -1,5 +1,7 @@
 # Express.js Master Handbook
 
+> **Version check (August 2026):** Express 5 remains the latest stable major line; this handbook keeps its Express 5.x / Node.js 18+ compatibility baseline and emphasizes supported Node releases for production.
+
 > **A beginner-to-production guide for learning Express.js as a single reference handbook**  
 > Target: **Express 5.x** with modern Node.js (Express 5.x requires Node.js 18+).  
 > Main examples use **ES Modules (ESM)**. CommonJS notes are included where useful.
@@ -478,6 +480,8 @@ Modern Node also provides conveniences around `import.meta` depending on the Nod
 ---
 
 # 6. Understanding the Express Request Lifecycle
+Every Express problem becomes easier when you trace one request in order. Middleware and routes run in registration/matching order; each layer either sends a response, passes control with `next()`, or fails into error handling. If a request hangs, returns twice, or skips expected code, inspect that flow before changing architecture.
+
 
 Consider:
 
@@ -1228,6 +1232,8 @@ Without `mergeParams: true`, parent route parameters are not preserved in the ch
 ---
 
 # 15. Route Chaining, app.route(), and router.route()
+Route chaining groups handlers for the **same path** so related HTTP methods are easier to read and maintain. Use it when GET/POST/PUT/DELETE operations share one resource path; do not use it if grouping hides unrelated authorization or middleware requirements.
+
 
 When several HTTP methods use the same path:
 
@@ -1407,6 +1413,8 @@ When maintaining Express 4, do not assume Express 5's rejected-promise behavior 
 ---
 
 # 19. 404 Handling
+A 404 in Express is usually “no route/middleware produced a response,” not an exception. Place a final not-found middleware **after all valid routes** and before the error handler. Keep 404 responses separate from server errors so monitoring and clients can distinguish missing resources/routes from application failures.
+
 
 A 404 is usually not an error thrown by Express. It means no route sent a response.
 
@@ -1439,6 +1447,8 @@ app.use(errorHandler);
 ---
 
 # 20. Serving Static Files
+`express.static()` maps files from a directory to HTTP responses. It is useful for public assets or simple static sites, but production systems often place a CDN or reverse proxy in front for caching and high-volume asset delivery. Never expose directories containing secrets, source files, or uploads that have not passed security checks.
+
 
 ```js
 app.use(express.static('public'));
@@ -2658,6 +2668,8 @@ For a tiny application, five layers may make simple code harder to follow. Archi
 ---
 
 # 35. Dependency Injection
+Express does not include a DI container, but dependency injection is still a useful design technique: pass repositories, services, clocks, mailers, or configuration into the code that needs them instead of importing global singletons everywhere. This makes tests deterministic and implementation changes easier.
+
 
 Dependency injection means giving an object/function the dependencies it needs instead of having it directly construct or import every dependency.
 
@@ -3428,6 +3440,8 @@ Consider:
 ---
 
 # 49. Server-Sent Events
+Server-Sent Events (SSE) keep one HTTP response open so the server can push a stream of text events to the browser. They are a good fit for one-way updates such as job progress or notifications; use WebSockets when you need a long-lived bidirectional protocol.
+
 
 **Server-Sent Events (SSE)** let the server continuously send text events over an HTTP connection to a browser.
 
@@ -3475,6 +3489,8 @@ SSE is server-to-client. For full bidirectional real-time communication, WebSock
 ---
 
 # 50. WebSockets and Socket.IO
+WebSockets provide a persistent bidirectional connection, while Socket.IO adds higher-level features such as reconnection and rooms on top of transport mechanisms. Express can share an HTTP server with these systems, but scaling requires planning for connection affinity and cross-instance event distribution.
+
 
 Express itself is primarily an HTTP request/response framework. For WebSockets, integrate a WebSocket library or Socket.IO with the underlying HTTP server.
 
@@ -3839,6 +3855,8 @@ Do not use literal production secrets in committed Compose files.
 ---
 
 # 56. Nginx with Express
+Nginx commonly sits in front of Express as a reverse proxy. It can terminate TLS, serve static assets, enforce limits, buffer/compress responses, and distribute traffic. Configure proxy headers and `trust proxy` deliberately so Express interprets client IP/protocol information safely.
+
 
 Typical architecture:
 
@@ -3975,6 +3993,8 @@ OpenTelemetry is commonly used as a vendor-neutral standard for telemetry instru
 ---
 
 # 59. Express with TypeScript
+TypeScript improves editor tooling and compile-time contracts in Express, especially around request DTOs, services, and domain models. It does **not** validate untrusted HTTP input at runtime, so keep schema validation at the request boundary even when every route is fully typed.
+
 
 Install basics:
 
@@ -6144,6 +6164,8 @@ A useful backend rule: treat external input as untrusted until validated and aut
 ---
 
 # Appendix B — Production Readiness Checklist
+Treat every checked item as an operational claim that should have evidence: configuration, tests, dashboards, alerts, load results, or a documented runbook. A checklist is most valuable when it reveals what the team has not yet verified.
+
 
 Use this before calling an Express API production-ready.
 
@@ -6211,6 +6233,8 @@ Use this before calling an Express API production-ready.
 ---
 
 # Appendix C — Common HTTP API Decision Guide
+Use this guide to choose HTTP semantics consistently. Start from the resource/business operation, then choose method, status code, idempotency behavior, validation contract, and authentication/authorization requirements together.
+
 
 | Situation | Typical choice |
 |---|---|
@@ -6235,6 +6259,8 @@ The exact status code contract should be documented and consistent across your A
 ---
 
 # Appendix D — Middleware Order Diagnostic
+When middleware “does not run,” trace registration order and route matching before assuming the middleware itself is broken. Express behavior is strongly order-dependent.
+
 
 When something does not work, inspect registration order.
 
@@ -6272,6 +6298,8 @@ Did the router mount path combine as expected?
 ---
 
 # Appendix E — Final Mental Model
+A production Express application is a request pipeline around Node's HTTP server. Keep transport concerns, validation, business rules, data access, and operational concerns separable so each can be tested and changed without turning every route into a monolith.
+
 
 When debugging or designing any Express endpoint, walk through this checklist mentally:
 

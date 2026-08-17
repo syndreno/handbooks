@@ -93,6 +93,26 @@ The goal of clean code is not to produce "beautiful-looking code."
 
 The goal is to produce code that future developers can understand and safely modify.
 
+## Version baseline for the examples
+
+This handbook teaches clean-code ideas rather than a single Java release. Unless a section says otherwise, the examples use modern Java syntax and APIs that are common in current production codebases.
+
+As of August 2026, **JDK 25 is a generally available release and is treated as an LTS release by most vendors**. JDK 21 is also an important long-term-support baseline in many existing systems. Before copying an example into a project, check the project's configured Java release in Maven/Gradle and the JDK supplied by your deployment platform.
+
+Useful checks:
+
+```bash
+java -version
+javac -version
+```
+
+Typical output identifies the installed runtime/compiler version. The exact patch number and vendor will vary.
+
+**Why this matters:** clean code must also be deployable code. Do not adopt a language feature merely because it is elegant if the project's supported Java baseline cannot compile or run it.
+
+Official version reference: <https://openjdk.org/projects/jdk/>
+
+
 ---
 
 # 2. What Clean Code Means
@@ -237,6 +257,34 @@ Organize code so that a developer asking:
 > "Where is the order functionality?"
 
 can find the answer quickly.
+
+## Package-by-layer vs package-by-feature
+
+Both structures can be valid.
+
+**Package-by-layer** groups technical roles:
+
+```text
+controller/
+service/
+repository/
+dto/
+```
+
+It is simple for small applications and tutorials, but a large feature may become scattered across many directories.
+
+**Package-by-feature** keeps the code for one business capability together:
+
+```text
+order/
+customer/
+payment/
+```
+
+This often improves local reasoning because a developer changing `order` behavior can see its controller, service, domain types, repository contract, and mapper close together.
+
+A practical rule is to organize the **top level by business capability** and use smaller technical sub-packages only when they genuinely improve navigation. Do not create packages such as `util`, `common`, or `misc` as default dumping grounds.
+
 
 ---
 
@@ -995,6 +1043,15 @@ Use when:
 Set<String> permissions = new HashSet<>();
 ```
 
+
+A `Set` models membership rather than position. `add()` returns a boolean indicating whether the set changed, which can be useful when duplicate insertion matters.
+
+```java
+boolean added = permissions.add("INVOICE_APPROVE");
+```
+
+Use a `Set` when uniqueness is part of the meaning. Do not use one merely to remove duplicates if preserving original order or duplicate counts is a business requirement. Choose the implementation (`HashSet`, `LinkedHashSet`, sorted sets) based on ordering and lookup requirements.
+
 ## Map
 
 Use when retrieving values by key.
@@ -1002,6 +1059,17 @@ Use when retrieving values by key.
 ```java
 Map<Long, Customer> customersById = new HashMap<>();
 ```
+
+
+A `Map<K, V>` associates a unique key with a value.
+
+```java
+Customer customer = customersById.get(42L);
+```
+
+`get()` may return `null` when no mapping exists, so use a contract that makes absence clear. Depending on the use case, `containsKey`, `getOrDefault`, `computeIfAbsent`, or returning an `Optional` from a repository-level API may communicate intent better.
+
+Use maps for real key-to-value lookup. Do not replace a domain object with `Map<String, Object>` simply because it is flexible; important business data benefits from named fields and types.
 
 ## Prefer interfaces
 
@@ -1075,6 +1143,27 @@ public static <T> T requirePresent(Optional<T> value, String message) {
     return value.orElseThrow(() -> new IllegalArgumentException(message));
 }
 ```
+
+
+The type parameter `<T>` means the method works with different element types while preserving type information.
+
+Inputs:
+
+- `value` — an `Optional<T>`;
+- `message` — the error message used if the value is empty.
+
+Output:
+
+- returns the contained `T` when present;
+- throws `IllegalArgumentException` when empty.
+
+Example:
+
+```java
+String email = requirePresent(optionalEmail, "Email is required");
+```
+
+Use a generic method when the algorithm is genuinely the same across types. Do not introduce a type parameter if the method only ever supports one concrete domain type.
 
 ## PECS
 
@@ -1231,6 +1320,20 @@ Use checked exceptions when the caller is realistically expected to recover from
 Use unchecked exceptions for many programming errors, invariant violations, invalid state, and business/service failures where forced catch declarations add little value.
 
 What matters most is consistency.
+
+
+### Practical decision questions
+
+Before choosing an exception type, ask:
+
+1. Is this a condition the immediate caller can reasonably handle?
+2. Is recovery part of the normal API contract?
+3. Would forcing every intermediate layer to declare/catch the exception improve correctness?
+4. Is the failure actually a programming/invariant error?
+
+For example, a parser library may use a checked exception when callers are expected to handle malformed external input. A domain method rejecting an impossible state often fits an unchecked domain exception.
+
+Do not catch a checked exception only to wrap it in an unchecked exception without adding meaning. When wrapping, preserve the original cause.
 
 ## Do not use exceptions for normal control flow
 
@@ -1672,6 +1775,21 @@ public PaymentProcessor create(PaymentMethod method) {
 
 Useful for complex object construction with many optional values.
 
+
+A builder separates object construction from the final immutable object and makes optional parameters self-documenting.
+
+```java
+ReportRequest request = ReportRequest.builder()
+        .from(startDate)
+        .to(endDate)
+        .includeArchived(false)
+        .build();
+```
+
+Use a builder when construction has many optional values, readable named steps matter, or validation should happen before producing the final object.
+
+Do not use a builder for a value that has two obvious required constructor parameters; it can add ceremony without reducing complexity.
+
 ## Adapter
 
 Useful when integrating incompatible APIs.
@@ -1720,11 +1838,54 @@ Useful when behavior depends heavily on object state.
 
 Instead of giant `if`/`switch` blocks, state-specific behavior may be modeled explicitly.
 
+
+The State pattern moves state-dependent behavior into state-specific objects or strategies.
+
+Use it when transitions and behavior are becoming difficult to reason about:
+
+```text
+Pending -> Approved
+Pending -> Rejected
+Approved -> Refunded
+```
+
+A state model should also define illegal transitions. The benefit is not eliminating every `switch`; it is keeping transition rules and behavior explicit when the workflow is complex.
+
+For a small enum with two simple branches, a normal `switch` may be clearer than a full State hierarchy.
+
 ## Template Method
 
 Useful when an algorithm has a stable sequence with customizable steps.
 
 Use carefully; composition is often easier to evolve.
+
+
+A Template Method usually places the fixed algorithm skeleton in a base type and lets subclasses override selected steps.
+
+Conceptually:
+
+```text
+process()
+  -> validate()
+  -> transform()   # customizable
+  -> persist()
+```
+
+It can be useful in stable inheritance frameworks, but it couples behavior to inheritance. Prefer composition/strategy when steps must vary independently, be combined dynamically, or be tested without subclassing.
+
+## Pattern decision rule
+
+A design pattern is a vocabulary for a recurring design problem, not a requirement to add more classes.
+
+Before introducing one, ask:
+
+1. What concrete problem exists today?
+2. What variation or dependency is difficult to manage?
+3. Would a normal method, composition, or small interface be simpler?
+4. Will another developer recognize the pattern without a long explanation?
+
+Patterns are most useful when they make change points explicit. They are harmful when added only to make a small feature look architecturally sophisticated.
+
 
 ---
 
@@ -2092,21 +2253,36 @@ log.debug("Customer loaded: " + customerId);
 
 Very detailed diagnostic information.
 
+
+Use for extremely detailed execution data that is normally disabled in production because of volume.
+
 ### DEBUG
 
 Developer-focused information.
+
+
+Use for diagnostic information helpful during development or incident investigation; avoid secrets and large sensitive payloads.
 
 ### INFO
 
 Normal important application events.
 
+
+Use for meaningful normal lifecycle/business events such as service startup or completion of an important workflow, not every method call.
+
 ### WARN
 
 Unexpected but recoverable conditions.
 
+
+Use when something abnormal happened but the operation or service can continue, such as a recoverable fallback.
+
 ### ERROR
 
 Failures requiring investigation.
+
+
+Use when an operation failed and requires investigation or action. Include enough context to diagnose the failure, but do not leak credentials or personal data.
 
 ## Never log sensitive data
 
@@ -2383,6 +2559,11 @@ Measure first using:
 
 For microbenchmarks, use a proper benchmarking framework rather than naïve `System.nanoTime()` loops for serious decisions.
 
+JIT compilation, dead-code elimination, warmup, garbage collection, CPU scaling, and JVM optimizations can make hand-written timing loops misleading.
+
+For Java microbenchmarks, **JMH (Java Microbenchmark Harness)** is the standard tool to consider. For application performance, prefer profiling and production-like load tests because a locally fast micro-operation may not be the real bottleneck.
+
+
 ---
 
 # 36. Testing Clean Java Code
@@ -2500,6 +2681,32 @@ Useful alternatives:
 - test builders,
 - real value objects.
 
+## What a mock actually does
+
+A mock replaces a collaborator so the test can control its behavior and verify an interaction. In the example above:
+
+- `mock(PaymentGateway.class)` creates a test double implementing `PaymentGateway`;
+- `when(...).thenReturn(...)` configures the value returned by a matching call;
+- the production service can be tested without calling a real payment provider.
+
+A mock does **not** prove that the real payment provider, database, or HTTP service works. That requires integration testing.
+
+### Mock vs stub vs fake
+
+| Test double | Main purpose | Typical example |
+|---|---|---|
+| Stub | Return controlled data | Gateway always returns `success` |
+| Mock | Verify interaction | Verify `charge()` was called once |
+| Fake | Working lightweight implementation | In-memory repository |
+| Real collaborator | Verify integration | Test database or local test server |
+
+Use the least complicated test double that makes the behavior clear.
+
+### When not to mock
+
+Avoid mocking your own value objects, collection operations, or every internal method. Tests that mirror implementation details become fragile during refactoring. Prefer asserting observable behavior: returned values, state changes, emitted events, or calls to true external boundaries.
+
+
 ---
 
 # 39. Integration and End-to-End Testing
@@ -2523,6 +2730,34 @@ Examples:
 Tests a major user workflow through the full application.
 
 A healthy test strategy usually includes many unit tests, selected integration tests, and fewer end-to-end tests.
+
+## What each level tells you
+
+A **unit test** answers: *Does this small piece of behavior work in isolation?*
+
+An **integration test** answers: *Do these real components work together with the actual protocol, serialization, SQL, transaction behavior, or framework configuration involved?*
+
+An **end-to-end test** answers: *Can a realistic user or system workflow succeed through the deployed application boundary?*
+
+For example, an order feature might have:
+
+```text
+Unit:
+PricingService applies the premium discount.
+
+Integration:
+OrderRepository saves and reloads an order from the test database.
+
+End-to-end:
+POST /orders creates an order and GET /orders/{id} returns it.
+```
+
+### Choosing the right test
+
+Use a unit test when the risk is business logic. Use an integration test when the risk is wiring or infrastructure. Use end-to-end testing for a small number of critical journeys.
+
+Do not duplicate the exact same assertion at every test level without a reason. End-to-end tests are valuable but are usually slower, more expensive to diagnose, and more sensitive to environment failures.
+
 
 ---
 
@@ -2817,6 +3052,30 @@ Use tools to support judgment, not replace it.
 
 A project with 100% coverage can still be badly designed.
 
+## What the tools contribute
+
+These tools solve different problems, so one does not replace all the others.
+
+- **Checkstyle** — enforces source-style and convention rules.
+- **PMD** — detects suspicious or unnecessarily complex source patterns.
+- **SpotBugs** — analyzes bytecode for bug patterns.
+- **Error Prone** — adds compile-time checks when integrated with `javac`.
+- **JaCoCo** — measures which bytecode was exercised by tests.
+- **Dependency scanners** — look for known vulnerable dependencies.
+- **SonarQube/SonarCloud** — aggregate quality, maintainability, security, and coverage signals.
+
+### A practical adoption order
+
+1. Make compiler warnings visible.
+2. Add formatting/style checks.
+3. Add static bug analysis.
+4. Run tests and coverage.
+5. Add dependency/security checks.
+6. Gate CI only on rules the team intends to maintain.
+
+A new tool should reduce risk, not create thousands of ignored warnings. For an older codebase, establish a baseline and prevent **new** violations first, then improve historical issues incrementally.
+
+
 ---
 
 # 46. Build and Dependency Hygiene
@@ -2860,6 +3119,45 @@ A build should behave consistently across:
 - CI,
 - staging,
 - production packaging.
+
+## What the common build commands mean
+
+For Maven:
+
+```bash
+mvn test
+```
+
+compiles the project as needed and runs tests configured for the test phase.
+
+```bash
+mvn verify
+```
+
+runs the lifecycle through the `verify` phase, which is commonly where projects attach additional integration or quality checks.
+
+```bash
+mvn package
+```
+
+builds the distributable artifact such as a JAR or WAR after earlier lifecycle phases succeed.
+
+For Gradle, `./gradlew build` normally runs the project's configured build lifecycle, including tests, while the **Gradle Wrapper** (`gradlew`) helps the team use the project-selected Gradle version.
+
+### Dependency changes deserve review
+
+When adding a dependency, check:
+
+- whether the JDK already provides the capability;
+- maintenance activity and security history;
+- transitive dependencies;
+- license compatibility;
+- upgrade policy;
+- size/startup impact where relevant;
+- whether the dependency becomes part of a public API.
+
+The cleanest dependency is often the one you do not need, but reimplementing a complex, security-sensitive library is usually worse than using a mature dependency.
+
 
 ---
 

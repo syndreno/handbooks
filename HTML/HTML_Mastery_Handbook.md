@@ -114,6 +114,13 @@ document.querySelector("#saveButton").addEventListener("click", () => {
 
 JavaScript gives it behavior.
 
+
+## HTML is a Living Standard
+
+Modern HTML is maintained as a **Living Standard** rather than as a language you should learn by memorizing an old version number such as “HTML5.” The platform evolves while browsers implement standardized features over time.
+
+For learners, the durable principle is simple: write semantic, valid HTML using features supported by your project’s browser requirements, and verify unfamiliar features in the current standard or reliable reference documentation.
+
 ---
 
 # 2. How the Web Works
@@ -174,6 +181,24 @@ body
 ```
 
 JavaScript can then read or modify this tree.
+
+
+## The page usually loads more than one resource
+
+The first HTML response often references other resources:
+
+```text
+HTML
+├── CSS
+├── JavaScript
+├── images
+├── fonts
+└── media/data requests
+```
+
+The browser parses HTML into the DOM while its loading systems discover and fetch dependencies. CSS participates in styling/layout; JavaScript can read or change the DOM and may request more data.
+
+This is why HTML choices can affect performance. A large image, a blocking script, an unnecessary embed, or poorly ordered critical resources can delay what the user sees even when the markup itself is small.
 
 ---
 
@@ -258,6 +283,22 @@ Contains the visible document content.
   <footer>...</footer>
 </body>
 ```
+
+
+## Why this skeleton matters
+
+The document structure establishes standards mode, language, metadata, and visible content before application code runs.
+
+The most important inputs are:
+
+- the doctype;
+- the document language;
+- character encoding;
+- viewport metadata for common responsive layouts;
+- a useful page title;
+- semantic content inside `<body>`.
+
+The browser turns this source into a DOM tree. DevTools may therefore show a structure that differs slightly from the raw file if the parser repaired invalid markup or JavaScript later modified it.
 
 ---
 
@@ -361,6 +402,23 @@ Avoid:
 
 HTML is forgiving, but lowercase markup is the standard development convention.
 
+
+## Browsers are forgiving; authors should still be precise
+
+HTML parsing includes error-recovery rules, so malformed markup may appear to “work.” That tolerance is for interoperability, not permission to ignore structure.
+
+Good authoring habits include:
+
+- valid nesting;
+- unique IDs;
+- quoted attribute values for consistency;
+- correct void-element syntax;
+- lowercase element/attribute names by convention;
+- meaningful indentation;
+- validation during development.
+
+A syntax mistake can change the DOM tree, which then affects CSS selectors, JavaScript queries, accessibility relationships, and form behavior.
+
 ---
 
 # 5. Elements, Tags, Attributes, and Values
@@ -396,6 +454,21 @@ Some attributes are enabled simply by existing.
 ```
 
 Do not think of them as normal string values.
+
+
+## Element vs tag
+
+A **tag** is source syntax such as `<a>` or `</a>`. An **element** is the node represented by the complete construct, including its attributes and content where applicable.
+
+Attributes configure or describe an element. Their allowed names and value rules depend on the element and specification.
+
+```html
+<a href="/reports" download>Download report</a>
+```
+
+Here `href` takes a URL-like value, while `download` can be used as a boolean attribute.
+
+Do not invent attributes merely because browsers ignore unknown markup. Use `data-*` for application-specific data and standard attributes for platform behavior.
 
 ---
 
@@ -649,6 +722,22 @@ Better:
 
 and style it with CSS.
 
+
+## Headings describe hierarchy, not font size
+
+Use heading levels to communicate section structure:
+
+```text
+h1 Page topic
+├── h2 Major section
+│   └── h3 Subsection
+└── h2 Another major section
+```
+
+Choose a level based on document hierarchy, then use CSS for appearance. Do not select `<h4>` simply because its default browser font looks smaller.
+
+Clear headings help screen-reader navigation, search/indexing, scanning, and maintenance. Keep headings descriptive enough that a user seeing only the heading list can understand the page structure.
+
 ---
 
 # 8. Links and Navigation
@@ -760,6 +849,21 @@ Descriptive links improve usability, accessibility, and search understanding.
   </ul>
 </nav>
 ```
+
+
+## Link vs button
+
+Use an `<a>` when the action **navigates to a URL or resource**. Use a `<button>` for an in-page action such as opening a dialog, submitting a form, toggling UI, or starting a JavaScript operation.
+
+Good link text describes the destination:
+
+```html
+<a href="/invoices/1001">View invoice 1001</a>
+```
+
+is more useful than repeated “click here.”
+
+For a group of primary navigation links, wrap them in `<nav>` and give multiple navigation regions distinguishable accessible names when necessary. Preserve normal keyboard and browser behaviors instead of recreating links with clickable `<div>` elements.
 
 ---
 
@@ -977,6 +1081,27 @@ Also useful for key-value metadata.
   <dd>ABC Technologies</dd>
 </dl>
 ```
+
+
+## Pick a list by meaning
+
+Use:
+
+- `<ul>` when order is not important;
+- `<ol>` when sequence/rank is meaningful;
+- `<dl>` for name/value or term/description groups.
+
+```html
+<ol>
+  <li>Upload invoice</li>
+  <li>Review extracted data</li>
+  <li>Submit for approval</li>
+</ol>
+```
+
+CSS can remove markers or change layout, but the underlying list semantics still communicate grouping to browsers and assistive technology.
+
+Do not use a list solely to gain indentation when the content is not actually a collection.
 
 ---
 
@@ -1208,6 +1333,32 @@ Better:
   <section>...</section>
 </main>
 ```
+
+
+## Use generic containers when no semantic element fits
+
+`<div>` is a generic block-level grouping element; `<span>` is a generic inline phrasing container. They are useful hooks for styling, layout, scripting, and grouping, but they do not add specific document meaning.
+
+Prefer:
+
+```html
+<nav>...</nav>
+<article>...</article>
+<button>...</button>
+```
+
+when those semantics are correct.
+
+Use:
+
+```html
+<div class="card-grid">...</div>
+<span class="status-dot" aria-hidden="true"></span>
+```
+
+when the wrapper genuinely has no more specific semantic role.
+
+A common mistake is “div soup”: building headings, buttons, navigation, and forms entirely from generic containers and then trying to recreate native behavior with JavaScript.
 
 ---
 
@@ -1889,6 +2040,32 @@ Server validation
 Correct approach
 ```
 
+
+## Validation has two different responsibilities
+
+HTML constraint validation improves **user experience** by catching basic problems near the field:
+
+```html
+<input
+  type="email"
+  name="email"
+  required
+  maxlength="254"
+>
+```
+
+But client-side validation is not a security boundary. Requests can be modified or sent without your page, so the server must independently validate all untrusted input.
+
+Think of the flow as:
+
+```text
+HTML constraints -> fast browser feedback
+JavaScript       -> optional richer UX
+server           -> authoritative validation/security
+```
+
+Error messages should identify the field, explain the problem in useful language, and remain accessible to keyboard and assistive-technology users.
+
 ---
 
 # 16. Audio, Video, and Embedded Content
@@ -1976,6 +2153,15 @@ For untrusted or partially trusted embedded content, consider `sandbox`.
 ```
 
 You can selectively grant permissions, but only grant what is necessary.
+
+
+## Media elements need fallbacks and user control
+
+`<audio>` and `<video>` can expose native playback controls and multiple source formats. Include captions/subtitles where the content requires them, and avoid unexpected autoplay with sound.
+
+Embedded third-party content—especially `<iframe>`—can affect privacy, performance, security, and accessibility. Give meaningful iframe titles, load heavy embeds only when needed, and use sandbox/permissions policies when your threat model requires restriction.
+
+If media communicates essential information, provide an equivalent accessible path such as captions, transcript, or surrounding text.
 
 ---
 
@@ -2068,6 +2254,23 @@ The title can appear in:
 
 Search engines may use it as a result snippet.
 
+
+## Think of `<head>` as document configuration
+
+The head commonly defines:
+
+- character encoding;
+- viewport behavior;
+- title and description;
+- stylesheet links;
+- icons;
+- canonical/resource metadata where appropriate;
+- scripts or preload hints when the application needs them.
+
+Order can matter for loading and parsing, so do not fill the head with copied tags you do not understand. Every resource hint or script option should solve a measured or understood need.
+
+Keep page-specific metadata accurate; duplicating the same title/description across every route reduces their usefulness.
+
 ---
 
 # 18. Metadata and SEO
@@ -2132,6 +2335,15 @@ Example:
 ```
 
 Use structured data only when it accurately represents visible content.
+
+
+## Metadata supports discovery but does not replace content quality
+
+A descriptive `<title>` and useful meta description help identify a page, while semantic headings, links, structured content, crawlable URLs, and meaningful text provide the actual document substance.
+
+Do not rely on obsolete “keyword stuffing” techniques. Search systems can change, so focus on standards-based markup and user-visible content.
+
+For social-sharing metadata or structured data, implement only the vocabulary your product actually needs and validate the generated markup. Metadata should accurately describe the visible page rather than make claims the page does not support.
 
 ---
 
@@ -2404,6 +2616,28 @@ CSS:
 }
 ```
 
+
+## HTML can help the browser choose the right media
+
+Responsive layout is mostly CSS, but responsive images are an HTML responsibility too.
+
+`srcset` offers candidate image resources and `sizes` tells the browser the expected display slot for width-descriptor candidates:
+
+```html
+<img
+  src="/img/product-800.jpg"
+  srcset="
+    /img/product-480.jpg 480w,
+    /img/product-800.jpg 800w,
+    /img/product-1200.jpg 1200w
+  "
+  sizes="(max-width: 40rem) 100vw, 50vw"
+  alt="Blue travel backpack"
+>
+```
+
+Use `<picture>` when you need art direction or format/source alternatives. Do not create separate desktop/mobile DOM trees when CSS can adapt one meaningful content structure.
+
 ---
 
 # 21. HTML Entities and Special Characters
@@ -2444,6 +2678,24 @@ Suppose you want to display code:
 ```
 
 Without escaping, the browser would treat it as markup rather than text.
+
+
+## Escape characters when HTML syntax requires it
+
+Character references are useful when a literal character would otherwise be interpreted as markup or when a named symbol improves source clarity.
+
+Common examples:
+
+```html
+&lt;   <!-- < -->
+&gt;   <!-- > -->
+&amp;  <!-- & -->
+&nbsp; <!-- non-breaking space -->
+```
+
+Use normal Unicode text directly when it is safe and readable; modern UTF-8 documents do not need every non-ASCII character converted into an entity.
+
+Avoid using repeated `&nbsp;` characters to create layout spacing. Spacing is a CSS responsibility.
 
 ---
 
@@ -2588,6 +2840,30 @@ Good for lightweight UI metadata.
 Do not store secrets in HTML attributes.
 
 Anything rendered in the page can be inspected by the user.
+
+
+## `data-*` is for application-specific element data
+
+A custom data attribute stores string data on an element:
+
+```html
+<button
+  type="button"
+  data-invoice-id="INV-1001"
+  data-action="approve"
+>
+  Approve
+</button>
+```
+
+JavaScript can read these through `dataset`:
+
+```javascript
+const button = document.querySelector("[data-invoice-id]");
+console.log(button.dataset.invoiceId); // "INV-1001"
+```
+
+Use data attributes for UI hooks or non-secret metadata that belongs with the element. Do **not** store passwords, authorization secrets, sensitive tokens, or data that the user must not see—the markup and DOM are inspectable.
 
 ---
 
@@ -2764,6 +3040,20 @@ Content inside a template is not normally rendered until JavaScript clones it.
 
 Prefer progressive enhancement when the site can provide useful functionality without JavaScript.
 
+
+## Prefer native behavior before rebuilding it
+
+HTML includes useful interaction primitives such as:
+
+- `<details>` / `<summary>` for disclosure;
+- `<dialog>` for dialog semantics and APIs;
+- `<datalist>` for suggestion lists;
+- native form validation attributes;
+- date/time/number input types where their behavior fits;
+- `loading="lazy"` for suitable images/iframes.
+
+Native features can reduce custom JavaScript and often provide keyboard/semantic behavior automatically. They still need design and compatibility evaluation: “native” does not mean every browser/UI behaves identically or that no accessibility testing is required.
+
 ---
 
 # 26. HTML and CSS Integration
@@ -2823,6 +3113,21 @@ CSS:
   font-weight: 700;
 }
 ```
+
+
+## Keep responsibility clear
+
+HTML should express meaning and structure; CSS should control presentation.
+
+```html
+<link rel="stylesheet" href="/assets/app.css">
+```
+
+The stylesheet can then target semantic elements, component classes, states, and responsive conditions.
+
+Avoid putting large reusable style systems into inline `style` attributes, because they are hard to share and maintain. Inline styles can still be appropriate for narrowly scoped dynamic values, especially when passed through CSS custom properties.
+
+When a style is missing, first confirm the stylesheet loaded successfully, then inspect selector matching and the computed cascade.
 
 ---
 
@@ -3219,6 +3524,15 @@ Search-friendly HTML usually overlaps with accessible, semantic HTML.
 
 </article>
 ```
+
+
+## SEO-friendly markup is mostly good document markup
+
+Use unique descriptive titles, meaningful headings, crawlable links, semantic page structure, appropriate image text alternatives, and content that matches user intent.
+
+Avoid turning navigation into JavaScript-only click handlers when normal links would work, or hiding essential text in images/canvas without an equivalent representation.
+
+Search-engine behavior evolves, so do not treat a particular markup trick as a guaranteed ranking factor. Standards-based, accessible, fast, understandable pages are a more durable foundation.
 
 ---
 
@@ -3911,6 +4225,15 @@ Avoid comments that merely repeat obvious markup:
 <p>Hello</p>
 ```
 
+
+## Name by purpose and keep structure predictable
+
+IDs used for labels, fragments, scripting, or accessibility relationships should be stable and unique. Classes should communicate a styling/component purpose rather than an accidental visual detail when that improves maintenance.
+
+For large pages, format attributes consistently and keep related semantic sections together. Reusable server/framework components should still render understandable HTML.
+
+Do not encode business secrets into element names or data attributes; source markup is visible to users. Organization should help developers find content, not pretend the client-side document is private.
+
 ---
 
 # 35. Progressive Enhancement
@@ -3958,6 +4281,25 @@ JavaScript adds enhanced behavior
 ```
 
 This often creates more resilient applications.
+
+
+## Start from the reliable core action
+
+Progressive enhancement asks whether the basic user goal can work with fundamental web capabilities, then layers richer behavior on top.
+
+Example:
+
+```html
+<form action="/search" method="get">
+  <label for="q">Search</label>
+  <input id="q" name="q">
+  <button>Search</button>
+</form>
+```
+
+JavaScript can later add autocomplete, instant results, or client-side validation without changing the form's semantic purpose.
+
+Not every application can function fully without JavaScript, but the principle still helps: preserve meaningful HTML, useful loading/error states, direct links where possible, and graceful failure instead of making every interaction depend on a fragile custom widget.
 
 ---
 
@@ -4151,6 +4493,25 @@ This example demonstrates:
 - descriptive links;
 - skip navigation;
 - modern JavaScript loading.
+
+
+## Design the landmark structure before the visual layout
+
+A typical application page may have:
+
+```text
+header
+nav
+main
+├── page heading
+├── primary section
+└── supporting section
+footer
+```
+
+Within `<main>`, choose `<section>`, `<article>`, forms, tables, lists, and headings based on content meaning—not on the CSS framework you plan to use.
+
+This separation pays off later: Bootstrap, Tailwind, custom CSS, or a JavaScript framework can change while the document structure remains understandable and accessible.
 
 ---
 
@@ -4750,6 +5111,20 @@ or:
 ```html
 <script type="module" src="/app.js"></script>
 ```
+
+
+## Use this as a reminder, not a substitute for element rules
+
+Elements with similar-looking output can have very different semantics and permitted content. Before copying a cheat-sheet snippet into production, confirm:
+
+- whether the element fits the content meaning;
+- required/important attributes;
+- valid child/parent content;
+- accessibility behavior;
+- browser support if the feature is unfamiliar;
+- security/privacy implications for external resources.
+
+The shortest syntax is not always the best production markup.
 
 ---
 

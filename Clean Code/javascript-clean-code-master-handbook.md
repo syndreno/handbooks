@@ -81,6 +81,29 @@ Throughout this handbook you will see:
 - **Scenario** examples — how the rule applies to real applications.
 - **Why** explanations — so you understand the reasoning instead of memorizing rules.
 
+## Runtime baseline and portability
+
+JavaScript code may run in browsers, Node.js, edge runtimes, workers, embedded engines, or build tooling. Clean JavaScript therefore includes knowing **which runtime owns an API**.
+
+As of August 2026, Node.js 24 is an LTS line and Node.js 26 is the Current line. Production services should normally follow a supported Node release line chosen by the project rather than assuming every developer's locally installed version is acceptable.
+
+Check Node with:
+
+```bash
+node --version
+```
+
+Also distinguish:
+
+```text
+JavaScript language feature  !=  browser API  !=  Node.js API  !=  package API
+```
+
+For example, `Array.prototype.map` is a JavaScript language API, while filesystem access is runtime-specific.
+
+Official Node release reference: <https://nodejs.org/en/about/previous-releases>
+
+
 ---
 
 # 2. What Clean Code Means
@@ -1067,6 +1090,55 @@ await Promise.all(files.map(file => uploadFile(file)));
 
 But do not do this for thousands of operations if the external system cannot handle the concurrency. Consider batching or a concurrency limiter.
 
+## 9.9 Quick method contract reference
+
+| Method | Callback purpose | Return value | Good default use |
+|---|---|---|---|
+| `map` | transform each item | new array, same length | convert values |
+| `filter` | keep/reject each item | new array, zero or more items | select values |
+| `find` | test until first match | matching value or `undefined` | locate one item |
+| `some` | test until one is true | boolean | “does any match?” |
+| `every` | test until one is false | boolean | “do all match?” |
+| `forEach` | perform synchronous side effects | `undefined` | logging/UI mutation |
+| `reduce` | combine items into one accumulator | final accumulator | totals/grouping when clear |
+
+Example:
+
+```js
+const prices = [10, 20, 30];
+
+const doubled = prices.map(price => price * 2);
+const expensive = prices.filter(price => price >= 20);
+const firstExpensive = prices.find(price => price >= 20);
+
+console.log(doubled);
+console.log(expensive);
+console.log(firstExpensive);
+```
+
+Output:
+
+```text
+[20, 40, 60]
+[20, 30]
+20
+```
+
+### Callback parameters
+
+Most array callbacks can receive:
+
+```text
+(value, index, array)
+```
+
+Use only the parameters you need. Naming an unused `index` merely because it exists adds noise.
+
+### `forEach` and promises
+
+`forEach` does not combine or await promises returned by its callback. Use `for...of` for sequential asynchronous work, or create promises and await `Promise.all` when parallel execution is safe.
+
+
 ---
 
 # 10. Objects and Data Modeling
@@ -1325,6 +1397,18 @@ Do not prematurely abstract a two-case rule. Apply OCP when extension pressure i
 A replacement implementation should honor the expected contract.
 
 If a storage service says `save()` resolves with the saved object, every implementation should follow that rule rather than one returning a boolean, one throwing for normal misses, and one returning `undefined`.
+
+
+If code accepts a base abstraction, any valid implementation should preserve the expectations of that abstraction.
+
+A subtype should not unexpectedly:
+
+- reject inputs the contract allows;
+- return a weaker kind of result;
+- introduce surprising side effects;
+- violate documented invariants.
+
+In JavaScript, this principle applies to objects that satisfy the same behavioral contract even when no formal interface syntax exists.
 
 ## 12.4 I — Interface Segregation Principle
 
@@ -1611,6 +1695,24 @@ userService -> orderService -> paymentService -> userService
 
 Circular dependencies often reveal unclear boundaries.
 
+
+A cycle such as:
+
+```text
+orders -> payments -> notifications -> orders
+```
+
+makes initialization and ownership harder to understand.
+
+Common fixes:
+
+- move shared types/constants to a lower-level module;
+- invert a dependency behind a callback/interface;
+- extract orchestration into a higher-level module;
+- merge modules if they are actually one cohesive concept.
+
+Do not create a new `common.js` dumping ground merely to break the import cycle.
+
 ## 15.5 Keep public module APIs small
 
 Do not export every internal helper.
@@ -1701,6 +1803,23 @@ A coupon being expired may be an expected result.
 A database being unavailable is an exceptional system failure.
 
 Do not use exceptions for every ordinary branch.
+
+
+Not every unsuccessful business result is an unexpected exception.
+
+Examples:
+
+```text
+coupon expired
+payment declined
+username already exists
+```
+
+may be normal domain outcomes that the caller should handle explicitly.
+
+Unexpected infrastructure failures—database unavailable, malformed provider response, programming invariant broken—often belong on an error/exception path.
+
+Choose a consistent API contract so callers can tell “valid negative result” from “operation failed.”
 
 ## 16.5 Never expose sensitive internals to clients
 
@@ -2039,6 +2158,34 @@ createReadStream(filePath)
   .pipe(createWriteStream(outputPath));
 ```
 
+## 20.5 Treat the process boundary as infrastructure
+
+Code that depends directly on `process`, signals, environment variables, filesystem layout, or runtime globals is harder to reuse and test. Keep those concerns near application startup and pass ordinary values/services inward.
+
+```js
+const config = loadConfig(process.env);
+const app = createApplication({ config, logger, database });
+```
+
+Now most application code does not need to know where configuration came from.
+
+## 20.6 Handle startup and shutdown failures deliberately
+
+A service should distinguish:
+
+```text
+startup failure  -> application never became ready
+request failure  -> one operation failed
+shutdown         -> stop accepting work and release resources
+```
+
+Database connection failure during startup should usually fail startup clearly rather than allowing a half-working service. During shutdown, stop accepting new work, allow an appropriate grace period for in-flight work, and close owned resources.
+
+## 20.7 Do not swallow promise rejections
+
+An asynchronous operation should be awaited, returned, or deliberately supervised. A promise created and forgotten can fail outside the caller's error path and make incidents difficult to diagnose.
+
+
 ---
 
 # 21. Validation and Sanitization
@@ -2111,6 +2258,11 @@ if (amount <= 0) {
 Browser validation improves user experience but does not protect your server.
 
 Always validate again at the trusted backend boundary.
+
+
+Frontend validation improves user experience, but clients can be modified, bypassed, scripted, or outdated.
+
+The server/API must independently validate every security- or data-integrity-sensitive rule. Reuse shared schemas where appropriate, but never treat “the browser already checked it” as a trust boundary.
 
 ## 21.4 Separate structural and business validation
 
@@ -2201,6 +2353,11 @@ If HTML is intentionally accepted, use a robust sanitization strategy appropriat
 
 Passwords should be processed by a password-hashing function designed for password storage. Keep authentication implementation in focused modules rather than scattered through controllers.
 
+
+Store password **verifiers/hashes** using a password-hashing algorithm intended for this purpose and a well-maintained library/runtime API. Do not encrypt passwords so they can be decrypted later.
+
+Password-reset flows should issue a separate short-lived reset credential rather than revealing the original password.
+
 ## 22.5 Do not log secrets
 
 Avoid logging:
@@ -2253,6 +2410,11 @@ const apiKey = 'prod-secret-123';
 ```
 
 Use secret/configuration management appropriate to the environment.
+
+
+Secrets include API keys, database passwords, signing keys, private tokens, and similar credentials.
+
+Keep them outside source control and load them through the deployment environment or a secret-management system. Validate presence at startup, restrict access by least privilege, and never print secret values in logs or error messages.
 
 ## 22.8 Validate redirect URLs and file paths
 
@@ -2421,6 +2583,19 @@ Good for focused business rules:
 expect(calculateTax(1000, 0.18)).toBe(180);
 ```
 
+
+A unit test verifies a small behavior with controlled dependencies.
+
+Good unit tests are:
+
+- deterministic;
+- fast enough to run frequently;
+- focused on externally observable behavior;
+- named after the behavior/condition;
+- independent of network and production infrastructure.
+
+Use unit tests heavily for business rules and transformations.
+
 ## 24.6 Integration tests
 
 Useful for boundaries between real components:
@@ -2440,6 +2615,11 @@ login -> add product -> checkout -> order confirmation
 ```
 
 Do not try to prove every tiny rule exclusively through slow end-to-end tests.
+
+
+End-to-end tests exercise a realistic workflow through major application boundaries, often including HTTP/UI and real integrations in a controlled environment.
+
+They answer “does the system work together?” but are usually slower and harder to diagnose than unit/integration tests. Keep them focused on critical journeys instead of reproducing every unit-test case.
 
 ## 24.8 Test pyramid as a heuristic
 
@@ -2838,6 +3018,47 @@ function calculateInvoiceTotal(invoice) {
 
 Silent fallback can make data corruption harder to detect.
 
+## 29.5 Missing property vs present property
+
+Sometimes you must distinguish:
+
+```js
+const input = { middleName: undefined };
+
+'middleName' in input; // true
+input.middleName === undefined; // true
+```
+
+This matters for patch/update APIs where:
+
+```text
+field missing        -> leave current value unchanged
+field present as null -> clear the value
+```
+
+Define this contract explicitly rather than letting each caller guess.
+
+## 29.6 Default parameters and destructuring
+
+Default parameters apply when an argument is `undefined`, not when it is `null`.
+
+```js
+function listUsers(limit = 20) {
+  return limit;
+}
+
+console.log(listUsers());       // 20
+console.log(listUsers(undefined)); // 20
+console.log(listUsers(null));   // null
+```
+
+Validate when `null` is invalid instead of assuming the default will replace it.
+
+## 29.7 Defensive coding should not become silent coding
+
+Do not chain `?.`, `??`, and broad fallbacks until every invalid state looks valid. Defensive code should either recover from an expected absence or fail with a useful error when an invariant is broken.
+
+
 ---
 
 # 30. Dates, Numbers, Strings, and Data Conversion
@@ -2919,6 +3140,29 @@ function normalizeEmail(email) {
 ```
 
 But do not blindly lowercase values where case has meaning.
+
+## 30.6 Parse numbers at the boundary
+
+`Number()` and `parseInt()` answer different questions.
+
+```js
+Number('42');       // 42
+Number('42px');     // NaN
+parseInt('42px', 10); // 42
+```
+
+If an input must be a complete numeric value, `Number()` plus `Number.isFinite()` is often clearer. `parseInt()` is appropriate when parsing an integer prefix is intentionally part of the contract.
+
+## 30.7 Compare date values, not formatted display strings
+
+A formatted date such as `"17/08/2026"` is presentation. Sorting or comparing presentation strings can produce incorrect results.
+
+Keep an unambiguous internal representation and format only at the UI/reporting boundary.
+
+## 30.8 Unicode and user-visible text
+
+JavaScript strings are Unicode text, but concepts such as “character count” can be more complicated than `.length`. For usernames, SMS limits, cursor movement, or truncating international text, test with emoji and combining characters rather than assuming one visible character always equals one code unit.
+
 
 ---
 
@@ -3040,11 +3284,30 @@ Consider cohesive parameter objects or redesigned responsibilities.
 
 Repeated business rules are especially dangerous because fixes can diverge.
 
+
+Duplicate syntax is not automatically a problem; duplicated **business knowledge** is.
+
+If three modules independently encode the same tax threshold, a policy change can make them disagree. Centralize the shared rule.
+
+If two functions merely look similar today but represent different concepts, premature unification can create a worse abstraction.
+
 ## 32.4 Shotgun surgery
 
 One business change requires edits in 12 unrelated files.
 
 This suggests the concept is not encapsulated well.
+
+
+A single requirement change forces edits across many files.
+
+Example:
+
+```text
+Adding one order status requires changes in controller,
+service, UI mapper, report helper, and five string comparisons.
+```
+
+Look for a missing domain abstraction, scattered constants, or unclear ownership. The fix is to gather the knowledge, not simply to hide it behind a global helper.
 
 ## 32.5 Divergent change
 
@@ -4232,6 +4495,29 @@ A good split is:
 pre-commit -> quick formatting/lint checks
 CI         -> complete verification
 ```
+
+## Expected command behavior
+
+Typical quality commands should be usable both locally and in CI.
+
+```bash
+npm run format:check
+npm run lint
+npm test
+```
+
+A successful check should normally exit with code `0`; violations should produce a non-zero exit code so CI can stop the build.
+
+### Formatter vs linter
+
+A **formatter** decides layout such as whitespace and line wrapping. A **linter** analyzes source patterns and rules that may represent mistakes or maintainability problems.
+
+Do not spend code-review time debating formatting that a formatter can enforce automatically.
+
+### Version and configuration hygiene
+
+Pin or deliberately range development-tool versions in the package manager, keep their configuration under version control, and review major upgrades. A new linter/formatter release can add or change rules; CI should not behave differently merely because one developer installed a different global version.
+
 
 ---
 

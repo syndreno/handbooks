@@ -88,6 +88,29 @@ Throughout the handbook, examples commonly use the following labels:
 - **Good** — a strong default for production code.
 - **Trade-off** — a reminder that clean code is contextual, not dogmatic.
 
+## Version baseline for the examples
+
+The examples use modern Python 3 syntax. As of August 2026, **Python 3.14 is the current feature-release series**. Many production environments still support earlier Python 3 versions, so always check the project's declared minimum version before using newer syntax or standard-library features.
+
+Useful checks:
+
+```bash
+python --version
+```
+
+Example output:
+
+```text
+Python 3.14.x
+```
+
+The patch number may differ.
+
+For a packaged project, keep the supported version explicit in `pyproject.toml`, CI, and deployment configuration. Clean code should not depend accidentally on a developer's newer local interpreter.
+
+Official release reference: <https://www.python.org/downloads/>
+
+
 ---
 
 # 2. What Clean Code Means
@@ -654,6 +677,54 @@ def add_item(
     items.append(item)
     return items
 ```
+
+## 6.5 Understand assignment and aliasing
+
+Python variables hold references to objects. Assigning a mutable object to another name does not automatically copy it.
+
+```python
+original = ["A", "B"]
+copy_name = original
+
+copy_name.append("C")
+
+print(original)
+```
+
+Output:
+
+```text
+['A', 'B', 'C']
+```
+
+Both names refer to the same list.
+
+When you need an independent shallow copy:
+
+```python
+copied = original.copy()
+```
+
+For nested mutable structures, a shallow copy may still share inner objects. Use deliberate data modeling rather than reaching for `deepcopy()` automatically.
+
+## 6.6 Make state ownership obvious
+
+Ask which object or layer is responsible for changing a value. State becomes difficult to reason about when many unrelated functions mutate the same list, dictionary, cache, or module-level variable.
+
+Prefer APIs such as:
+
+```python
+cart.add_item(product)
+```
+
+over exposing internals that every caller modifies directly:
+
+```python
+cart.items.append(product)
+```
+
+when the object has invariants such as quantity limits, pricing rules, or audit requirements.
+
 
 ---
 
@@ -1579,6 +1650,24 @@ def find_user(user_id: int) -> User | None:
     ...
 ```
 
+
+A type such as:
+
+```python
+User | None
+```
+
+means callers must consider absence. It does **not** mean the function argument is optional to pass; those are separate concepts.
+
+```python
+def find_user(user_id: int) -> User | None:
+    ...
+```
+
+Here `user_id` is required, while the return value may be missing.
+
+Use `None` for one clear absence meaning. If callers need to distinguish not-found, unauthorized, invalid, and failed states, use richer result/error modeling instead of overloading `None`.
+
 ## 15.4 Protocols for behavior-oriented typing
 
 A protocol lets code depend on capability rather than concrete inheritance.
@@ -2303,6 +2392,43 @@ Use them when:
 
 Avoid generators when a concrete list is simpler and the dataset is small.
 
+## 23.4 What `yield` changes
+
+A normal function runs to completion and returns one result. A generator function contains `yield`; calling it creates a generator object and execution advances only when the caller requests the next value.
+
+```python
+def countdown():
+    yield 3
+    yield 2
+    yield 1
+
+numbers = countdown()
+print(next(numbers))
+print(next(numbers))
+```
+
+Output:
+
+```text
+3
+2
+```
+
+The generator remembers where execution paused. After the final value, asking for another item ends iteration with `StopIteration`; normal `for` loops handle that automatically.
+
+### Important trade-off
+
+Generators are usually **single-pass**. Once consumed, they do not magically restart.
+
+```python
+values = countdown()
+list(values)  # [3, 2, 1]
+list(values)  # []
+```
+
+Use a list when callers need indexing, repeated iteration, length checks, or all values at once. Use an iterator/generator when lazy, streaming consumption communicates the workflow better.
+
+
 ---
 
 # 24. Decorators
@@ -2355,6 +2481,19 @@ Ask:
 
 > Would a new developer understand this function's behavior without inspecting five decorators?
 
+Decorators hide behavior at the function boundary. That is useful for cross-cutting concerns such as authorization, tracing, caching, retries, or registration, but stacking many decorators can make execution order hard to understand.
+
+Before adding a decorator, ask:
+
+- Is the behavior truly cross-cutting?
+- Does order matter?
+- Can the decorated function still be tested directly?
+- Will exceptions and return types remain understandable?
+- Would an explicit function call be clearer?
+
+Prefer a named, documented decorator over a clever wrapper that changes arguments or return values unexpectedly.
+
+
 ---
 
 # 25. Context Managers
@@ -2400,6 +2539,40 @@ Context managers are excellent for:
 - temporary directories;
 - temporary configuration;
 - tracing spans.
+
+## How a context manager works
+
+The `with` statement defines a lifetime around a resource.
+
+Conceptually, an object-based context manager provides:
+
+```python
+class Resource:
+    def __enter__(self):
+        # acquire
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        # release
+        ...
+```
+
+`__enter__()` returns the value bound after `as`. `__exit__()` runs when the block leaves, including when an exception occurs.
+
+With `@contextmanager`, code before `yield` acts like acquisition/setup and code after `yield` acts like cleanup. Put cleanup in `finally` when it must always happen.
+
+```python
+@contextmanager
+def managed_resource():
+    resource = acquire()
+    try:
+        yield resource
+    finally:
+        resource.close()
+```
+
+Use a context manager when callers should not have to remember a matching `close()`, `release()`, `commit()/rollback()`, or restoration step.
+
 
 ---
 
@@ -2513,6 +2686,21 @@ logger.info(
 - `WARNING` — unexpected but recoverable condition;
 - `ERROR` — operation failed;
 - `CRITICAL` — severe failure threatening application operation.
+
+
+A practical convention is:
+
+```text
+DEBUG   diagnostic detail for developers/operators
+INFO    important normal lifecycle/business event
+WARNING abnormal condition that recovered or may need attention
+ERROR   operation failed
+CRITICAL severe failure threatening continued service
+```
+
+The exact policy is team-specific. The important part is consistency.
+
+Do not log the same exception at every layer. Usually, either handle it or let it propagate to a boundary that can add useful context and log it once.
 
 ## 27.3 Do not log secrets
 
@@ -2747,6 +2935,38 @@ Daylight-saving transitions affect some time zones.
 
 If your business logic means "same local time tomorrow", date/calendar operations may be more appropriate than adding 24 hours.
 
+## 30.6 Distinguish domain date/time types
+
+Do not use `datetime` for every time-related concept.
+
+- `date` — a calendar date such as an invoice due date.
+- `time` — a local clock time without a date.
+- aware `datetime` — a real-world timestamp or scheduled local time with timezone context.
+- `timedelta` — a duration, not a calendar date.
+- `ZoneInfo` — rules for a named timezone such as `Asia/Kolkata`.
+
+Example:
+
+```python
+from datetime import date, datetime, timezone
+
+invoice_date = date(2026, 8, 17)
+created_at = datetime.now(timezone.utc)
+
+print(invoice_date.isoformat())
+print(created_at.tzinfo is not None)
+```
+
+Output:
+
+```text
+2026-08-17
+True
+```
+
+For API/storage boundaries, prefer an explicit, documented format such as ISO 8601. Avoid silently parsing ambiguous strings such as `01/02/2026`, which can mean different dates in different locales.
+
+
 ---
 
 # 31. Working with Files, JSON, CSV, and Serialization
@@ -2904,6 +3124,18 @@ For simple scripts, direct query functions may be cleaner than building a large 
 
 Use abstractions when they reduce complexity, not because a diagram says so.
 
+A repository can clarify a domain-oriented persistence boundary:
+
+```python
+order = order_repository.get(order_id)
+order_repository.save(order)
+```
+
+But a dedicated query/reporting module may be cleaner for complex read-only SQL, and a small application may be perfectly understandable with direct ORM access in a focused service.
+
+Use the abstraction when it reduces coupling or expresses domain operations. Do not add pass-through repository methods that merely rename every ORM method without adding a meaningful boundary.
+
+
 ---
 
 # 33. API and Service-Layer Code
@@ -2963,6 +3195,53 @@ def to_order_response(order: Order) -> dict[str, object]:
 For operations like payments or event processing, consider whether retries could duplicate actions.
 
 A clean API contract defines what repeated requests mean.
+
+
+An idempotent operation can be repeated without creating an additional unintended effect.
+
+Example problem:
+
+```text
+Client times out after payment request.
+Client retries.
+Server must not charge twice.
+```
+
+A common design uses an idempotency key stored with the result of the first successful operation. A retry with the same key returns/reuses that result.
+
+Idempotency is not “retry everything.” Define which side effects are protected, how long keys are retained, and what happens when the same key arrives with different input.
+
+## 33.5 Define boundary inputs and outputs
+
+An application service is easier to understand when its contract uses explicit data rather than a framework request object.
+
+```python
+from dataclasses import dataclass
+from decimal import Decimal
+
+
+@dataclass(frozen=True)
+class CreateOrderCommand:
+    customer_id: int
+    product_ids: tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class CreateOrderResult:
+    order_id: int
+    total: Decimal
+```
+
+The HTTP layer converts request data into the command and converts the result into a response. The business service therefore does not need to know about cookies, HTTP headers, framework response classes, or JSON serialization.
+
+### Error mapping belongs at the boundary
+
+A domain error such as `InsufficientStock` should remain meaningful inside the application. The HTTP adapter can map it to the API's chosen status and error body. This prevents transport concerns from leaking throughout business code.
+
+### When not to add a service layer
+
+A tiny script or CRUD-only tool may not need several layers. Add a boundary when it reduces coupling or clarifies business behavior, not because every project diagram must contain `controller -> service -> repository`.
+
 
 ---
 
@@ -3039,6 +3318,31 @@ Prefer:
 - isolated workers;
 - locks only where required;
 - small critical sections.
+
+## 34.6 Prefer structured task ownership
+
+When several asynchronous operations belong to one parent operation, make their lifetime explicit. Modern Python provides `asyncio.TaskGroup` for this style.
+
+```python
+import asyncio
+
+
+async def load_dashboard():
+    async with asyncio.TaskGroup() as group:
+        profile_task = group.create_task(load_profile())
+        orders_task = group.create_task(load_orders())
+
+    return profile_task.result(), orders_task.result()
+```
+
+The context does not complete until its tasks complete; failures are propagated in a defined way instead of leaving detached tasks running unnoticed.
+
+## 34.7 Concurrency is not automatically parallelism
+
+`asyncio` is primarily useful for coordinating waiting on I/O. CPU-heavy Python work can still block an event loop. Depending on the workload, threads, processes, native extensions, multiple interpreters, queues, or separate services may be more appropriate.
+
+Choose the concurrency model after identifying the bottleneck. A simpler synchronous implementation is often the cleanest starting point.
+
 
 ---
 
@@ -3338,6 +3642,13 @@ A useful question:
 
 > If this business rule breaks, will a test fail?
 
+Coverage tells you which code executed during tests; it does not tell you whether assertions are meaningful.
+
+A test can execute a branch and assert nothing useful. Conversely, some defensive or platform-specific branches may be expensive to cover.
+
+Use coverage to discover suspiciously untested behavior, especially critical business rules and error paths. Do not reward teams for a number that encourages trivial tests.
+
+
 ---
 
 # 38. Mocking and Test Doubles
@@ -3374,6 +3685,22 @@ Good candidates:
 ## 38.3 Avoid mocking every internal method
 
 If a test needs 15 mocks for one class, the class may have too many collaborators or the test is coupled to implementation.
+
+
+Mock the boundary whose behavior must be controlled, not the implementation steps of the unit under test.
+
+Fragile:
+
+```text
+test expects:
+  _validate called once
+  _normalize called once
+  _calculate called once
+```
+
+A harmless refactor can break that test even when behavior is unchanged.
+
+Prefer testing observable behavior and substituting external collaborators such as a clock, HTTP client, payment gateway, message publisher, or repository when isolation is useful.
 
 ## 38.4 Inject clocks instead of patching time everywhere
 

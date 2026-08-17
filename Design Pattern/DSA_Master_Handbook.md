@@ -114,7 +114,11 @@ The goal is **pattern recognition**, not memorizing hundreds of answers.
 
 # 2. What Is DSA?
 
+Data Structures and Algorithms (DSA) is the study of how to organize data and how to process it efficiently and correctly. The practical skill is choosing operations and representations that fit the constraints, then proving correctness and understanding the time/memory trade-off.
+
 ## Data Structure
+
+A data structure is the organization chosen for data because that organization makes some operations cheaper than others. When selecting one, ask which operations must be fast—indexing, insertion, deletion, lookup, ordering, minimum/maximum retrieval, or relationship traversal—and what memory trade-off is acceptable.
 
 A data structure defines **how data is stored and organized**.
 
@@ -131,6 +135,8 @@ Examples:
 - Trie
 
 ## Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 An algorithm defines **how data is processed to solve a problem**.
 
@@ -166,6 +172,8 @@ The choice of data structure often decides the efficiency of the application.
 
 # 3. Problem-Solving Mindset
 
+Good DSA work starts before coding. Translate the prompt into inputs, outputs, constraints, edge cases, and required complexity; derive a correct baseline; then optimize the repeated work while preserving a clear invariant that explains correctness.
+
 A strong DSA learner does not immediately begin coding.
 
 ## Step 1 — Understand the problem
@@ -196,6 +204,8 @@ Should I return values or indices?
 
 ## Step 2 — Build a brute-force solution
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 ```python
 def two_sum_bruteforce(nums, target):
     for i in range(len(nums)):
@@ -214,6 +224,8 @@ Space: O(1)
 Brute force gives a correctness baseline.
 
 ## Step 3 — Identify repeated work
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 For each number `x`, you need to know whether:
 
@@ -247,6 +259,8 @@ Space: O(n)
 
 ## Step 4 — Ask pattern questions
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 ```text
 Is the input sorted?
 Do I need fast membership lookup?
@@ -264,9 +278,13 @@ These questions often reveal the correct approach.
 
 # 4. Time and Space Complexity
 
+Complexity analysis estimates how an algorithm's resource usage grows as input size increases. Focus on the dominant growth rate rather than machine-specific timing, and analyze both execution work and extra memory so you can compare approaches before benchmarking.
+
 Complexity describes how resource use grows as input size grows.
 
 ## O(1) — Constant
+
+`O(1)` means the amount of work does not grow with the number of input elements. It does **not** mean the operation takes exactly one CPU instruction; it means the step count is bounded by a constant with respect to input size. Examples include reading a known array index or checking a stored variable.
 
 ```python
 value = nums[5]
@@ -279,6 +297,8 @@ Typical examples:
 - Average hash lookup
 
 ## O(log n) — Logarithmic
+
+`O(log n)` appears when each step reduces the remaining problem by a constant factor, often by half. Binary search is the classic example. The logarithm base is ignored in Big-O because changing the base only multiplies the count by a constant factor.
 
 Typical example:
 
@@ -298,6 +318,8 @@ That is why binary search is extremely efficient.
 
 ## O(n) — Linear
 
+`O(n)` means the running time grows proportionally with the input size. A single complete pass over an array is the standard example. Several separate linear passes are still `O(n)` because constant multipliers are omitted in asymptotic analysis.
+
 ```python
 for value in nums:
     process(value)
@@ -307,6 +329,8 @@ One pass over the input.
 
 ## O(n log n)
 
+`O(n log n)` commonly appears when an algorithm performs logarithmic levels of work and processes `O(n)` data across each level. Efficient comparison sorts such as merge sort and heap sort have this bound; divide-and-conquer algorithms often produce it as well.
+
 Typical efficient comparison sorting:
 
 - Merge Sort
@@ -314,6 +338,8 @@ Typical efficient comparison sorting:
 - Average-case Quick Sort
 
 ## O(n²) — Quadratic
+
+`O(n²)` usually appears when the algorithm examines many pairs of input elements, such as two nested loops over the same `n` items. Doubling `n` can make the dominant work roughly four times larger, so quadratic approaches become expensive quickly on large inputs.
 
 Common when checking all pairs:
 
@@ -327,6 +353,8 @@ For very large `n`, this is usually too slow.
 
 ## O(2^n) — Exponential
 
+The code below is a concrete example of **O(2^n) — Exponential**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
+
 Common when every element has two choices:
 
 ```text
@@ -338,6 +366,8 @@ Typical subset/backtracking problems.
 
 ## O(n!) — Factorial
 
+Factorial is defined for non-negative integers by `n! = n × (n-1) × ... × 1`, with `0! = 1`. A recursive implementation mirrors that definition, but an iterative version avoids recursive call-stack growth. Factorial values grow extremely quickly, so ordinary fixed-width integer types overflow at relatively small `n` values.
+
 Common when generating every ordering.
 
 Examples:
@@ -346,6 +376,8 @@ Examples:
 - Brute-force Traveling Salesman
 
 ## Space Complexity
+
+Space complexity measures how much additional memory grows with input size. Distinguish the input itself from **auxiliary space** used by the algorithm, and remember to include recursion depth, temporary arrays, hash tables, queues, and stacks. An in-place algorithm usually means `O(1)` or very small auxiliary storage, not that the input occupies no memory.
 
 A fast algorithm can still use too much memory.
 
@@ -374,19 +406,29 @@ Space
 
 # 5. Asymptotic Notation
 
+Asymptotic notation describes growth rates while ignoring constant factors and small-input details. Big-O is commonly used for an upper growth bound, Big-Omega for a lower bound, and Big-Theta when upper and lower bounds match asymptotically.
+
 ## Big-O
+
+Big-O is an asymptotic upper bound on growth. In everyday algorithm analysis it is often used to describe dominant upper-order behavior, but the formal notation does not itself mean 'worst case'—case analysis and asymptotic bound are separate ideas.
 
 Asymptotic upper bound. This is the notation used most often in interviews.
 
 ## Big-Omega
 
+Big-Omega (`Ω`) gives an asymptotic lower bound: beyond some input size, the function grows at least as fast as the stated bound up to a constant factor.
+
 Asymptotic lower bound.
 
 ## Big-Theta
 
+Big-Theta (`Θ`) is a tight asymptotic bound: the function is bounded both above and below by the same growth rate up to constant factors.
+
 Tight asymptotic bound.
 
 ## Ignore constants
+
+Constant factors do not change asymptotic growth, so `3n + 20` is `O(n)`. Do not confuse this with real performance: constants still affect actual runtime and can matter greatly for realistic input sizes.
 
 ```text
 O(2n)   → O(n)
@@ -396,6 +438,8 @@ O(5000) → O(1)
 
 ## Ignore lower-order terms
 
+For large `n`, the fastest-growing term dominates. Thus `n² + 100n + 5` is `O(n²)`. Lower-order terms can affect small inputs but do not change the asymptotic class.
+
 ```text
 O(n² + n + 20) → O(n²)
 ```
@@ -404,7 +448,11 @@ O(n² + n + 20) → O(n²)
 
 # 6. Math Fundamentals for DSA
 
+A small set of mathematical tools appears repeatedly in DSA: modular arithmetic, divisibility, GCD/LCM, primes, logarithms, combinatorics, and exponentiation. The purpose is practical—these tools simplify constraints, prevent overflow, or reduce repeated computation in algorithms.
+
 ## Greatest Common Divisor — Euclidean Algorithm
+
+The Euclidean algorithm finds the greatest common divisor (GCD) by repeatedly replacing `(a, b)` with `(b, a mod b)` until the second value becomes zero. The remaining non-zero value is the GCD. It runs in logarithmic time with respect to the numeric values and is a standard building block for fractions, modular arithmetic, and LCM calculation.
 
 ```python
 def gcd(a, b):
@@ -420,6 +468,8 @@ O(log(min(a, b)))
 ```
 
 ## Least Common Multiple
+
+The least common multiple (LCM) of two non-zero integers can be derived from the GCD: `lcm(a, b) = |a / gcd(a, b) × b|`. Dividing before multiplying reduces overflow risk in fixed-width languages. Define how your implementation should behave when either input is zero; a common convention returns zero.
 
 ```python
 def lcm(a, b):
@@ -446,6 +496,8 @@ def is_prime(n):
 Why stop at `sqrt(n)`? If `n = a × b`, at least one factor must be `<= sqrt(n)`.
 
 ## Sieve of Eratosthenes
+
+The Sieve of Eratosthenes finds all primes up to a limit by marking multiples of each discovered prime as composite. Starting the marking at `p × p` is enough because smaller multiples already have a smaller prime factor. The standard implementation runs in `O(n log log n)` time and uses `O(n)` marking space.
 
 Find every prime up to `n`.
 
@@ -475,6 +527,8 @@ O(n log log n)
 
 ## Fast Exponentiation
 
+Fast exponentiation computes `base^exp` by repeatedly squaring the base and using the binary representation of the exponent. Each step halves the remaining exponent, reducing multiplication count from `O(exp)` to `O(log exp)`. A modular variant applies `% mod` after multiplications to keep values bounded.
+
 ```python
 def power(base, exponent):
     result = 1
@@ -497,6 +551,8 @@ O(log exponent)
 
 ## Modular Arithmetic
 
+Modular arithmetic keeps values within a fixed remainder range and is common in counting problems or large exponentiation. Addition and multiplication can usually be reduced after each operation, but division requires a modular inverse and is not equivalent to ordinary integer division.
+
 Useful when results become extremely large.
 
 ```text
@@ -514,6 +570,8 @@ MOD = 1_000_000_007
 
 # 7. Bit Manipulation
 
+Bit manipulation treats an integer as a sequence of binary bits. Operations such as AND (`&`), OR (`|`), XOR (`^`), complement (`~`), and shifts can test or modify individual bits efficiently. Use explicit parentheses around shift expressions when precedence could be unclear, and remember that signed integer width and overflow behavior are language-specific.
+
 Important operators:
 
 | Operator | Meaning |
@@ -527,12 +585,16 @@ Important operators:
 
 ## Odd or even
 
+The least significant binary bit tells parity: it is `1` for odd integers and `0` for even integers. Testing `n & 1` is a constant-time alternative to `n % 2`, although `% 2` is often clearer when bit operations are not otherwise relevant.
+
 ```python
 if n & 1:
     print("odd")
 ```
 
 ## Check kth bit
+
+`bit_is_set(n, k)` tests whether the zero-based bit at position `k` in integer `n` is `1`. `1 << k` creates a mask containing only that bit, and bitwise AND keeps it only if it is present in `n`. The function returns a Boolean and runs in `O(1)` time for fixed-width machine integers.
 
 ```python
 def bit_is_set(n, k):
@@ -541,11 +603,15 @@ def bit_is_set(n, k):
 
 ## Set kth bit
 
+To set the zero-based bit `k`, OR the number with the mask `1 << k`. The mask has a `1` only at position `k`, so every other bit is preserved while bit `k` becomes `1`. This is a constant-time bit operation on fixed-width integers.
+
 ```python
 n |= 1 << k
 ```
 
 ## Clear kth bit
+
+To clear the zero-based bit `k`, build the mask `1 << k`, invert it, and AND it with the number. The inverted mask has a `0` at position `k`, which forces that bit off while preserving the remaining bits.
 
 ```python
 n &= ~(1 << k)
@@ -553,11 +619,15 @@ n &= ~(1 << k)
 
 ## Toggle kth bit
 
+To toggle the zero-based bit `k`, XOR the number with `1 << k`. XOR with `1` flips a bit (`0 ↔ 1`), while XOR with `0` leaves the other positions unchanged.
+
 ```python
 n ^= 1 << k
 ```
 
 ## Remove lowest set bit
+
+`n & (n - 1)` clears the lowest set bit of a positive/nonzero integer. Repeating this operation counts set bits in time proportional to the number of `1` bits rather than the full integer width (Brian Kernighan's technique).
 
 ```python
 n &= n - 1
@@ -577,6 +647,8 @@ def count_set_bits(n):
 ```
 
 ## XOR trick
+
+When every value except one appears exactly twice, XOR is useful because `x ^ x = 0` and `x ^ 0 = x`. XORing the full array cancels each duplicate pair, leaving the unique value in `O(n)` time and `O(1)` extra space. This exact trick does not directly solve cases where duplicates appear three times.
 
 Properties:
 
@@ -608,6 +680,8 @@ Space: O(1)
 
 # 8. Arrays
 
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
+
 Arrays store elements sequentially.
 
 Python lists behave like dynamic arrays.
@@ -634,6 +708,8 @@ Value: 10  20  30  40
 
 ## Reverse an array in place
 
+In-place reversal swaps symmetric elements from the two ends and moves inward until the pointers meet. Each element is touched a constant number of times, giving `O(n)` time and `O(1)` auxiliary space. The input array is mutated, so callers that need the original order must copy it first.
+
 ```python
 def reverse_array(nums):
     left = 0
@@ -646,6 +722,8 @@ def reverse_array(nums):
 ```
 
 ## Kadane's Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 Problem:
 
@@ -696,6 +774,8 @@ maximum/minimum sum over a contiguous subarray
 
 # 9. Strings
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 Strings are sequences of characters.
 
 Many string problems reduce to:
@@ -708,6 +788,8 @@ Many string problems reduce to:
 - Dynamic programming
 
 ## Palindrome
+
+A palindrome reads the same forward and backward under the problem's comparison rules. The standard two-pointer check compares the leftmost and rightmost relevant characters and moves inward, stopping on the first mismatch. Time is `O(n)` and extra space can be `O(1)` when normalization is not stored separately.
 
 ```python
 def is_palindrome(s):
@@ -726,6 +808,8 @@ def is_palindrome(s):
 
 ## Character frequency
 
+A frequency table records how many times each value occurs. Python's `Counter` constructs this mapping directly from an iterable and is useful when counts—not just membership—are needed.
+
 ```python
 from collections import Counter
 
@@ -741,6 +825,8 @@ n: 2
 ```
 
 ## Anagram
+
+Two strings are anagrams when they contain the same symbols with the same frequencies, subject to the problem's normalization rules. A frequency map gives `O(n)` expected time and avoids sorting; sorting both strings is simpler in some cases but typically costs `O(n log n)`. Decide explicitly whether case, spaces, punctuation, and Unicode normalization matter.
 
 ```python
 from collections import Counter
@@ -788,6 +874,8 @@ This difference frequently determines the correct algorithm.
 
 # 10. Linked Lists
 
+A linked list stores values in nodes connected by references rather than by contiguous indexed positions. This makes pointer rewiring cheap once the relevant node is known, but random access is slow because traversal normally starts from the head. Linked-list problems therefore focus heavily on pointer movement, insertion/removal, reversal, cycle detection, and fast/slow-pointer techniques.
+
 A linked list stores nodes connected by references.
 
 ```text
@@ -803,16 +891,22 @@ class Node:
 
 ## Advantages
 
+These are the practical benefits of **Linked Lists**, not automatic guarantees. They matter most when the pattern is solving the problem it was designed for; otherwise the extra abstraction may cost more than it saves.
+
 - Dynamic size
 - Fast insertion/deletion when location is already known
 
 ## Disadvantages
+
+These are the main trade-offs introduced by **Linked Lists**. Treat them as design costs to evaluate against the expected benefit, especially for small systems where additional layers, indirection, or infrastructure can reduce clarity.
 
 - No `O(1)` random access
 - Pointer/reference memory overhead
 - Usually poorer CPU-cache locality than arrays
 
 ## Traverse
+
+Linked-list traversal starts at `head` and repeatedly follows each node's `next` reference until it becomes `None`. `current` is only a moving reference; it does not change the links. The example prints each node value, visits `n` nodes in `O(n)` time, and uses `O(1)` extra iterative space.
 
 ```python
 def traverse(head):
@@ -824,6 +918,8 @@ def traverse(head):
 ```
 
 ## Reverse linked list
+
+Reversing a singly linked list rewires each node's `next` reference. Keep three pieces of state: the previous node, the current node, and the original next node so the remainder of the list is not lost before reassignment. The iterative algorithm runs in `O(n)` time and `O(1)` extra space.
 
 ```python
 def reverse_list(head):
@@ -841,6 +937,8 @@ def reverse_list(head):
 
 ## Middle node — Fast/Slow pointers
 
+Advance `slow` by one node and `fast` by two. When `fast` reaches the end, `slow` is at the middle. For even-length lists, the loop condition determines whether the first or second middle is returned, so match it to the problem's required convention.
+
 ```python
 def middle_node(head):
     slow = head
@@ -854,6 +952,8 @@ def middle_node(head):
 ```
 
 ## Detect cycle — Floyd's Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 ```python
 def has_cycle(head):
@@ -906,6 +1006,8 @@ removed = stack.pop()
 
 ## Use Cases
 
+Use **Stacks** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - Undo/redo
 - Browser navigation
 - Function calls
@@ -915,6 +1017,8 @@ removed = stack.pop()
 - Monotonic-stack problems
 
 ## Valid Parentheses
+
+Balanced-bracket checking uses a stack of opening brackets. Each closing bracket must match the most recent unmatched opening bracket, so a mismatch or an empty stack fails immediately; after the scan, the stack must also be empty. The algorithm is `O(n)` time and `O(n)` worst-case space.
 
 ```python
 def valid_parentheses(s):
@@ -961,12 +1065,16 @@ first = queue.popleft()
 
 ## Common Uses
 
+Use **Queues and Deques** when the problem characteristics below are genuinely present. The list is a recognition aid, not a rule that every listed situation must use this approach.
+
 - BFS
 - Customer/service queues
 - Job processing
 - Producer/consumer concepts
 
 ## Deque
+
+A deque (double-ended queue) supports insertion and removal at both the front and back. It can behave as either a stack or a queue and is especially useful for sliding-window algorithms and 0-1 BFS. Prefer an implementation whose front and back operations are constant-time rather than an array operation that shifts many elements.
 
 A deque supports insertion/removal from both ends.
 
@@ -1012,6 +1120,8 @@ Worst-case behavior may be worse because of collisions, but normal implementatio
 
 ## Frequency map
 
+A frequency map stores `value → count`. Scan the input once, incrementing the count for each value; later frequency queries are average `O(1)` with a hash map. This pattern is useful for duplicates, anagrams, counting categories, majority/frequency problems, and many sliding-window algorithms.
+
 ```python
 def frequencies(nums):
     freq = {}
@@ -1023,6 +1133,8 @@ def frequencies(nums):
 ```
 
 ## Duplicate detection
+
+Duplicate detection can use a set of values seen so far. If the current value is already present, a duplicate exists; otherwise add it and continue. This is `O(n)` expected time with `O(n)` extra space, compared with `O(n²)` pair checking or `O(n log n)` sorting.
 
 ```python
 def contains_duplicate(nums):
@@ -1052,6 +1164,8 @@ matching complement
 
 # 14. Sorting Algorithms
 
+Sorting rearranges values according to an ordering rule so later operations can exploit structure. Learn not only the code but also stability, in-place behavior, best/average/worst complexity, comparator requirements, and when a language's built-in sort is preferable to a manual algorithm.
+
 Sorting often unlocks other techniques:
 
 - Binary search
@@ -1060,6 +1174,8 @@ Sorting often unlocks other techniques:
 - Interval merging
 
 ## Bubble Sort
+
+Bubble sort repeatedly compares adjacent elements and swaps pairs that are out of order. After each full pass, one extreme value has moved to its final end position. It is easy to learn but `O(n²)` in average/worst cases; with an early-exit flag it can be `O(n)` on already sorted input.
 
 Repeatedly swap adjacent out-of-order values.
 
@@ -1091,6 +1207,8 @@ Mostly educational.
 
 ## Selection Sort
 
+Selection sort repeatedly chooses the smallest (or largest) remaining element and places it into the next final position. It performs `O(n²)` comparisons regardless of initial order and only `O(n)` swaps, so it is mostly educational or useful when writes are unusually expensive. The usual in-place form is not stable.
+
 Find the smallest remaining value and place it next.
 
 ```text
@@ -1100,6 +1218,8 @@ Time: O(n²)
 Good for learning but rarely preferred for large real data.
 
 ## Insertion Sort
+
+Insertion sort grows a sorted prefix one element at a time. For each new value, it shifts larger prefix elements to the right until the correct insertion position opens. It is stable with the usual comparison, in-place, `O(n²)` in the average/worst case, and `O(n)` on already or nearly sorted data.
 
 Insert each value into an already-sorted prefix.
 
@@ -1124,6 +1244,8 @@ Good for:
 - Nearly sorted arrays
 
 ## Merge Sort
+
+Merge sort divides the sequence into halves, recursively sorts each half, and merges two sorted halves in linear time. Its recurrence leads to `O(n log n)` time in all standard cases; array implementations typically need `O(n)` auxiliary merge storage. Merge sort is stable when equal elements are taken from the left half first.
 
 Divide into halves, recursively sort them, then merge.
 
@@ -1159,6 +1281,8 @@ Space: O(n)
 
 ## Quick Sort
 
+Quick sort partitions elements around a pivot so smaller and larger values move to opposite sides, then recursively sorts the partitions. Average time is `O(n log n)` but poor pivot choices can produce `O(n²)`. Partition scheme, duplicate handling, and recursion depth are important implementation details.
+
 Partition around a pivot.
 
 Typical complexity:
@@ -1169,6 +1293,8 @@ Worst:   O(n²)
 ```
 
 ## Heap Sort
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 Uses a heap.
 
@@ -1191,6 +1317,8 @@ Avoid it when the range is huge.
 
 ## Radix Sort
 
+Radix sort orders keys by processing digits/positions using a stable sub-sort such as counting sort. For fixed-width non-negative integers, complexity is roughly `O(d(n + k))` where `d` is digit count and `k` the radix. Handling negatives, strings, or variable lengths requires an explicit representation strategy.
+
 Processes digits/positions.
 
 Typical:
@@ -1202,6 +1330,8 @@ O(d(n + k))
 where `d` is number of digits/positions.
 
 ## Stable Sorting
+
+Sorting all values is often the simplest selection baseline. It is appropriate when ordered output is useful elsewhere or input size is moderate; it does unnecessary work when only one rank is needed and no other sorted-order benefit exists.
 
 A stable sort preserves the original order of equal keys.
 
@@ -1222,7 +1352,11 @@ This is useful when sorting records by multiple fields.
 
 # 15. Searching and Binary Search
 
+Searching asks whether, where, or under what condition a target can be found. Start with linear search as the no-precondition baseline, then use binary search when ordering or monotonicity lets you safely discard large parts of the search space.
+
 ## Linear Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```python
 def linear_search(nums, target):
@@ -1238,6 +1372,8 @@ Time: O(n)
 ```
 
 ## Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Requires sorted data or another monotonic search condition.
 
@@ -1266,6 +1402,8 @@ Time: O(log n)
 
 ## Lower Bound
 
+A lower bound returns the first position whose value is **not less than** the target (equivalently, the insertion position before existing equal values). The binary-search invariant must preserve all possible answers, including the position immediately after the final element when every value is smaller.
+
 First position where:
 
 ```text
@@ -1273,6 +1411,8 @@ value >= target
 ```
 
 ## Upper Bound
+
+An upper bound returns the first position whose value is **greater than** the target, which is the insertion position after all existing equal values. It differs from lower bound only in the comparison that decides which half can still contain the answer.
 
 First position where:
 
@@ -1318,9 +1458,13 @@ monotonic feasibility
 
 # 16. Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Two indices move through the data and often replace nested loops.
 
 ## Pair Sum in Sorted Array
+
+With sorted input, place one pointer at each end. If the sum is too small, moving the left pointer right is the only move that can increase it; if the sum is too large, move the right pointer left. This invariant gives `O(n)` time and `O(1)` extra space after sorting is already available.
 
 ```python
 def pair_sum(nums, target):
@@ -1346,6 +1490,8 @@ Time: O(n)
 ```
 
 ## Remove Duplicates from Sorted Array
+
+Because the array is sorted, equal values appear next to one another. A read pointer scans every element while a write pointer marks where the next distinct value belongs. The algorithm runs in `O(n)` time and can overwrite the input in place using `O(1)` extra space; the returned length/count tells the caller which prefix contains the unique values.
 
 ```python
 def remove_duplicates(nums):
@@ -1377,6 +1523,8 @@ partition
 
 # 17. Sliding Window
 
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
+
 Sliding window is powerful for **contiguous** portions of arrays or strings.
 
 Two major types:
@@ -1385,6 +1533,8 @@ Two major types:
 2. Variable-size window
 
 ## Fixed Window — Maximum sum of K consecutive values
+
+This is a fixed-size sliding-window problem. Build the first `k`-element sum once, then each shift subtracts the outgoing value and adds the incoming value, producing `O(n)` total time instead of `O(nk)` repeated summation.
 
 ```python
 def max_sum_k(nums, k):
@@ -1407,6 +1557,8 @@ Time: O(n)
 ```
 
 ## Variable Window — Longest substring without duplicates
+
+A variable-size sliding window expands one boundary and shrinks the other whenever the validity constraint is violated. This is linear when each boundary moves forward at most `n` times and window state can be updated incrementally.
 
 ```python
 def longest_unique_substring(s):
@@ -1443,7 +1595,11 @@ Important warning: sliding-window sum logic may fail when negative values destro
 
 # 18. Prefix Sum and Difference Arrays
 
+Prefix sums and difference arrays are complementary preprocessing techniques. Prefix sums make repeated range queries cheap; difference arrays make many range updates cheap before one final reconstruction. Their correctness depends on a clear indexing convention and careful boundary handling.
+
 ## Prefix Sum
+
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
 
 Input:
 
@@ -1480,6 +1636,8 @@ Range query: O(1)
 ```
 
 ## Prefix Sum + Hash Map
+
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
 
 Very important problem:
 
@@ -1531,6 +1689,8 @@ Applications:
 
 # 19. Recursion
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 A recursive function calls itself.
 
 Every recursive solution requires:
@@ -1557,6 +1717,8 @@ factorial(4)
 
 ## Good uses
 
+These are situations where the surrounding technique matches the data shape and operations well. Confirm the stated preconditions first; a pattern can become incorrect or slower when those assumptions do not hold.
+
 - Trees
 - Divide and conquer
 - Backtracking
@@ -1573,6 +1735,8 @@ Use iteration when recursion provides no meaningful benefit.
 ---
 
 # 20. Backtracking
+
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
 
 Backtracking explores choices and undoes them.
 
@@ -1599,6 +1763,8 @@ Undo
 ```
 
 ## Generate Subsets
+
+Generating all subsets explores two choices for each element: include it or exclude it. That creates `2^n` possible subsets, so exponential output size is unavoidable. Backtracking should add a **copy** of the current path to the result because the same mutable path is modified during later recursive calls.
 
 ```python
 def subsets(nums):
@@ -1629,6 +1795,8 @@ There are:
 subsets.
 
 ## Generate Permutations
+
+Generating permutations chooses one unused item for each next position, recursively explores the remainder, and then undoes the choice. There are `n!` outputs for distinct items, so factorial work is inherent. With duplicate input values, add a duplicate-skipping rule if unique permutations are required.
 
 ```python
 def permutations(nums):
@@ -1672,6 +1840,8 @@ try every valid arrangement
 
 # 21. Trees
 
+A tree is a connected acyclic hierarchical structure with nodes linked by parent/child relationships. Tree algorithms are easiest to understand recursively: define what one subtree call returns, choose a traversal order, and account for tree height because recursion/operation cost can degrade on skewed trees.
+
 A tree represents hierarchy.
 
 ```text
@@ -1698,6 +1868,8 @@ Important terms:
 
 ## Binary Tree
 
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
+
 Each node has at most two children.
 
 ```python
@@ -1709,6 +1881,8 @@ class TreeNode:
 ```
 
 ## Preorder
+
+Preorder traversal visits **node → left subtree → right subtree**. It is useful when the parent must be processed before its children, such as copying a tree, serializing certain tree formats, or producing prefix-style expression order. A complete traversal visits every node once, so time is `O(n)`.
 
 ```text
 Root → Left → Right
@@ -1725,6 +1899,8 @@ def preorder(root):
 ```
 
 ## Inorder
+
+Inorder traversal visits **left subtree → node → right subtree**. On a Binary Search Tree with a consistent ordering rule, this produces keys in sorted order. A complete traversal is `O(n)` time and uses `O(h)` call-stack/explicit-stack space for tree height `h`.
 
 ```text
 Left → Root → Right
@@ -1746,6 +1922,8 @@ Important property:
 
 ## Postorder
 
+Postorder traversal visits **left subtree → right subtree → node**. Because children are processed before their parent, it is useful for deleting trees, computing subtree aggregates, and many tree-DP problems. A complete traversal is `O(n)` time and uses `O(h)` traversal stack space.
+
 ```text
 Left → Right → Root
 ```
@@ -1760,6 +1938,8 @@ Examples:
 - Tree DP
 
 ## Level Order
+
+Level-order traversal is BFS on a tree. Use a queue to process nodes in increasing depth; if the output is grouped by levels, capture the queue size at the start of each level so newly enqueued children belong to the next group.
 
 Uses BFS:
 
@@ -1787,6 +1967,8 @@ def level_order(root):
 
 ## Height
 
+A node's **height** is the length of the longest downward path from that node to a leaf, under the chosen edge/node convention. Tree operation complexity is often expressed in terms of overall tree height `h`.
+
 ```python
 def height(root):
     if root is None:
@@ -1811,6 +1993,8 @@ Common tree interview problems:
 
 # 22. Binary Search Trees
 
+A Binary Search Tree (BST) maintains an ordering invariant: values in one subtree compare before the node and values in the other compare after it, according to the chosen duplicate policy. Operations depend on tree height, so an unbalanced BST can degrade from `O(log n)` expected/balanced behavior to `O(n)`.
+
 BST rule:
 
 ```text
@@ -1831,6 +2015,8 @@ Example:
 ```
 
 ## Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```python
 def search_bst(root, target):
@@ -1861,6 +2047,8 @@ O(n)
 ```
 
 ## Balanced BSTs
+
+A balanced BST keeps height `O(log n)` by enforcing a balancing rule during updates. This prevents ordinary search/insert/delete from degrading to linear time on adversarial insertion order. AVL and Red-Black trees use different balance guarantees and update trade-offs.
 
 Examples:
 
@@ -1907,6 +2095,8 @@ Output:
 | Build heap | O(n) |
 
 ## Top K Largest Values
+
+A min-heap of size `k` can maintain the `k` largest values seen so far. Push candidates and remove the smallest whenever the heap exceeds `k`; at the end, the heap contains the desired top `k`. This uses `O(n log k)` time and `O(k)` extra space, often better than sorting all `n` items.
 
 ```python
 import heapq
@@ -2064,6 +2254,8 @@ Real-world graph examples:
 
 ## Adjacency List
 
+An adjacency list stores, for each vertex, the vertices (and optionally edge weights) directly connected to it. It uses `O(V + E)` space and is usually preferred for sparse graphs because traversing a vertex touches only its actual outgoing/incident edges. For undirected graphs, each edge is normally stored in both endpoint lists.
+
 ```python
 graph = {
     "A": ["B", "C"],
@@ -2082,6 +2274,8 @@ O(V + E)
 Usually best for sparse graphs.
 
 ## Adjacency Matrix
+
+An adjacency matrix uses a `V × V` table where one cell records whether or with what weight an edge connects two vertices. Edge existence is `O(1)` to check, but memory is `O(V²)` even for sparse graphs. It is useful for dense graphs or algorithms that naturally work with all vertex pairs.
 
 ```text
     A B C D
@@ -2102,6 +2296,8 @@ Useful for dense graphs or constant-time edge-existence checks.
 ---
 
 # 26. BFS
+
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
 
 Breadth-First Search explores level by level.
 
@@ -2145,6 +2341,8 @@ Important practice: mark nodes visited when they are **enqueued**, not after the
 
 # 27. DFS
 
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
+
 Depth-First Search explores deeply before backtracking.
 
 ```python
@@ -2169,6 +2367,8 @@ O(V + E)
 
 ## Common DFS Uses
 
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
+
 - Connected components
 - Cycle detection
 - Tree traversal
@@ -2177,6 +2377,8 @@ O(V + E)
 - Topological-sort variants
 
 ## Number of Islands
+
+Treat each land cell as a graph vertex connected to neighboring land cells. Scan the grid; each unvisited land cell starts one BFS/DFS that marks its entire island. Every cell is processed a constant number of times, so runtime is `O(rows × cols)`.
 
 ```python
 def num_islands(grid):
@@ -2216,6 +2418,8 @@ This demonstrates that a matrix can be an implicit graph.
 
 # 28. Topological Sorting
 
+Sorting rearranges values according to an ordering rule so later operations can exploit structure. Learn not only the code but also stability, in-place behavior, best/average/worst complexity, comparator requirements, and when a language's built-in sort is preferable to a manual algorithm.
+
 Topological ordering applies to a:
 
 ```text
@@ -2239,6 +2443,8 @@ Applications:
 - Spreadsheet dependency evaluation
 
 ## Kahn's Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 ```python
 from collections import deque
@@ -2295,6 +2501,8 @@ Choose the algorithm based on the graph.
 
 ## BFS
 
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
+
 Use when every edge has equal cost, typically `1`.
 
 ```text
@@ -2302,6 +2510,8 @@ O(V + E)
 ```
 
 ## Dijkstra's Algorithm
+
+Dijkstra's algorithm computes single-source shortest paths when edge weights are non-negative. Maintain tentative distances and repeatedly process the smallest-distance candidate from a min-priority queue; ignore stale queue entries whose distance no longer matches the best known value. Typical adjacency-list complexity is `O((V+E) log V)`.
 
 Use for non-negative weighted edges.
 
@@ -2343,6 +2553,8 @@ Do **not** use ordinary Dijkstra with negative edge weights.
 
 ## Bellman-Ford
 
+Bellman-Ford finds single-source shortest paths even when some edges are negative. Relax every edge up to `V-1` times because a simple shortest path uses at most `V-1` edges; one additional successful relaxation indicates a reachable negative cycle. Complexity is `O(VE)`.
+
 Handles negative edges and detects reachable negative cycles.
 
 ```text
@@ -2350,6 +2562,8 @@ Time: O(VE)
 ```
 
 ## Floyd-Warshall
+
+Floyd-Warshall computes all-pairs shortest paths by progressively allowing each vertex as an intermediate point. Its core transition is `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`. It uses `O(V³)` time and `O(V²)` distance storage and can handle negative edges, but not negative cycles when meaningful finite shortest paths are required.
 
 All-pairs shortest paths.
 
@@ -2403,6 +2617,8 @@ Applications:
 
 ## Kruskal's Algorithm
 
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
+
 1. Sort edges by weight.
 2. Add the cheapest edge that does not create a cycle.
 3. Use DSU to track components.
@@ -2412,6 +2628,8 @@ Time: O(E log E)
 ```
 
 ## Prim's Algorithm
+
+Prim's algorithm builds a minimum spanning tree by repeatedly adding the cheapest edge that connects the current tree to a new vertex. A min-priority queue efficiently selects the next candidate edge. With an adjacency list and binary heap, the common complexity is `O(E log V)`; the graph should be treated as weighted and undirected for the standard MST problem.
 
 Grow the tree from one start node using a priority queue.
 
@@ -2525,11 +2743,15 @@ O(V + E)
 
 # 33. Greedy Algorithms
 
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
+
 A greedy algorithm chooses the locally best option at each step.
 
 But greedy is only correct when that local choice can be **proven safe**.
 
 ## Activity Selection
+
+For the classic maximum-number-of-non-overlapping-intervals problem, sorting by finishing time and repeatedly choosing the earliest finishing compatible interval is optimal. The greedy choice leaves as much room as possible for future intervals; sorting dominates at `O(n log n)`.
 
 Problem:
 
@@ -2558,6 +2780,8 @@ def max_meetings(intervals):
 
 ## Common Greedy Problems
 
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
+
 - Activity selection
 - Fractional knapsack
 - Huffman coding
@@ -2566,6 +2790,8 @@ def max_meetings(intervals):
 - Minimum spanning tree
 
 ## Greedy vs DP
+
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
 
 Greedy:
 
@@ -2585,6 +2811,8 @@ Never use greedy only because it "looks obvious". Look for a correctness argumen
 
 # 34. Dynamic Programming
 
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
+
 Dynamic Programming is useful when a problem has:
 
 1. Overlapping subproblems
@@ -2600,6 +2828,8 @@ Reuse it.
 
 ## Naive Fibonacci
 
+Naive recursive Fibonacci branches into two recursive calls and recomputes the same smaller values many times, causing exponential work. It is useful only to demonstrate overlapping subproblems; memoization or iteration reduces the number of distinct states to `O(n)`.
+
 ```python
 def fib(n):
     if n <= 1:
@@ -2611,6 +2841,8 @@ def fib(n):
 This repeats the same work many times.
 
 ## Memoization — Top Down
+
+Top-down DP starts from the requested state and recursively computes only states that are reached, caching each result. The memo key must fully identify a state, and recursion depth counts toward space usage.
 
 ```python
 def fib(n, memo=None):
@@ -2628,6 +2860,8 @@ def fib(n, memo=None):
 
 ## Tabulation — Bottom Up
 
+Bottom-up DP orders states so every dependency is already computed before a state is filled. It avoids recursion overhead and makes iteration order explicit, but may compute states that top-down memoization would never visit.
+
 ```python
 def fib(n):
     if n <= 1:
@@ -2643,6 +2877,8 @@ def fib(n):
 ```
 
 ## Space Optimization
+
+Space optimization removes DP states that are no longer needed. If `dp[i]` depends only on a fixed number of earlier rows/values, replace the full table with rolling variables or a small rolling array. Do this only after the full state transition is correct, because update order can accidentally overwrite a dependency.
 
 ```python
 def fib(n):
@@ -2684,7 +2920,11 @@ If you cannot describe the state precisely, the DP is not yet clearly designed.
 
 # 35. Important DP Patterns
 
+DP patterns differ mainly in how the **state** is shaped: index, two indexes, capacity, interval, subset mask, grid cell, tree node, or digit position. For each pattern, write the state meaning as a sentence before the recurrence; this prevents many dimension and transition errors.
+
 ## Climbing Stairs
+
+Climbing Stairs is a simple DP model: if the final move can be one or two steps, the number of ways to reach step `i` is the sum of the ways to reach `i-1` and `i-2`. Define base cases carefully; conventions for `n = 0` depend on whether 'do nothing' counts as one valid way.
 
 If you may climb 1 or 2 steps:
 
@@ -2693,6 +2933,8 @@ ways[n] = ways[n-1] + ways[n-2]
 ```
 
 ## 0/1 Knapsack
+
+In 0/1 Knapsack each item can be selected at most once. A typical state combines item/index and remaining capacity; in 1D optimization, iterate capacities **downward** so the current item is not reused within the same iteration.
 
 Each item can be used at most once.
 
@@ -2711,6 +2953,8 @@ Skip item
 
 ## Unbounded Knapsack
 
+Unbounded knapsack allows an item to be selected more than once. In one-dimensional tabulation, the loop direction is important: iterating capacities upward allows the current item to contribute repeatedly to later states. This differs from 0/1 knapsack, where downward capacity iteration prevents reusing the same item in one iteration.
+
 Items can be reused.
 
 Examples:
@@ -2719,6 +2963,8 @@ Examples:
 - Rod Cutting
 
 ## Coin Change — Minimum Coins
+
+The minimum-coin problem asks for the fewest coins needed to form each amount. A common DP state stores the best answer for amount `x`; each coin proposes `1 + dp[x - coin]` when that smaller amount is reachable. Use a sentinel larger than any possible answer and distinguish 'unreachable' from a valid zero-coin base case.
 
 ```python
 def coin_change(coins, amount):
@@ -2737,6 +2983,8 @@ def coin_change(coins, amount):
 ```
 
 ## Longest Increasing Subsequence
+
+The Longest Increasing Subsequence (LIS) keeps elements in original order but not necessarily contiguously. A simple DP is `O(n²)`; a tails/binary-search method maintains the smallest possible tail for each subsequence length and runs in `O(n log n)`. The tails array is not necessarily the actual LIS unless predecessor information is also stored.
 
 Basic DP:
 
@@ -2767,6 +3015,8 @@ O(n log n)
 
 ## Longest Common Subsequence
 
+The Longest Common Subsequence (LCS) asks for the longest sequence that appears in two inputs in the same relative order, without requiring contiguity. A classic DP state `dp[i][j]` describes prefixes of the two sequences: matching symbols extend the answer; otherwise the transition skips one side. The standard table takes `O(mn)` time.
+
 For:
 
 ```text
@@ -2788,6 +3038,8 @@ dp[i][j] = LCS length using first i chars of A and first j chars of B
 
 ## Grid DP
 
+Grid DP stores the best/count answer for each cell based on previously solved neighboring cells. The allowed movement determines the transition and valid evaluation order. When movement is only right/down, row-major or column-major tabulation is usually straightforward; if arbitrary cycles are allowed, the problem may be a graph problem rather than simple DP.
+
 A typical transition for counting paths:
 
 ```text
@@ -2795,6 +3047,8 @@ dp[r][c] = dp[r-1][c] + dp[r][c-1]
 ```
 
 ## Edit Distance
+
+Edit Distance measures the minimum inserts, deletes, and replacements needed to transform one string into another. A DP state over prefixes considers matching equal characters or taking one operation plus the best neighboring subproblem. Standard complexity is `O(mn)` time and `O(mn)` space before row optimization.
 
 Operations:
 
@@ -2810,6 +3064,8 @@ Uses:
 
 ## Interval DP
 
+Interval DP defines a state over a contiguous range, commonly `dp[left][right]`, and combines answers from smaller subintervals. It appears in problems such as matrix-chain multiplication, optimal parenthesization, or bursting balloons. The challenge is choosing the interval length/order so every dependency has already been computed.
+
 State describes a range:
 
 ```text
@@ -2824,6 +3080,8 @@ Examples:
 - Interval games
 
 ## Tree DP
+
+Tree DP computes a state for each node from states of its children (or from a rerooted parent/child relationship). A DFS usually establishes the processing order. Clearly define what each state means—for example, 'best answer in this subtree if the node is chosen'—because correctness depends on combining child states consistently.
 
 State belongs to a tree node.
 
@@ -2854,7 +3112,11 @@ Examples:
 
 # 36. String-Matching Algorithms
 
+String-matching algorithms search for one or more patterns inside text. Compare them by preprocessing cost, search complexity, memory, collision behavior, alphabet assumptions, and whether the same pattern or same text will be queried repeatedly.
+
 ## Naive Matching
+
+Naive pattern matching tries the pattern at every possible text start and compares characters until mismatch. Worst-case time is `O(nm)`, but it is simple and often adequate for small inputs; KMP/Z avoid repeated comparisons when larger guarantees are needed.
 
 Try the pattern at every possible starting position.
 
@@ -2865,6 +3127,8 @@ O(nm)
 ```
 
 ## KMP
+
+Knuth-Morris-Pratt (KMP) searches for a pattern without rechecking characters that are already known to match. It preprocesses the pattern into a prefix/failure table, then uses that table to decide how far the pattern can shift after a mismatch. Preprocessing plus search runs in `O(m + n)` for pattern length `m` and text length `n`.
 
 Knuth-Morris-Pratt avoids rechecking characters.
 
@@ -2882,6 +3146,8 @@ O(n + m)
 
 ## Rabin-Karp
 
+Rabin-Karp compares rolling hash values for the pattern and each same-length text window. Updating the rolling hash can be constant-time per shift, making the average scan efficient and especially useful when searching many patterns or repeated windows. Because different strings can share a hash, a hash match should be verified when correctness cannot tolerate collisions.
+
 Uses rolling hash.
 
 Applications:
@@ -2893,6 +3159,8 @@ Applications:
 Hash collisions must be handled.
 
 ## Z Algorithm
+
+The Z algorithm computes, for each position, the length of the longest substring starting there that matches the prefix of the whole string. By reusing a previously matched interval, it runs in linear time. A common pattern-search trick concatenates `pattern + separator + text` and looks for Z-values equal to the pattern length.
 
 `Z[i]` stores the length of the longest prefix match beginning at index `i`.
 
@@ -2917,6 +3185,8 @@ Because hashes can collide, verification or multiple hashes may be used when cor
 ---
 
 # 37. Monotonic Stack and Queue
+
+Monotonic stacks and queues maintain candidates in sorted order while processing a sequence. They turn many 'nearest greater/smaller' and sliding-window extrema problems into linear time because each element is inserted and removed only a constant number of times.
 
 A monotonic structure maintains values in increasing or decreasing order while scanning.
 
@@ -2954,6 +3224,8 @@ Common problems:
 
 ## Monotonic Queue
 
+A monotonic queue, usually implemented with a deque, maintains candidates in sorted-by-value order while also expiring elements that leave a sliding range. It gives `O(n)` total processing for sliding-window maximum/minimum because each index enters and leaves the deque at most once.
+
 Useful for sliding-window maximum/minimum.
 
 Can reduce:
@@ -2972,6 +3244,8 @@ O(n)
 
 # 38. Intervals and Sweep Line
 
+Interval problems represent ranges such as time spans, coordinates, or reservations. Before coding, define whether endpoints are inclusive or exclusive and whether touching intervals overlap; that decision controls sorting, merge conditions, sweep-line events, and off-by-one behavior.
+
 Intervals occur in:
 
 - Meetings
@@ -2982,6 +3256,8 @@ Intervals occur in:
 - Capacity planning
 
 ## Merge Intervals
+
+To merge overlapping intervals, first sort by start coordinate. Keep the last merged interval; if the next interval overlaps under the chosen endpoint convention, extend the end, otherwise start a new merged interval. Sorting dominates at `O(n log n)`; the scan itself is `O(n)`.
 
 ```python
 def merge_intervals(intervals):
@@ -3033,6 +3309,8 @@ Important: whether start and end at the same coordinate overlap depends on probl
 
 # 39. Segment Trees
 
+A tree is a connected acyclic hierarchical structure with nodes linked by parent/child relationships. Tree algorithms are easiest to understand recursively: define what one subtree call returns, choose a traversal order, and account for tree height because recursion/operation cost can degrade on skewed trees.
+
 Segment Trees support efficient dynamic range operations.
 
 Typical complexity:
@@ -3052,6 +3330,8 @@ Typical operations:
 - GCD
 
 ## Why not always use prefix sum?
+
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
 
 Prefix sum:
 
@@ -3134,7 +3414,11 @@ Worst:   O(n²)
 
 ## Choosing a kth-element strategy
 
+The best kth-element method depends on whether you need one rank or repeated ranks, whether mutation is allowed, and whether worst-case guarantees matter. Full sort is simplest (`O(n log n)`), a heap is `O(n log k)`, and Quickselect is `O(n)` average but `O(n²)` worst case without stronger pivot selection.
+
 ### Sorting
+
+Sorting all values is often the simplest selection baseline. It is appropriate when ordered output is useful elsewhere or input size is moderate; it does unnecessary work when only one rank is needed and no other sorted-order benefit exists.
 
 ```text
 O(n log n)
@@ -3144,6 +3428,8 @@ Simple and good for moderate input.
 
 ### Heap
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 ```text
 O(n log k)
 ```
@@ -3151,6 +3437,8 @@ O(n log k)
 Great when `k` is small or data arrives as a stream.
 
 ### Quickselect
+
+Quickselect partitions around a pivot like Quicksort but continues only into the side containing the desired rank. Expected time is `O(n)` with randomized/good pivots, worst-case `O(n²)`, and it normally mutates the input unless implemented on a copy.
 
 ```text
 Average O(n)
@@ -3162,9 +3450,13 @@ Excellent when only one order statistic is needed.
 
 # 42. Core Problem-Solving Patterns
 
+Problem-solving patterns are reusable ways to remove repeated work. Treat each pattern as a clue-to-invariant mapping: identify the input structure, state what must remain true while the algorithm runs, and only then choose pointer movements, data structures, or transitions.
+
 This section is more important than memorizing isolated problems.
 
 ## Pattern 1 — Frequency Map
+
+A frequency map stores `value → count`. Scan the input once, incrementing the count for each value; later frequency queries are average `O(1)` with a hash map. This pattern is useful for duplicates, anagrams, counting categories, majority/frequency problems, and many sliding-window algorithms.
 
 Clues:
 
@@ -3184,6 +3476,8 @@ Hash Map / Counter
 
 ## Pattern 2 — Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Clues:
 
 ```text
@@ -3195,6 +3489,8 @@ remove duplicates
 ```
 
 ## Pattern 3 — Sliding Window
+
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
 
 Clues:
 
@@ -3208,6 +3504,8 @@ at most K
 
 ## Pattern 4 — Fast/Slow Pointers
 
+Think of **fast/slow pointers** as a recognition pattern rather than a memorized solution. The clues below suggest that the technique may remove repeated work; confirm its preconditions and maintain an invariant that explains why pointer/state updates are safe.
+
 Clues:
 
 ```text
@@ -3218,6 +3516,8 @@ repeated state
 ```
 
 ## Pattern 5 — Prefix Sum
+
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
 
 Clues:
 
@@ -3230,6 +3530,8 @@ cumulative
 
 ## Pattern 6 — Binary Search
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Clues:
 
 ```text
@@ -3240,6 +3542,8 @@ maximum feasible
 ```
 
 ## Pattern 7 — Heap
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 Clues:
 
@@ -3253,6 +3557,8 @@ repeated minimum/maximum
 
 ## Pattern 8 — BFS
 
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
+
 Clues:
 
 ```text
@@ -3263,6 +3569,8 @@ nearest
 ```
 
 ## Pattern 9 — DFS
+
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
 
 Clues:
 
@@ -3275,6 +3583,8 @@ tree recursion
 
 ## Pattern 10 — Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Clues:
 
 ```text
@@ -3285,6 +3595,8 @@ valid arrangements
 ```
 
 ## Pattern 11 — Dynamic Programming
+
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
 
 Clues:
 
@@ -3298,6 +3610,8 @@ overlapping subproblems
 
 ## Pattern 12 — Greedy
 
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
+
 Clues:
 
 ```text
@@ -3308,6 +3622,8 @@ provably safe local choice
 ```
 
 ## Pattern 13 — Monotonic Stack
+
+A monotonic stack keeps its elements in increasing or decreasing order by removing values that can no longer be useful. Each element is pushed and popped at most once, so many nearest-greater/nearest-smaller problems become `O(n)`. The crucial design decision is whether the stack stores values or indexes and which comparison preserves the needed candidate boundary.
 
 Clues:
 
@@ -3321,6 +3637,8 @@ temperature
 
 ## Pattern 14 — DSU
 
+Think of **dsu** as a recognition pattern rather than a memorized solution. The clues below suggest that the technique may remove repeated work; confirm its preconditions and maintain an invariant that explains why pointer/state updates are safe.
+
 Clues:
 
 ```text
@@ -3332,6 +3650,8 @@ undirected cycle
 
 ## Pattern 15 — Topological Sort
 
+A topological ordering places every prerequisite before the items that depend on it. It exists only for a **directed acyclic graph (DAG)**. Common implementations use Kahn's algorithm with indegrees and a queue, or DFS with postorder; if all vertices cannot be ordered, the dependency graph contains a cycle.
+
 Clues:
 
 ```text
@@ -3341,6 +3661,8 @@ before/after constraints
 ```
 
 ## Pattern 16 — Trie
+
+A trie stores keys by shared prefixes. Each step consumes one symbol, so lookup time depends mainly on key length rather than on the number of stored keys. Tries are useful for autocomplete, prefix counting, dictionary search, and word-grid problems, but they can use substantially more memory than a hash-based set or map.
 
 Clues:
 
@@ -3352,6 +3674,8 @@ many words
 ```
 
 ## Pattern 17 — Segment/Fenwick Tree
+
+Think of **segment/fenwick tree** as a recognition pattern rather than a memorized solution. The clues below suggest that the technique may remove repeated work; confirm its preconditions and maintain an invariant that explains why pointer/state updates are safe.
 
 Clues:
 
@@ -3365,9 +3689,13 @@ online dynamic data
 
 # 43. Real-World Use Cases
 
+Real systems use DSA through the operations they need: fast lookup, ordering, scheduling, routing, deduplication, top-k retrieval, dependency resolution, or range aggregation. The useful habit is to translate the business requirement into required operations and then choose the structure that makes those operations efficient.
+
 DSA is not only for interviews.
 
 ## Search Autocomplete
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Possible structures:
 
@@ -3382,6 +3710,8 @@ Heap
 3. Heap selects top suggestions.
 
 ## GPS Navigation
+
+Road networks are weighted graphs: intersections are vertices and roads are edges with distance/time costs. Dijkstra works for non-negative costs; A* can accelerate point-to-point search with an admissible heuristic. Real routing also needs turn restrictions and dynamic weights.
 
 Model:
 
@@ -3398,6 +3728,8 @@ Algorithms:
 
 ## Social Network
 
+A social network is naturally a graph where people are vertices and relationships are edges. BFS/DFS support reachability and degrees of separation, while sets/maps support neighbor membership; large-scale recommendations often require more specialized ranking/indexing beyond basic traversal.
+
 ```text
 User       = Vertex
 Friendship = Edge
@@ -3412,11 +3744,15 @@ Tasks:
 
 ## Browser Back Button
 
+Back navigation is naturally LIFO: the most recently visited prior page should be returned first. A stack models this directly; real browser forward navigation typically needs a second stack or indexed history state.
+
 ```text
 Stack
 ```
 
 ## Print/Job Queue
+
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
 
 ```text
 Queue
@@ -3424,17 +3760,23 @@ Queue
 
 ## Priority Scheduler
 
+A priority queue returns the next highest/lowest-priority job efficiently. Insert and remove-best are typically `O(log n)`, making it appropriate when priorities change the processing order rather than simple FIFO arrival.
+
 ```text
 Heap / Priority Queue
 ```
 
 ## File System
 
+A file system namespace is hierarchical and is commonly modeled as a tree: directories contain child files/directories. Tree traversal supports recursive listing, size aggregation, and search; links/mounts can introduce graph-like behavior in real systems.
+
 ```text
 Tree
 ```
 
 ## Database Indexing
+
+Balanced search trees/B-trees are common indexing structures because they keep search paths shallow and support ordered/range access. Hash indexes favor equality lookup. The DSA lesson is to match the index structure to the query operations, not to assume one index type is universally best.
 
 Common related structures:
 
@@ -3446,6 +3788,8 @@ Hash index
 
 ## Dependency Management
 
+Dependencies form a directed graph from a prerequisite to a dependent item (or the reverse by convention). A topological ordering gives a valid execution/build order when the graph is acyclic; a cycle means the prerequisites cannot all be satisfied in a linear order.
+
 ```text
 Directed Graph
 Topological Sort
@@ -3453,6 +3797,8 @@ Cycle Detection
 ```
 
 ## Calendar Scheduling
+
+Bookings are intervals on a time axis. Sorting, overlap checks, sweep lines, heaps, or interval trees can answer different questions such as merge bookings, detect conflicts, count simultaneous rooms, or support dynamic inserts.
 
 ```text
 Intervals
@@ -3462,6 +3808,8 @@ Heap
 ```
 
 ## Cheapest Network Connection
+
+The code below is a concrete example of **Cheapest Network Connection**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
 
 ```text
 MST
@@ -3473,13 +3821,19 @@ Prim
 
 # 44. Interview Problem-Solving Framework
 
+An interview framework makes your reasoning visible: clarify inputs and constraints, establish a brute-force baseline, identify repeated work, choose a pattern, justify correctness, analyze complexity, implement clearly, and test edge cases. The explanation is part of the solution, not an extra step after coding.
+
 Use this sequence during interviews.
 
 ## 1. Restate the problem
 
+Restate the task in your own words, naming the input, required output, and success condition. This catches misunderstandings before implementation starts.
+
 Explain what must be returned in your own words.
 
 ## 2. Clarify assumptions
+
+Clarify assumptions that can change correctness or complexity: empty input, duplicates, negative values, input size, whether mutation is allowed, and whether multiple valid answers may exist.
 
 Ask about:
 
@@ -3494,9 +3848,13 @@ multiple answers
 
 ## 3. Describe brute force
 
+State a simple correct approach first. Its purpose is to establish a baseline and reveal which repeated operation is making the solution slow.
+
 A correct slow solution shows that you understand the problem.
 
 ## 4. Identify the bottleneck
+
+Name the exact repeated work responsible for the brute-force cost—for example repeated membership search, repeated range summation, or exploring the same state many times.
 
 Example:
 
@@ -3506,6 +3864,8 @@ We repeatedly scan for the complement.
 
 ## 5. Optimize
 
+Replace the bottleneck with a data structure, precomputation, ordering, or algorithmic pattern. Explain the invariant that makes the optimized step valid rather than naming a pattern alone.
+
 Example:
 
 ```text
@@ -3513,6 +3873,8 @@ Store seen values in a hash map.
 ```
 
 ## 6. State complexity before coding
+
+State the expected time and auxiliary-space complexity before implementation. This creates a target you can verify against the final code, including library operations used inside loops.
 
 Example:
 
@@ -3522,6 +3884,8 @@ Space: O(n)
 ```
 
 ## 7. Write clear code
+
+Implement with descriptive state names and a structure that mirrors the explanation. Avoid compressing steps when that hides the algorithm's invariant or edge-case handling.
 
 Prefer descriptive names:
 
@@ -3535,9 +3899,13 @@ distance
 
 ## 8. Dry run
 
+Trace the code on a small concrete input, recording how the important pointers, queue/stack contents, DP state, or graph-visited state changes after each step.
+
 Trace a normal example.
 
 ## 9. Test edge cases
+
+Before finishing, test the smallest valid input, boundaries, duplicates, absent targets, extreme values, and structure-specific cases such as disconnected graphs or skewed trees when relevant.
 
 Typical cases:
 
@@ -3557,7 +3925,11 @@ answer at boundary
 
 # 45. Common Mistakes and Debugging
 
+DSA bugs are often caused by incorrect boundaries, stale state, missing visited checks, wrong base cases, or an invariant that was never made explicit. Debug by reducing the input, tracing state changes line by line, and checking the first point where the program diverges from the expected invariant.
+
 ## Off-by-one errors
+
+Off-by-one bugs happen when an endpoint is included/excluded incorrectly. Write the interval convention explicitly—such as `[left, right]` or `[left, right)`—and test empty, one-element, and boundary-position cases before trusting the loop.
 
 Bad:
 
@@ -3575,6 +3947,8 @@ for i in range(len(nums)):
 
 ## Empty-input assumptions
 
+Algorithms that immediately read the first element or root need an explicit empty-input contract. Either handle the empty case early or document that the caller guarantees non-empty input; otherwise initialization can fail before the core algorithm begins.
+
 This fails on an empty array:
 
 ```python
@@ -3584,6 +3958,8 @@ maximum = nums[0]
 Handle empty input if allowed.
 
 ## Binary search boundaries never move
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Classic inclusive-boundary binary search must make progress:
 
@@ -3599,9 +3975,13 @@ right = mid - 1
 
 ## Marking BFS nodes visited too late
 
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
+
 Usually mark when **enqueuing** to prevent duplicates.
 
 ## Forgetting backtracking undo
+
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
 
 ```python
 current.append(choice)
@@ -3613,6 +3993,8 @@ The undo step is essential.
 
 ## Vague DP state
 
+A DP state must be a sentence precise enough to determine its dimensions and transitions, for example: “`dp[i]` is the minimum cost to finish the first `i` items.” If you cannot state exactly what a cell means, recurrence and base-case bugs are likely.
+
 You should be able to say:
 
 ```text
@@ -3623,13 +4005,19 @@ in one exact sentence.
 
 ## Dijkstra with negative edges
 
+Dijkstra relies on non-negative edge weights; a later negative edge can invalidate a distance that was treated as final. Use Bellman-Ford for general negative edges (and cycle detection), or exploit DAG order when the graph is acyclic.
+
 Ordinary Dijkstra assumes non-negative weights.
 
 ## Sliding window with negative values
 
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
+
 Some sum-based sliding-window approaches require monotonic behavior that negative values destroy.
 
 ## Integer overflow
+
+Fixed-width integer arithmetic can wrap when a sum, difference, or product exceeds the type's range. Promote operands **before** the risky operation (for example to `long`) and check problem constraints rather than casting only after overflow has already occurred.
 
 In fixed-width languages such as Java/C++, use an appropriate integer type for large sums and products.
 
@@ -3659,6 +4047,8 @@ If callers require the original data, use a separate visited structure.
 ---
 
 # 46. Complexity Cheat Sheet
+
+Use a complexity cheat sheet to recall typical costs, then verify the exact implementation being used. 'Hash lookup is `O(1)`' means average/expected behavior under normal hashing assumptions; a tree or language-specific container may have different guarantees.
 
 ## Data Structures
 
@@ -3731,6 +4121,8 @@ Actual limits depend on:
 
 # 47. DSA Learning Roadmap
 
+A learning roadmap should progress from basic containers and complexity to reusable patterns, trees/graphs, and advanced techniques. Advance when you can derive and explain a solution without copying, not merely when you have completed a fixed number of exercises.
+
 ## Stage 1 — Foundation
 
 Learn:
@@ -3788,6 +4180,8 @@ Practice:
 
 ## Stage 4 — Recursion and Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Learn:
 
 - Recursion tree
@@ -3823,6 +4217,8 @@ Practice:
 
 ## Stage 6 — Graphs
 
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
+
 Learn:
 
 - Representations
@@ -3844,6 +4240,8 @@ Practice:
 - Redundant Connection
 
 ## Stage 7 — Greedy and DP
+
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
 
 Learn:
 
@@ -3867,6 +4265,8 @@ Practice:
 
 ## Stage 8 — Advanced
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 Learn when needed:
 
 - Monotonic stack/queue
@@ -3881,6 +4281,8 @@ Learn when needed:
 ---
 
 # 48. Practice Problem Ladder
+
+A problem ladder increases difficulty by changing one dimension at a time—larger constraints, less obvious patterns, combined techniques, or stricter space requirements. Move upward only after you can explain and re-implement the previous level without relying on memorized code.
 
 ## Beginner
 
@@ -3985,7 +4387,11 @@ Recognition clue
 
 # 49. 30-Day Revision Plan
 
+This revision plan is a pacing framework, not a guarantee of mastery in thirty days. Use spaced repetition: re-derive old techniques, retry failed problems without notes, and mix topics so recognition comes from the problem rather than from the day's label.
+
 ## Days 1–3
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 Complexity
@@ -3996,6 +4402,8 @@ Hashing
 
 ## Days 4–6
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 Linked Lists
 Stacks
@@ -4003,6 +4411,8 @@ Queues
 ```
 
 ## Days 7–10
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 Two Pointers
@@ -4013,12 +4423,16 @@ Binary Search
 
 ## Days 11–13
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 Recursion
 Backtracking
 ```
 
 ## Days 14–17
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 Trees
@@ -4029,6 +4443,8 @@ Trie
 
 ## Days 18–21
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 Graphs
 BFS
@@ -4038,6 +4454,8 @@ Topological Sort
 
 ## Days 22–24
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 Dijkstra
 DSU
@@ -4046,12 +4464,16 @@ MST
 
 ## Days 25–27
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 Greedy
 Dynamic Programming
 ```
 
 ## Days 28–29
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 Monotonic Stack
@@ -4060,6 +4482,8 @@ Advanced Range Structures
 ```
 
 ## Day 30
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 Simulate an interview:
 
@@ -4084,70 +4508,116 @@ Edge cases
 
 # 50. Glossary
 
+The glossary defines terms in compact form for revision. When a term affects algorithm choice—such as stable sort, DAG, subarray, subsequence, or amortized complexity—connect the definition to the property it guarantees, not just the vocabulary.
+
 ## Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 A finite procedure for solving a problem.
 
 ## Data Structure
+
+A data structure is the organization chosen for data because that organization makes some operations cheaper than others. When selecting one, ask which operations must be fast—indexing, insertion, deletion, lookup, ordering, minimum/maximum retrieval, or relationship traversal—and what memory trade-off is acceptable.
 A method for organizing and storing data.
 
 ## Node
+
+A custom node class groups the value stored at one position with references to neighboring nodes. The exact fields depend on the structure—for example, `next` for a singly linked list and `left`/`right` for a binary tree. Algorithms usually pass or return node references rather than copying whole structures.
 An individual element in a linked structure such as a linked list, tree, or graph.
 
 ## Edge
+
+An **edge** represents a relationship between vertices. It may be directed or undirected and can carry data such as weight, capacity, label, or cost; those properties determine which graph algorithms are valid.
 A connection between graph vertices.
 
 ## Vertex
+
+A **vertex** (node) is an entity in a graph. Vertices are usually identified by an index/key and connected through edges; algorithm complexity often uses `V` for the number of vertices.
 A graph node.
 
 ## Root
+
+The **root** is the distinguished top node of a rooted tree. It has no parent, and traversal/depth relationships are commonly defined relative to it.
 Topmost node of a tree.
 
 ## Leaf
+
+A **leaf** is a tree node with no children. Leaf handling often forms a natural base case for recursion, subtree aggregation, or path problems.
 A tree node with no children.
 
 ## Depth
+
+A node's **depth** is its distance from the root under the chosen convention, commonly measured in edges (root depth `0`). Some educational texts count nodes instead, so define the convention when it matters.
 Distance from the root to a node.
 
 ## Height
+
+A node's **height** is the length of the longest downward path from that node to a leaf, under the chosen edge/node convention. Tree operation complexity is often expressed in terms of overall tree height `h`.
 Longest downward path from a node to a leaf.
 
 ## Cycle
+
+A **cycle** is a path that returns to a previously visited vertex according to the graph's direction rules. Cycle detection differs between directed and undirected graphs because the immediate parent edge is expected in an undirected traversal.
 A path that returns to a previously visited node under the relevant graph interpretation.
 
 ## DAG
+
+A **DAG (Directed Acyclic Graph)** is a directed graph with no directed cycle. Because no dependency can lead back to itself, DAGs are central to prerequisite scheduling, build pipelines, dependency resolution, and dynamic programming over topological order.
 Directed Acyclic Graph.
 
 ## Connected Component
+
+A **connected component** is a maximal group of vertices in an undirected graph where every pair is connected by some path. A full BFS/DFS from each still-unvisited vertex can label or count components in `O(V + E)` time.
 A maximal group of connected vertices in an undirected graph.
 
 ## Subarray
+
+A **subarray** is a contiguous slice of an array. For example, `[2, 3]` is a subarray of `[1, 2, 3, 4]`, while `[1, 3]` is not because it skips an element.
 A contiguous part of an array.
 
 ## Substring
+
+A **substring** is a contiguous portion of a string. For example, `"cat"` is a substring of `"educate"` only if those characters appear consecutively in that order.
 A contiguous part of a string.
 
 ## Subsequence
+
+A **subsequence** keeps the original relative order but may skip elements. For example, `[1, 3, 5]` is a subsequence of `[1, 2, 3, 4, 5]` even though it is not contiguous.
 A selection preserving relative order but allowing skipped positions.
 
 ## Subset
+
+A **subset** is any selection of elements from a set; unlike a subsequence, order and original positions are not the defining property. A set of `n` distinct elements has `2^n` subsets, including the empty set.
 A selection of elements without a contiguous/order requirement inherent to the mathematical set.
 
 ## Stable Sort
+
+A **stable sort** preserves the original relative order of records whose sort keys compare equal. This matters when data is sorted by multiple fields in stages, because a later stable sort does not destroy earlier ordering among ties.
 A sort that preserves the relative order of equal keys.
 
 ## In-place
+
+An **in-place** algorithm performs its main transformation in the original data structure while using only a small amount of extra storage, commonly `O(1)` auxiliary space. This does not mean the algorithm uses literally zero memory.
 Uses only a small amount of additional storage compared with the input.
 
 ## Amortized Complexity
+
+Amortized analysis spreads the cost of occasional expensive operations over a long sequence of operations. For example, a dynamic array resize may cost `O(n)`, but because resizing is infrequent, repeated append operations can still have `O(1)` amortized cost. Amortized complexity is a sequence-level guarantee; it does not mean every individual operation is constant-time.
 Average operation cost over a sequence of operations.
 
 ## Memoization
+
+Memoization caches a function's result by state so repeated calls return immediately. In Python, a dictionary or `functools.cache/lru_cache` can be used when arguments are hashable. Include all state-changing parameters in the cache key.
 Top-down caching of subproblem results.
 
 ## Tabulation
+
+Tabulation computes DP states iteratively from base cases toward the target. The table shape and iteration order must ensure every referenced dependency is already computed; this often avoids recursion-depth limits.
 Bottom-up dynamic programming.
 
 ## Relaxation
+
+**Relaxation** is the shortest-path operation that asks whether reaching `v` through `u` gives a better known distance. If `dist[u] + weight(u, v)` is smaller than `dist[v]`, the algorithm updates `dist[v]`; repeated relaxations are the core of Dijkstra and Bellman–Ford.
 Trying to improve a graph distance:
 
 ```text
@@ -4167,9 +4637,13 @@ Examples:
 
 # 51. Advanced Topics
 
+Advanced topics are most useful after core patterns are comfortable because they combine multiple invariants and trade-offs. Study them when your target problems actually require stronger range queries, string indexing, graph decomposition, probabilistic reasoning, or specialized data structures.
+
 After the core handbook is comfortable, continue with these topics as needed.
 
 ## Advanced Trees
+
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
 
 - AVL Tree
 - Red-Black Tree
@@ -4180,6 +4654,8 @@ After the core handbook is comfortable, continue with these topics as needed.
 - Heavy-Light Decomposition
 
 ## Advanced Graphs
+
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
 
 - Tarjan SCC
 - Bridges
@@ -4193,6 +4669,8 @@ After the core handbook is comfortable, continue with these topics as needed.
 
 ## Advanced Dynamic Programming
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 - Bitmask DP
 - Digit DP
 - Tree DP
@@ -4203,6 +4681,8 @@ After the core handbook is comfortable, continue with these topics as needed.
 
 ## Advanced Strings
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 - Suffix Array
 - Suffix Tree
 - Suffix Automaton
@@ -4211,6 +4691,8 @@ After the core handbook is comfortable, continue with these topics as needed.
 - Aho-Corasick
 
 ## Computational Geometry
+
+**Computational geometry** applies algorithms to points, lines, polygons, and spatial relationships. Common DSA topics include orientation/cross-product tests, line-segment intersection, convex hulls, sweep-line methods, and closest-pair problems.
 
 - Orientation
 - Segment intersection
@@ -4235,6 +4717,8 @@ Not all of these are required for ordinary software-development interviews, but 
 ---
 
 # 52. Final Recognition Cheat Sheet
+
+Recognition clues help narrow candidate techniques, but they are not proofs. Use each clue to form a hypothesis, then verify the input properties and state an invariant or recurrence that explains why the candidate algorithm is correct.
 
 When you see:
 
@@ -4355,7 +4839,11 @@ That reasoning transfers to many future problems.
 
 # Bonus — Mini Projects for Learning DSA
 
+Mini projects connect abstract structures to persistent state and user-visible behavior. For each project, identify the dominant operations first, choose the data structure based on those operations, and document what would become slower or harder if a different structure were used.
+
 ## 1. Autocomplete Engine
+
+An autocomplete engine combines a **trie** for fast prefix navigation, optional hash maps for metadata, and often a heap or ranking structure for the best suggestions. A useful implementation should define how words are inserted, how prefixes are searched, and how ties or popularity scores affect the returned suggestions.
 
 Use:
 
@@ -4373,6 +4861,8 @@ Features:
 
 ## 2. Route Finder
 
+A route finder models locations as graph vertices and roads/connections as edges. Use BFS when every edge has equal cost; use Dijkstra when edge weights such as distance or travel time are non-negative. The program should return the reachable path or distance and handle unreachable destinations explicitly.
+
 Use:
 
 ```text
@@ -4389,6 +4879,8 @@ Features:
 
 ## 3. Task Scheduler
 
+A scheduler often needs efficient priority selection plus state for queued/completed work. A priority queue handles the next highest/lowest-priority task, while maps can support task lookup/cancellation. Define tie-breaking and deadline semantics so scheduling is deterministic.
+
 Use:
 
 ```text
@@ -4404,6 +4896,8 @@ Features:
 - Execution order
 
 ## 4. Social Network Analyzer
+
+A social network is naturally a graph where people are vertices and relationships are edges. BFS/DFS support reachability and degrees of separation, while sets/maps support neighbor membership; large-scale recommendations often require more specialized ranking/indexing beyond basic traversal.
 
 Use:
 
@@ -4422,6 +4916,8 @@ Features:
 - Connected groups
 
 ## 5. Calendar Conflict Detector
+
+A calendar conflict detector treats meetings as intervals. Sort by start time, then compare each interval with the end of the previous accepted interval; an overlap exists when the next start is before the relevant previous end. Sorting costs `O(n log n)` and the subsequent scan costs `O(n)`.
 
 Use:
 

@@ -56,6 +56,43 @@
 46. [Quick Reference Cheat Sheet](#46-quick-reference-cheat-sheet)
 47. [Glossary](#47-glossary)
 
+
+### Appendix Index
+
+- [Appendix A — Recommended Build Order for a New Access Application](#appendix-a--recommended-build-order-for-a-new-access-application)
+- [Appendix B — A Professional Three-Layer Way to Think About Access](#appendix-b--a-professional-three-layer-way-to-think-about-access)
+- [Appendix C — Staging Pattern for Safe Imports](#appendix-c--staging-pattern-for-safe-imports)
+- [Appendix D — Audit Log Pattern](#appendix-d--audit-log-pattern)
+- [Appendix E — Soft Delete Pattern](#appendix-e--soft-delete-pattern)
+- [Appendix F — Status Table Pattern](#appendix-f--status-table-pattern)
+- [Appendix G — Configuration Table Pattern](#appendix-g--configuration-table-pattern)
+- [Appendix H — Safer Parameter Handling](#appendix-h--safer-parameter-handling)
+- [Appendix I — Why Date Ranges Often Use `< next day`](#appendix-i--why-date-ranges-often-use--next-day)
+- [Appendix J — Defensive VBA Practices](#appendix-j--defensive-vba-practices)
+- [Appendix K — Access Application Architecture Example](#appendix-k--access-application-architecture-example)
+- [Appendix L — Master Practice Exercises](#appendix-l--master-practice-exercises)
+- [Appendix M — Version Awareness](#appendix-m--version-awareness)
+- [Appendix N — Access Limits and Scaling Strategy](#appendix-n--access-limits-and-scaling-strategy)
+- [Appendix O — The 20 Rules Worth Remembering](#appendix-o--the-20-rules-worth-remembering)
+- [Appendix P — TempVars and Application State](#appendix-p--tempvars-and-application-state)
+- [Appendix Q — Data Macros](#appendix-q--data-macros)
+- [Appendix R — Event-Driven Thinking](#appendix-r--event-driven-thinking)
+- [Appendix S — RecordSource, RowSource, ControlSource](#appendix-s--recordsource-rowsource-controlsource)
+- [Appendix T — `Requery`, `Refresh`, `Repaint`, and Recalc](#appendix-t--requery-refresh-repaint-and-recalc)
+- [Appendix U — Search and Filter Design Patterns](#appendix-u--search-and-filter-design-patterns)
+- [Appendix V — Access SQL Patterns You Will Reuse Often](#appendix-v--access-sql-patterns-you-will-reuse-often)
+- [Appendix W — Multi-Value Fields: Understand Before Using](#appendix-w--multi-value-fields-understand-before-using)
+- [Appendix X — Attachment Strategy](#appendix-x--attachment-strategy)
+- [Appendix Y — Error Logging Pattern](#appendix-y--error-logging-pattern)
+- [Appendix Z — Testing an Access Application](#appendix-z--testing-an-access-application)
+- [Appendix AA — Production Readiness Checklist](#appendix-aa--production-readiness-checklist)
+- [Appendix AB — Migrating from Access Back End to SQL Server](#appendix-ab--migrating-from-access-back-end-to-sql-server)
+- [Appendix AC — Dashboard Design](#appendix-ac--dashboard-design)
+- [Appendix AD — Business Rule Decision Guide](#appendix-ad--business-rule-decision-guide)
+- [Appendix AE — Documentation Template for Every Database](#appendix-ae--documentation-template-for-every-database)
+- [Appendix AF — Maintenance Cadence Example](#appendix-af--maintenance-cadence-example)
+- [Appendix AG — Learning Challenges](#appendix-ag--learning-challenges)
+
 ---
 
 # 1. How to Use This Handbook
@@ -1115,6 +1152,56 @@ Access can accept pasted tabular data, but verify:
 - duplicate values,
 - date interpretation.
 
+## Records and the "Current Record" Mental Model
+
+In Datasheet or Form view, Access normally works with one **current record** at a time. A record can be:
+
+- unchanged,
+- being edited (often described as "dirty"),
+- newly inserted,
+- saved.
+
+This matters because validation events, VBA, and related subforms can behave differently before and after the current record is saved.
+
+## Direct Table Editing vs Forms
+
+Editing a table directly is convenient during development and data inspection. For normal users, a form is often safer because it can provide:
+
+- required-field checks,
+- lookup controls,
+- clear labels,
+- business-rule validation,
+- buttons for approved actions,
+- controlled navigation.
+
+Do not depend on users remembering every rule while typing directly into tables.
+
+## Search vs Filter
+
+**Search/Find** locates a matching value while keeping the full recordset available.
+
+**Filter** temporarily limits the visible records to those that meet criteria.
+
+Example:
+
+```text
+Find:     locate CustomerID C1005
+Filter:   show all customers where Region = "West"
+```
+
+## Safe Bulk Correction
+
+Before a large Find/Replace or action query:
+
+1. back up the data,
+2. preview affected rows with a SELECT query,
+3. confirm record count,
+4. perform the change,
+5. verify the result.
+
+A faster edit is not a safer edit unless you can prove which records changed.
+
+
 ---
 
 # 15. Queries: Complete Guide
@@ -1804,6 +1891,79 @@ DLookup("CustomerName","tblCustomers","CustomerID=" & [CustomerID])
 ```
 
 Domain functions are convenient but can become slow when repeatedly called for many records. Prefer joins/queries for set-based operations.
+
+## Function Syntax, Inputs, and Outputs
+
+### `IIf`
+
+```text
+IIf(expr, truepart, falsepart)
+```
+
+- `expr`: condition evaluated as True/False.
+- `truepart`: value returned when condition is True.
+- `falsepart`: value returned when condition is False.
+- **Return value:** one of the two branch results.
+
+Use it for short conditional expressions in queries, controls, and reports. Avoid deeply nested `IIf` expressions when a lookup table, query, or VBA procedure would be clearer.
+
+### `Nz`
+
+```text
+Nz(value [, valueifnull])
+```
+
+- `value`: expression that may contain Null.
+- `valueifnull`: optional replacement.
+- **Return value:** original value when non-Null; replacement when Null.
+
+Be explicit about the replacement type. Replacing a missing monetary amount with `0` may be correct; replacing an unknown date with `0` may hide a data-quality problem.
+
+### `DateAdd`
+
+```text
+DateAdd(interval, number, date)
+```
+
+Example:
+
+```text
+DateAdd("m", 3, [InvoiceDate])
+```
+
+returns a date three months after `InvoiceDate`.
+
+### `DateDiff`
+
+```text
+DateDiff(interval, date1, date2 [, firstdayofweek [, firstweekofyear]])
+```
+
+Returns a numeric count of interval boundaries between two dates. The result is not automatically a precise age or elapsed-time description; choose the interval and boundary logic carefully.
+
+### `DLookup`
+
+```text
+DLookup(expr, domain [, criteria])
+```
+
+Example:
+
+```text
+DLookup("CustomerName","tblCustomers","CustomerID=" & [CustomerID])
+```
+
+- `expr`: field/expression to return.
+- `domain`: table or query name.
+- `criteria`: optional filter text.
+- **Return value:** a matching value or Null when no matching record is found.
+
+`DLookup` is convenient for isolated lookups. For a query returning many rows, a join is often clearer and more efficient.
+
+## Expression Context Matters
+
+Access expressions in query Design View, control sources, macro arguments, and VBA do not always use identical syntax rules. For example, VBA uses its own control flow and string-building rules. When an expression becomes difficult to quote or debug, move complex logic into a saved query or a small, well-named VBA function.
+
 
 ---
 
@@ -2565,6 +2725,73 @@ Benefits:
 - less quoting trouble,
 - safer handling of text/date values.
 
+## `OpenRecordset` Mental Model
+
+A call such as:
+
+```vb
+Set rs = db.OpenRecordset(source, type)
+```
+
+takes:
+
+- `source`: table name, saved query, or SQL statement,
+- `type`: requested recordset behavior such as `dbOpenSnapshot` or `dbOpenDynaset`.
+
+It returns a `DAO.Recordset` object.
+
+### Snapshot vs Dynaset decision
+
+Use a **snapshot** when you only need to read:
+
+```vb
+Set rs = db.OpenRecordset("qryMonthlyTotals", dbOpenSnapshot)
+```
+
+Use a **dynaset** when the source is updateable and the procedure needs to edit records.
+
+## Always Handle Empty Recordsets
+
+Before reading fields, remember that a query can return no rows.
+
+Typical pattern:
+
+```vb
+If rs.EOF Then
+    Debug.Print "No records"
+Else
+    Do While Not rs.EOF
+        Debug.Print rs!CustomerID
+        rs.MoveNext
+    Loop
+End If
+```
+
+## Use `dbFailOnError` for Action SQL
+
+When executing update/append/delete statements through DAO:
+
+```vb
+CurrentDb.Execute strSQL, dbFailOnError
+```
+
+causes DAO to raise an error for certain failed updates instead of letting the procedure continue as if everything succeeded.
+
+## Clean Up Objects
+
+Close recordsets you open and release object references:
+
+```vb
+If Not rs Is Nothing Then
+    rs.Close
+    Set rs = Nothing
+End If
+Set db = Nothing
+```
+
+Object cleanup is especially important in long-running forms and repeated automation routines.
+
+
 ---
 
 # 25. Transactions and Reliable Data Updates
@@ -2628,6 +2855,43 @@ Err_Handler:
 ```
 
 Transactions matter when multiple related writes must stay consistent.
+
+## What a Transaction Does Not Do
+
+A transaction improves consistency for supported database operations, but it does not automatically make arbitrary external actions reversible.
+
+For example, sending an email or writing a separate file to disk is not undone merely because a DAO database transaction rolls back.
+
+Plan mixed workflows carefully:
+
+```text
+Validate everything possible
+→ begin transaction
+→ perform related database writes
+→ commit
+→ perform non-transactional external side effects when appropriate
+```
+
+## Error-Handling Rule
+
+After `BeginTrans`, every error path must deliberately lead to either:
+
+```text
+CommitTrans
+```
+
+or:
+
+```text
+Rollback
+```
+
+Never leave transaction state ambiguous.
+
+## Concurrency
+
+A transaction is not a replacement for good multi-user design. Long transactions can hold locks and frustrate other users. Keep the transactional unit as short as practical while still protecting the business operation.
+
 
 ---
 
@@ -2857,6 +3121,20 @@ Avoid unsafe designs where the back-end `.accdb` is used through unreliable sync
 
 For distributed/remote users, a server database is usually a better back end.
 
+## Practical Multi-User Rules
+
+For a shared Access application:
+
+- give each user a local front-end copy,
+- keep the back end on a stable LAN file share when using an Access back end,
+- use a UNC path when practical instead of user-specific mapped drive letters,
+- avoid storing the active front end in a synchronized folder and having everyone run the same file,
+- plan backups and maintenance when no users are connected,
+- handle write conflicts and locked records gracefully.
+
+For users working across unreliable WAN/VPN links, consider a server database or remote-desktop/application-hosting architecture rather than directly opening an Access back-end file across a poor connection.
+
+
 ---
 
 # 29. Split Database Architecture
@@ -2935,6 +3213,33 @@ At startup:
 3. inform/update user if required.
 
 A mature enterprise Access application often has a dedicated front-end update mechanism.
+
+## Why Local Front Ends Matter
+
+A split database is not merely two files. The operational pattern matters:
+
+```text
+One shared back end
++ one local front end per user
+```
+
+If every user opens the same front-end file from the network share, you lose much of the reliability and deployment benefit.
+
+## Deployment Flow
+
+A professional deployment can look like:
+
+```text
+Developer ACCDB source
+→ compile/test
+→ produce ACCDE where appropriate
+→ publish master front-end version
+→ updater copies current version to each user's local folder
+→ front end links to shared/server back end
+```
+
+Keep the development source separate from the distributed production copy.
+
 
 ---
 
@@ -3165,6 +3470,34 @@ For a multi-user backend:
 - users should be out of the database before certain maintenance operations,
 - verify a usable backup,
 - compact in a controlled process.
+
+## Compact and Repair Prerequisites
+
+Before compacting an important database:
+
+1. create a verified backup,
+2. obtain exclusive access,
+3. ensure sufficient file permissions and disk space,
+4. run the operation from a stable environment,
+5. open and test critical forms/queries afterward.
+
+Compact and Repair can reclaim unused space and help with certain corruption problems, but it is not the same as compressing a backup and it is not a guarantee that damaged data can always be recovered.
+
+## Backup Quality
+
+A backup is only useful if it can be restored.
+
+Periodically test:
+
+```text
+Can the file open?
+Are expected tables present?
+Can a critical query run?
+Does the front end relink correctly?
+```
+
+For a split application, back up the data back end separately from the front-end source code/configuration as appropriate.
+
 
 ---
 
@@ -3422,6 +3755,69 @@ Modules
   modDatabase
   modExport
 ```
+
+## Conventions Are for Clarity, Not Decoration
+
+Prefixes such as `tbl`, `qry`, `frm`, and `rpt` are common developer conventions, not Access requirements. Their value is that code and documentation reveal object type immediately.
+
+The most important rules are:
+
+- be consistent,
+- avoid ambiguous/reserved names,
+- use names that describe business meaning,
+- do not encode temporary details that will become misleading.
+
+Risky field names include generic words such as:
+
+```text
+Name
+Date
+Value
+Type
+Description
+```
+
+because they can be ambiguous in joins and expressions.
+
+Prefer:
+
+```text
+CustomerName
+OrderDate
+UnitPrice
+PaymentType
+TicketDescription
+```
+
+## Separate Business Objects from Utility Objects
+
+A larger project benefits from predictable naming:
+
+```text
+qrySales_MonthlySummary
+qrySales_OpenOrders
+qryUtil_UserPermissions
+qryImport_InvalidRows
+```
+
+The exact convention is less important than being able to find related objects quickly.
+
+## Module Responsibilities
+
+Avoid one huge `modUtilities` that becomes a dumping ground.
+
+Consider focused modules:
+
+```text
+modValidation
+modExport
+modSecurity
+modLogging
+modStartup
+```
+
+Keep procedures small enough that their inputs, outputs, and side effects are easy to understand.
+
 
 ---
 
@@ -4002,6 +4398,90 @@ If maximum marks varies by exam/subject, compare it in form logic or a suitable 
 - subject topper,
 - failed students,
 - student transcript.
+
+## Recommended Relationship Detail
+
+A more complete design can separate course enrollment from individual exam marks.
+
+Example:
+
+```text
+tblStudents
+  StudentID PK
+
+tblCourses
+  CourseID PK
+
+tblEnrollments
+  EnrollmentID PK
+  StudentID FK
+  CourseID FK
+  EnrolledOn
+  EnrollmentStatus
+
+tblSubjects
+  SubjectID PK
+  CourseID FK
+
+tblExams
+  ExamID PK
+  SubjectID FK
+  ExamName
+  ExamDate
+  MaxMarks
+
+tblMarks
+  MarkID PK
+  StudentID FK
+  ExamID FK
+  MarksObtained
+```
+
+If each student should have only one mark per exam, enforce that business rule with a **unique composite index** on:
+
+```text
+StudentID + ExamID
+```
+
+rather than relying only on form code.
+
+## Forms
+
+Useful UI objects:
+
+```text
+frmStudent
+frmCourse
+frmEnrollment
+frmExam
+frmMarksEntry
+subfrmStudentEnrollments
+subfrmExamMarks
+```
+
+For marks entry, show the exam's maximum marks and validate:
+
+```text
+0 <= MarksObtained <= MaxMarks
+```
+
+Because `MaxMarks` belongs to the exam definition, it should be read from related data rather than hard-coded as `100`.
+
+## Reports
+
+Useful outputs:
+
+- class roster,
+- exam result sheet,
+- subject performance,
+- student transcript,
+- failed/at-risk students,
+- attendance/result combination if attendance is modeled.
+
+## Practice Challenge
+
+Add a rule that a student cannot be enrolled twice in the same course at the same active period. Decide whether this should be enforced by a unique index, additional term/academic-year fields, form validation, or a combination.
+
 
 ---
 
@@ -4694,6 +5174,43 @@ Advantages:
 - import process is repeatable,
 - audit trail is easier.
 
+## Step-by-Step Import Design
+
+A staging table should resemble the incoming file closely enough to load it without prematurely forcing bad rows into production relationships.
+
+Typical flow:
+
+```text
+1. Clear/create staging area.
+2. Import raw file.
+3. Add batch identifier and import timestamp.
+4. Run validation queries.
+5. Produce an error report.
+6. Stop if critical errors exist.
+7. Append/update only valid rows.
+8. Reconcile source count and amount totals.
+9. Archive/log the import batch.
+```
+
+### Useful staging metadata
+
+```text
+ImportBatchID
+SourceFileName
+ImportedOn
+ImportedBy
+SourceRowNumber
+ValidationStatus
+ValidationMessage
+```
+
+Do not automatically delete bad rows from staging; retaining them can help explain why the batch failed.
+
+## Production Protection
+
+Never use an append query simply because the file "looks correct." Validate required keys, data types, duplicates, foreign-key references, and business totals before writing production tables.
+
+
 ---
 
 # Appendix D — Audit Log Pattern
@@ -4730,6 +5247,24 @@ Access does not automatically provide a universal row-level audit trail for all 
 
 For high-security or regulatory applications, centralized server-side auditing may be more appropriate.
 
+## Decide What You Need to Audit
+
+Do not log everything blindly. Define:
+
+- which business entities are sensitive,
+- which actions matter,
+- which old/new values are necessary,
+- who performed the action,
+- when it happened,
+- how long logs must be retained.
+
+For multi-field changes, a row-per-field audit design can be easier to analyze than placing all changes into one Long Text value.
+
+## User Identity Caution
+
+`Environ("Username")` or a Windows username can be useful in controlled environments but is not automatically a strong security identity. If audit evidence has compliance significance, use an architecture with appropriate authenticated server-side controls.
+
+
 ---
 
 # Appendix E — Soft Delete Pattern
@@ -4758,6 +5293,36 @@ Benefits:
 - easier auditing.
 
 But remember to consistently filter soft-deleted records.
+
+## When Soft Delete Helps
+
+Use soft deletion when users need to remove items from normal workflows while preserving history.
+
+Typical query:
+
+```sql
+SELECT *
+FROM tblCustomers
+WHERE IsDeleted = False;
+```
+
+### Design decision: cascade behavior
+
+If a customer is soft-deleted, what happens to open orders?
+
+Possible answers:
+
+- block deletion while open orders exist,
+- allow deletion but preserve orders,
+- change customer status rather than delete,
+- close/archive related records through a controlled workflow.
+
+Soft delete does not remove the need to define relationship behavior.
+
+### Performance
+
+If most queries filter on `IsDeleted`, consider whether the field should be indexed based on table size and selectivity. A Yes/No field alone may not always be highly selective, so test rather than indexing by habit.
+
 
 ---
 
@@ -4796,6 +5361,42 @@ IsClosedStatus
 Then store `StatusID` in transaction tables.
 
 This improves consistency.
+
+## Status Is Often More Than a Label
+
+A controlled status table can include behavior flags:
+
+```text
+StatusID
+StatusCode
+StatusName
+SortOrder
+IsClosedStatus
+AllowsEditing
+RequiresApproval
+```
+
+This avoids scattering rules such as:
+
+```text
+If Status="Closed" Or Status="Rejected" Or Status="Cancelled" Then ...
+```
+
+through many forms.
+
+## Validate Transitions
+
+Even with a lookup table, not every status change should be allowed.
+
+Example:
+
+```text
+Draft → Submitted → Approved
+               ↘ Rejected
+```
+
+A user should not necessarily jump directly from `Draft` to `Approved`. For complex workflows, model allowed transitions explicitly or enforce them in a controlled service/form layer.
+
 
 ---
 
@@ -4838,6 +5439,31 @@ End Function
 
 For heavy use, cache settings rather than calling `DLookup` repeatedly.
 
+## Data Types Matter
+
+A single `SettingValue` text field is simple but forces every caller to interpret the value.
+
+For larger applications, consider storing metadata:
+
+```text
+SettingName
+SettingValue
+SettingType
+Description
+IsUserEditable
+```
+
+Then validate conversion before use.
+
+Example:
+
+```text
+DefaultTaxRate | 0.18 | Decimal | Default tax assumption | No
+```
+
+Do not store passwords, API secrets, or other sensitive credentials in a plain Access settings table and assume the database file itself provides strong secret protection.
+
+
 ---
 
 # Appendix H — Safer Parameter Handling
@@ -4877,6 +5503,34 @@ qd.Parameters("pTo") = Me.txtToDate
 
 This pattern is easier to reason about.
 
+## Why Parameters Are Better
+
+A parameterized query separates **query structure** from **user-supplied values**.
+
+Benefits:
+
+- fewer quote/locale mistakes,
+- clear expected data types,
+- easier testing,
+- less string concatenation,
+- reduced risk of malformed SQL.
+
+### Handle form input before assigning
+
+```vb
+If IsNull(Me.txtFromDate) Or IsNull(Me.txtToDate) Then
+    MsgBox "Enter both dates."
+    Exit Sub
+End If
+```
+
+Then assign validated values to the QueryDef parameters.
+
+## Parameters Are Not a Complete Security Model
+
+Parameterized queries improve correctness and help avoid injection-style string-concatenation problems, but authorization still matters. A user who should not be able to view payroll records must be prevented by the application/data security design, not merely by using query parameters.
+
+
 ---
 
 # Appendix I — Why Date Ranges Often Use `< next day`
@@ -4897,6 +5551,35 @@ WHERE OrderDate >= [pFrom]
 ```
 
 This treats the end date as an inclusive calendar day while avoiding time-of-day assumptions.
+
+## Half-Open Date Ranges
+
+This pattern:
+
+```sql
+WHERE OrderDate >= [pFrom]
+  AND OrderDate < DateAdd("d",1,[pTo])
+```
+
+is a **half-open interval**:
+
+```text
+[start, next-day)
+```
+
+It includes every time on the selected end date without requiring you to guess the last representable time such as `23:59:59`.
+
+Example:
+
+```text
+From: 2026-08-01 00:00
+To:   before 2026-08-14 00:00
+```
+
+includes all records on August 13.
+
+Use this pattern only when `pTo` is intended as an inclusive calendar date. If the user supplies an exact timestamp, the business rule may be different.
+
 
 ---
 
@@ -6010,6 +6693,38 @@ Avoid dozens of independent `DCount`/`DSum` calls if performance becomes poor.
 
 A single aggregate query can often calculate several KPIs at once.
 
+## Query First, Form Second
+
+Build and test the summary query before designing KPI text boxes.
+
+Example aggregate query concept:
+
+```sql
+SELECT
+    Count(*) AS TicketCount,
+    Sum(IIf(Status="Open",1,0)) AS OpenCount,
+    Sum(IIf(DueDate<Now() And Status<>"Closed",1,0)) AS OverdueCount
+FROM tblTickets;
+```
+
+Then bind dashboard controls to a query/result source where practical.
+
+## Refresh Strategy
+
+Decide when dashboard data should update:
+
+- when the form opens,
+- after the user changes a filter,
+- after a ticket is saved,
+- on an explicit Refresh button.
+
+Avoid requerying every control repeatedly without a reason.
+
+## Dashboard Limits
+
+Access dashboards are useful for operational desktop applications. If the primary requirement becomes enterprise-scale interactive analytics across very large datasets, a BI platform may be a better reporting layer.
+
+
 ---
 
 # Appendix AD — Business Rule Decision Guide
@@ -6115,6 +6830,51 @@ Audit Requirement:
 ```
 
 Documentation dramatically reduces support time months or years later.
+
+## Add Change History
+
+For production applications, record:
+
+```text
+Version
+ReleaseDate
+Developer
+ChangeSummary
+DatabaseSchemaChange
+RequiredBackEndUpgrade
+RollbackPlan
+```
+
+## Document Every External Dependency
+
+Examples:
+
+```text
+Linked Excel/CSV files
+ODBC DSNs
+SQL Server instances
+Network folders
+Email integration
+Word templates
+Reference libraries
+Scheduled tasks
+Trusted locations
+```
+
+A database can be perfectly documented internally and still fail in production because an undocumented external path, library, or permission changes.
+
+## Minimum Support Runbook
+
+Include:
+
+1. how to deploy the front end,
+2. how to relink the back end,
+3. how to back up,
+4. how to identify the current version,
+5. where errors are logged,
+6. how to restore service after a failed update,
+7. who owns business approval for changes.
+
 
 ---
 

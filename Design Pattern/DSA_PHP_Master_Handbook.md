@@ -107,6 +107,8 @@ Theory → Code → Dry Run → Problems → Review → Repeat
 
 # 2. What Are Data Structures and Algorithms?
 
+Data Structures and Algorithms (DSA) is the study of how to organize data and how to process it efficiently and correctly. The practical skill is choosing operations and representations that fit the constraints, then proving correctness and understanding the time/memory trade-off.
+
 ## 2.1 Data Structure
 
 A **data structure** is a way of organizing data so that operations on that data can be performed efficiently.
@@ -154,6 +156,8 @@ This is **binary search**.
 ---
 
 ## 2.3 Data Structure vs Algorithm
+
+A data structure is the organization chosen for data because that organization makes some operations cheaper than others. When selecting one, ask which operations must be fast—indexing, insertion, deletion, lookup, ordering, minimum/maximum retrieval, or relationship traversal—and what memory trade-off is acceptable.
 
 Think of:
 
@@ -243,11 +247,15 @@ That is exactly what DSA knowledge gives you: **better choices**.
 
 # 4. PHP Foundations Required for DSA
 
+For DSA in PHP, you need predictable control over values, loops, functions, arrays, comparisons, classes, and the SPL data structures used as stacks, queues, heaps, and specialized containers. Language semantics matter because PHP arrays are ordered hash tables and can behave differently from compact arrays in other languages.
+
 Before solving DSA problems, be comfortable with the following PHP concepts.
 
 ---
 
 ## 4.1 Variables
+
+Variables give names to values and state used by an algorithm. In DSA code, use descriptive names for indexes, boundaries, counters, and accumulated results because unclear state is a common source of off-by-one and update-order bugs.
 
 ```php
 $name = "Shoeb";
@@ -260,6 +268,8 @@ $isActive = true;
 
 ## 4.2 Indexed Arrays
 
+An array-like structure stores elements in an indexed sequence. Its main advantage is direct access by position; the main trade-off is that inserting or deleting near the front or middle usually requires shifting elements. In DSA problems, arrays are also the base structure behind two pointers, sliding windows, prefix sums, binary search, heaps, and many dynamic-programming tables.
+
 ```php
 $numbers = [10, 20, 30];
 
@@ -269,6 +279,8 @@ echo $numbers[0]; // 10
 ---
 
 ## 4.3 Associative Arrays
+
+A PHP associative array stores key/value pairs. In DSA it commonly acts as a hash-map-like frequency table or lookup index—for example `$count[$value] = ($count[$value] ?? 0) + 1`. Average lookup/insertion is expected `O(1)`, while memory usage is significantly larger than a packed numeric array.
 
 ```php
 $user = [
@@ -285,7 +297,11 @@ Associative arrays are especially important because they can behave like maps/di
 
 ## 4.4 Loops
 
+Loops express repeated state updates. In DSA, choose the loop form that makes boundaries and mutation obvious: index-based loops for positions and direct iteration for values. Boundary clarity matters more than syntax brevity.
+
 ### `for`
+
+A `for` loop is useful when iteration is controlled by an index or counter. Its three expressions initialize the counter, test whether another iteration should run, and update the counter. In DSA, it is common when you need array indexes or a precise numeric range.
 
 ```php
 for ($i = 0; $i < 5; $i++) {
@@ -295,6 +311,8 @@ for ($i = 0; $i < 5; $i++) {
 
 ### `foreach`
 
+`foreach` iterates directly over array values, so it is clearer than an index loop when the position is not needed. The loop variable receives one element on each iteration; use the key/value form when the array key also matters.
+
 ```php
 foreach ($numbers as $number) {
     echo $number . PHP_EOL;
@@ -302,6 +320,8 @@ foreach ($numbers as $number) {
 ```
 
 ### Key and value
+
+PHP's `foreach ($array as $key => $value)` form exposes both the current key and its associated value. This is especially useful for associative arrays used as frequency maps, lookup tables, or graph adjacency maps.
 
 ```php
 foreach ($user as $key => $value) {
@@ -313,6 +333,8 @@ foreach ($user as $key => $value) {
 
 ## 4.5 Functions
 
+A function/method packages a reusable piece of algorithmic work behind inputs and a return value. For DSA helpers, make the contract explicit: what each parameter represents, whether the input is mutated, what is returned, and what happens for empty or invalid input.
+
 ```php
 function add(int $a, int $b): int
 {
@@ -323,6 +345,8 @@ function add(int $a, int $b): int
 ---
 
 ## 4.6 Anonymous Functions
+
+An **anonymous function** is a function value without a declared function name. Here, `$compare` stores a callable that receives `$a` and `$b` and returns the spaceship comparison result (`-1`, `0`, or `1`). PHP array functions such as `usort()`, `array_map()`, and `array_filter()` accept callables so behavior can be passed into an operation instead of hard-coded.
 
 ```php
 $compare = function ($a, $b) {
@@ -343,6 +367,8 @@ array_reduce()
 
 ## 4.7 Arrow Functions
 
+PHP arrow functions use the compact `fn(...) => expression` syntax for a single expression. Variables from the surrounding scope are captured by value automatically. They are useful for short transformations or predicates, but a normal closure is clearer when several statements or explicit by-reference captures are required.
+
 ```php
 $squares = array_map(
     fn($x) => $x * $x,
@@ -353,6 +379,8 @@ $squares = array_map(
 ---
 
 ## 4.8 Classes
+
+Classes are useful in DSA for nodes, heaps, tries, graphs, or reusable structures that own state plus operations. Keep fields tied to one invariant and expose methods that preserve it; a class is unnecessary when a small pure function solves the problem more clearly.
 
 ```php
 class Node
@@ -379,6 +407,8 @@ Classes are useful when implementing:
 
 ## 4.9 Strict Types
 
+With `declare(strict_types=1);`, scalar type declarations are enforced more strictly for calls originating from that PHP file instead of silently coercing many mismatched scalar values. It improves predictability in algorithm code, but you should still validate user input because type declarations do not replace domain validation.
+
 For learning and larger projects:
 
 ```php
@@ -392,6 +422,8 @@ This helps detect accidental type mismatches.
 ---
 
 ## 4.10 PHP Comparison Operator
+
+The **spaceship operator** `<=>` performs a three-way comparison: it returns a negative value when the left operand is smaller, `0` when they compare equal, and a positive value when the left operand is greater. That makes it convenient inside sorting callbacks such as `usort()`.
 
 The spaceship operator:
 
@@ -416,6 +448,8 @@ usort($numbers, fn($a, $b) => $a <=> $b);
 ---
 
 # 5. Algorithm Analysis: Time and Space Complexity
+
+Complexity analysis estimates how an algorithm's resource usage grows as input size increases. Focus on the dominant growth rate rather than machine-specific timing, and analyze both execution work and extra memory so you can compare approaches before benchmarking.
 
 Complexity tells us how an algorithm scales as input becomes larger.
 
@@ -442,6 +476,8 @@ Common complexities:
 
 ## 5.2 O(1)
 
+`O(1)` means the amount of work does not grow with the number of input elements. It does **not** mean the operation takes exactly one CPU instruction; it means the step count is bounded by a constant with respect to input size. Examples include reading a known array index or checking a stored variable.
+
 ```php
 $value = $arr[5];
 ```
@@ -451,6 +487,8 @@ The operation does not grow with array size in the usual algorithmic model.
 ---
 
 ## 5.3 O(n)
+
+`O(n)` means the running time grows proportionally with the input size. A single complete pass over an array is the standard example. Several separate linear passes are still `O(n)` because constant multipliers are omitted in asymptotic analysis.
 
 ```php
 foreach ($arr as $value) {
@@ -463,6 +501,8 @@ If array size doubles, approximately twice as much work is performed.
 ---
 
 ## 5.4 O(n²)
+
+`O(n²)` usually appears when the algorithm examines many pairs of input elements, such as two nested loops over the same `n` items. Doubling `n` can make the dominant work roughly four times larger, so quadratic approaches become expensive quickly on large inputs.
 
 ```php
 foreach ($arr as $a) {
@@ -482,6 +522,8 @@ about 1,000,000 pair operations
 
 ## 5.5 O(log n)
 
+`O(log n)` appears when each step reduces the remaining problem by a constant factor, often by half. Binary search is the classic example. The logarithm base is ignored in Big-O because changing the base only multiplies the count by a constant factor.
+
 Binary search repeatedly halves the search area.
 
 ```text
@@ -493,6 +535,8 @@ Binary search repeatedly halves the search area.
 
 ## 5.6 O(n log n)
 
+`O(n log n)` commonly appears when an algorithm performs logarithmic levels of work and processes `O(n)` data across each level. Efficient comparison sorts such as merge sort and heap sort have this bound; divide-and-conquer algorithms often produce it as well.
+
 Common in:
 
 - merge sort
@@ -502,6 +546,8 @@ Common in:
 ---
 
 ## 5.7 Space Complexity
+
+Space complexity measures how much additional memory grows with input size. Distinguish the input itself from **auxiliary space** used by the algorithm, and remember to include recursion depth, temporary arrays, hash tables, queues, and stacks. An in-place algorithm usually means `O(1)` or very small auxiliary storage, not that the input occupies no memory.
 
 Consider:
 
@@ -527,6 +573,8 @@ O(n)
 ---
 
 ## 5.8 Recursive Stack Space
+
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
 
 ```php
 function countdown(int $n): void
@@ -562,6 +610,8 @@ It means:
 ---
 
 ## 5.10 Complexity Rules
+
+When deriving complexity, count how the dominant work grows with input size rather than counting individual source-code lines. Sequential blocks add, nested independent loops usually multiply, halving/doubling loops are logarithmic, and recursion must include both the number of calls and work done per call.
 
 Drop constants:
 
@@ -610,6 +660,8 @@ Important concepts include:
 
 ## 6.1 Modulo
 
+The modulo operator returns a remainder and appears in cyclic indexing, parity, hashing, and modular arithmetic. Be careful with negative operands because remainder sign rules differ across languages; if a non-negative mathematical modulus is required, normalize the result according to the language's semantics.
+
 ```php
 echo 17 % 5; // 2
 ```
@@ -633,6 +685,8 @@ if ($n % 2 === 0) {
 
 ## 6.2 GCD — Euclidean Algorithm
 
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
+
 ```php
 function gcd(int $a, int $b): int
 {
@@ -654,6 +708,8 @@ O(log(min(a, b)))
 
 ## 6.3 LCM
 
+The least common multiple (LCM) of two non-zero integers can be derived from the GCD: `lcm(a, b) = |a / gcd(a, b) × b|`. Dividing before multiplying reduces overflow risk in fixed-width languages. Define how your implementation should behave when either input is zero; a common convention returns zero.
+
 ```php
 function lcm(int $a, int $b): int
 {
@@ -664,6 +720,8 @@ function lcm(int $a, int $b): int
 ---
 
 ## 6.4 Prime Check
+
+The example implements **6.4 Prime Check** with `isPrime(...)`. Its parameters are `int $n`. Trace how those inputs change or are read, then inspect the `return` statement (or observable mutation/output) to identify the result. Also account for the cost of any loop, recursion, container operation, or nested call when deriving complexity.
 
 ```php
 function isPrime(int $n): bool
@@ -691,6 +749,8 @@ O(√n)
 ---
 
 ## 6.5 Sieve of Eratosthenes
+
+The Sieve of Eratosthenes finds all primes up to a limit by marking multiples of each discovered prime as composite. Starting the marking at `p × p` is enough because smaller multiples already have a smaller prime factor. The standard implementation runs in `O(n log log n)` time and uses `O(n)` marking space.
 
 Find all primes up to `n`.
 
@@ -752,6 +812,8 @@ PHP arrays are flexible ordered key-value structures and can represent:
 
 ## 7.1 Indexed Array
 
+A PHP indexed array uses integer keys, usually starting at zero when created as a list. PHP arrays are ordered hash tables rather than compact C-style arrays, so memory usage and some operation costs differ from textbook dynamic arrays.
+
 ```php
 $numbers = [5, 10, 15];
 ```
@@ -766,6 +828,8 @@ echo $numbers[1];
 
 ## 7.2 Traversal
 
+Traversal means visiting each relevant element/node in a defined order. The important state is the current position and the rule for advancing to the next one. A full traversal is usually `O(n)` for a linear structure, while trees/graphs additionally require a stack/queue or recursion and, for cyclic graphs, visited tracking.
+
 ```php
 foreach ($numbers as $number) {
     echo $number . PHP_EOL;
@@ -775,6 +839,8 @@ foreach ($numbers as $number) {
 ---
 
 ## 7.3 Insert at End
+
+Appending at the end adds a new element after the current last element. The exact cost depends on the container: dynamic arrays are commonly `O(1)` amortized but may occasionally resize, while a linked list is `O(1)` only if a tail reference is maintained.
 
 ```php
 $numbers[] = 20;
@@ -792,6 +858,8 @@ For one value, `$numbers[] = 20` is normally clearer.
 
 ## 7.4 Remove from End
 
+Removing the last element is naturally stack-like. For PHP arrays, `array_pop()` removes and returns the final value; handle the empty-array case according to the function's documented behavior and your desired contract.
+
 ```php
 $last = array_pop($numbers);
 ```
@@ -799,6 +867,8 @@ $last = array_pop($numbers);
 ---
 
 ## 7.5 Insert at Beginning
+
+Inserting at the beginning is cheap for a linked structure when only the head reference changes, but expensive for a dynamic array because existing elements may need to shift. This difference is a useful example of choosing a data structure based on the operations that must be fast.
 
 ```php
 array_unshift($numbers, 1);
@@ -811,6 +881,8 @@ For repeated front operations, prefer an actual queue/deque structure.
 ---
 
 ## 7.6 Remove from Beginning
+
+Removing from the beginning shifts/reindexes list-style integer keys and is not a good primitive for a high-volume queue. Use an SPL queue/deque structure when repeated front removals are central to the algorithm.
 
 ```php
 $first = array_shift($numbers);
@@ -829,6 +901,8 @@ for queue-heavy workloads.
 ---
 
 ## 7.7 Find Maximum
+
+Finding a maximum requires a baseline that is valid for the input domain. Initialize from the first element (after handling empty input) rather than from `0`, which fails when every value is negative. Then scan once and replace the current maximum whenever a larger value appears: `O(n)` time, `O(1)` extra space.
 
 ```php
 function findMax(array $arr): int|float
@@ -865,6 +939,8 @@ O(1)
 
 ## 7.8 Reverse an Array Manually
 
+Manual in-place reversal uses two indexes, swaps the two values, and moves inward. It demonstrates `O(n)` time and `O(1)` auxiliary space while mutating the original array; a built-in reverse may be clearer when the exercise is not about pointer technique.
+
 ```php
 function reverseArray(array $arr): array
 {
@@ -886,6 +962,8 @@ function reverseArray(array $arr): array
 ---
 
 ## 7.9 Rotate Array Right
+
+Normalize `k` by the array length, then rotate cyclically. A copy-based solution is straightforward and uses `O(n)` extra memory; an in-place reversal method can use `O(1)` auxiliary space but requires careful segment boundaries.
 
 Example:
 
@@ -922,6 +1000,8 @@ function rotateRight(array $arr, int $k): array
 
 ## 7.10 Remove Duplicates
 
+Duplicate removal depends on whether order must be preserved and whether the input is sorted. A hash/set approach is simple for arbitrary input (`O(n)` expected time, extra memory); sorted input can often be deduplicated in place with two pointers.
+
 ```php
 $unique = array_values(array_unique($numbers));
 ```
@@ -953,6 +1033,8 @@ function uniqueValues(array $arr): array
 
 # 8. Strings
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 String problems are extremely common in interviews.
 
 Common patterns:
@@ -969,6 +1051,8 @@ Common patterns:
 ---
 
 ## 8.1 Character Traversal
+
+Traversal means visiting each relevant element/node in a defined order. The important state is the current position and the rule for advancing to the next one. A full traversal is usually `O(n)` for a linear structure, while trees/graphs additionally require a stack/queue or recursion and, for cyclic graphs, visited tracking.
 
 For ASCII-oriented interview problems:
 
@@ -991,6 +1075,8 @@ DSA platforms often specify lowercase English characters, where ordinary string 
 ---
 
 ## 8.2 Palindrome
+
+A palindrome reads the same forward and backward under the problem's comparison rules. The standard two-pointer check compares the leftmost and rightmost relevant characters and moves inward, stopping on the first mismatch. Time is `O(n)` and extra space can be `O(1)` when normalization is not stored separately.
 
 ```php
 function isPalindrome(string $s): bool
@@ -1027,6 +1113,8 @@ O(1)
 
 ## 8.3 Valid Palindrome Ignoring Symbols
 
+A palindrome reads the same forward and backward under the problem's comparison rules. The standard two-pointer check compares the leftmost and rightmost relevant characters and moves inward, stopping on the first mismatch. Time is `O(n)` and extra space can be `O(1)` when normalization is not stored separately.
+
 ```php
 function isCleanPalindrome(string $s): bool
 {
@@ -1058,6 +1146,8 @@ function isCleanPalindrome(string $s): bool
 
 ## 8.4 Frequency Count
 
+Count each value/character once and store `key => count`. In PHP, an associative array can serve as a frequency map; take care with PHP's key coercion rules if keys may be numeric strings or mixed types.
+
 ```php
 function charFrequency(string $s): array
 {
@@ -1076,6 +1166,8 @@ function charFrequency(string $s): array
 
 ## 8.5 Anagram
 
+Two strings are anagrams when they contain the same symbols with the same frequencies, subject to the problem's normalization rules. A frequency map gives `O(n)` expected time and avoids sorting; sorting both strings is simpler in some cases but typically costs `O(n log n)`. Decide explicitly whether case, spaces, punctuation, and Unicode normalization matter.
+
 ```php
 function areAnagrams(string $a, string $b): bool
 {
@@ -1090,6 +1182,8 @@ function areAnagrams(string $a, string $b): bool
 ---
 
 # 9. Linked Lists
+
+A linked list stores values in nodes connected by references rather than by contiguous indexed positions. This makes pointer rewiring cheap once the relevant node is known, but random access is slow because traversal normally starts from the head. Linked-list problems therefore focus heavily on pointer movement, insertion/removal, reversal, cycle detection, and fast/slow-pointer techniques.
 
 A linked list consists of nodes.
 
@@ -1112,6 +1206,8 @@ Unlike an indexed array, nodes are connected rather than accessed directly by po
 
 ## 9.1 Singly Linked List Node
 
+A singly linked list node stores a value plus one `next` reference. Access to the `i`th element requires traversal from the head, but insertion/removal near a known node only changes a small number of links. Keep ownership of the head (and optional tail) explicit.
+
 ```php
 class ListNode
 {
@@ -1130,6 +1226,8 @@ class ListNode
 
 ## 9.2 Traverse
 
+Traversal begins at the linked-list head and follows `next` until the reference becomes `null`. A temporary pointer such as `$current` lets the code inspect each node without changing links. Visiting all `n` nodes costs `O(n)` time and `O(1)` iterative auxiliary space.
+
 ```php
 function printList(?ListNode $head): void
 {
@@ -1145,6 +1243,8 @@ function printList(?ListNode $head): void
 ---
 
 ## 9.3 Insert at Beginning
+
+Inserting at the beginning is cheap for a linked structure when only the head reference changes, but expensive for a dynamic array because existing elements may need to shift. This difference is a useful example of choosing a data structure based on the operations that must be fast.
 
 ```php
 function prepend(?ListNode $head, int $value): ListNode
@@ -1162,6 +1262,8 @@ O(1)
 ---
 
 ## 9.4 Insert at End
+
+Appending at the end adds a new element after the current last element. The exact cost depends on the container: dynamic arrays are commonly `O(1)` amortized but may occasionally resize, while a linked list is `O(1)` only if a tail reference is maintained.
 
 ```php
 function append(?ListNode $head, int $value): ListNode
@@ -1200,6 +1302,8 @@ O(1)
 
 ## 9.5 Reverse Linked List
 
+Reversing a singly linked list rewires each node's `next` reference. Keep three pieces of state: the previous node, the current node, and the original next node so the remainder of the list is not lost before reassignment. The iterative algorithm runs in `O(n)` time and `O(1)` extra space.
+
 One of the most important interview problems.
 
 ```php
@@ -1233,6 +1337,8 @@ null ← 1 ← 2 ← 3
 
 ## 9.6 Find Middle — Slow/Fast Pointer
 
+The slow/fast-pointer technique moves one pointer one node per step and another two nodes per step. When the fast pointer reaches the end, the slow pointer is at the middle. It finds the middle in one pass (`O(n)` time) without first counting nodes and uses `O(1)` extra space.
+
 ```php
 function middleNode(?ListNode $head): ?ListNode
 {
@@ -1251,6 +1357,8 @@ function middleNode(?ListNode $head): ?ListNode
 ---
 
 ## 9.7 Detect Cycle — Floyd Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 ```php
 function hasCycle(?ListNode $head): bool
@@ -1286,6 +1394,8 @@ O(1)
 ---
 
 ## 9.8 Doubly Linked List
+
+A doubly linked list stores both `next` and `prev` links. This enables traversal in both directions and makes deletion of a known node easier because its predecessor is directly available, at the cost of extra memory and more pointer updates that must remain consistent.
 
 Each node has:
 
@@ -1324,6 +1434,8 @@ pop top plate
 
 ## 10.1 Operations
 
+These are the core operations exposed by **Stacks**. For each operation, know what input it accepts, whether it mutates the structure, what it returns, and its typical time complexity; those costs determine whether the structure fits a problem.
+
 ```text
 push
 pop
@@ -1334,6 +1446,8 @@ isEmpty
 ---
 
 ## 10.2 PHP Array Stack
+
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
 
 ```php
 $stack = [];
@@ -1350,6 +1464,8 @@ $value = array_pop($stack);
 
 ## 10.3 SPL Stack
 
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
+
 ```php
 $stack = new SplStack();
 
@@ -1363,6 +1479,8 @@ echo $stack->pop(); // 20
 ---
 
 ## 10.4 Balanced Parentheses
+
+Balanced-bracket checking uses a stack of opening brackets. Each closing bracket must match the most recent unmatched opening bracket, so a mismatch or an empty stack fails immediately; after the scan, the stack must also be empty. The algorithm is `O(n)` time and `O(n)` worst-case space.
 
 Input:
 
@@ -1406,6 +1524,8 @@ function isValidParentheses(string $s): bool
 
 ## 10.5 Stack Use Cases
 
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
+
 - undo/redo
 - browser history
 - expression evaluation
@@ -1432,6 +1552,8 @@ Think of people waiting in line.
 
 ## 11.1 SPL Queue
 
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
+
 ```php
 $queue = new SplQueue();
 
@@ -1446,6 +1568,8 @@ echo $queue->dequeue(); // A
 
 ## 11.2 Queue Use Cases
 
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
+
 - job processing
 - BFS
 - email sending
@@ -1457,6 +1581,8 @@ echo $queue->dequeue(); // A
 ---
 
 ## 11.3 Deque
+
+A deque (double-ended queue) supports insertion and removal at both the front and back. It can behave as either a stack or a queue and is especially useful for sliding-window algorithms and 0-1 BFS. Prefer an implementation whose front and back operations are constant-time rather than an array operation that shifts many elements.
 
 Deque means:
 
@@ -1484,6 +1610,8 @@ Useful for:
 
 # 12. Hash Tables, Maps, and Sets
 
+Hash-based structures trade extra memory for fast average-case membership, lookup, insertion, and deletion. They are especially useful for frequency tables, duplicate detection, complement lookup, caching, and visited-state tracking. Their ordering guarantees and worst-case behavior depend on the language and implementation, so do not assume sorted iteration unless the API explicitly provides it.
+
 A hash table provides fast key-based lookup on average.
 
 PHP associative arrays often serve this purpose.
@@ -1491,6 +1619,8 @@ PHP associative arrays often serve this purpose.
 ---
 
 ## 12.1 Frequency Map
+
+A frequency map stores `value → count`. Scan the input once, incrementing the count for each value; later frequency queries are average `O(1)` with a hash map. This pattern is useful for duplicates, anagrams, counting categories, majority/frequency problems, and many sliding-window algorithms.
 
 ```php
 $numbers = [1, 2, 2, 3, 3, 3];
@@ -1513,6 +1643,8 @@ Result:
 ---
 
 ## 12.2 Two Sum
+
+The optimized Two Sum pattern trades memory for speed. While scanning, compute the complement `target - current`; if that complement was seen earlier, return the matching indexes/values, otherwise store the current item. With a hash map this is `O(n)` expected time and `O(n)` extra space.
 
 Problem:
 
@@ -1577,6 +1709,8 @@ For object identity, `SplObjectStorage` is also useful.
 
 ## 12.4 When to Think "Hash Map"
 
+Hash-based structures trade extra memory for fast average-case membership, lookup, insertion, and deletion. They are especially useful for frequency tables, duplicate detection, complement lookup, caching, and visited-state tracking. Their ordering guarantees and worst-case behavior depend on the language and implementation, so do not assume sorted iteration unless the API explicitly provides it.
+
 Look for wording such as:
 
 - frequency
@@ -1593,11 +1727,15 @@ Look for wording such as:
 
 # 13. Recursion
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 Recursion occurs when a function calls itself.
 
 ---
 
 ## 13.1 Basic Structure
+
+A recursive function needs (1) a base case that returns without another recursive call and (2) a recursive step that moves to a smaller/simpler state. State the parameter meaning and confirm each call makes progress toward termination.
 
 ```php
 function recursiveFunction($input)
@@ -1621,6 +1759,8 @@ Two essential parts:
 
 ## 13.2 Factorial
 
+Factorial is defined for non-negative integers by `n! = n × (n-1) × ... × 1`, with `0! = 1`. A recursive implementation mirrors that definition, but an iterative version avoids recursive call-stack growth. Factorial values grow extremely quickly, so ordinary fixed-width integer types overflow at relatively small `n` values.
+
 ```php
 function factorial(int $n): int
 {
@@ -1635,6 +1775,8 @@ function factorial(int $n): int
 ---
 
 ## 13.3 Fibonacci — Naive
+
+Naive recursive Fibonacci recomputes the same smaller values repeatedly and grows exponentially. It is useful as a teaching example of overlapping subproblems, not as a practical implementation for large `n`.
 
 ```php
 function fibonacci(int $n): int
@@ -1660,6 +1802,8 @@ Dynamic programming improves it.
 ---
 
 ## 13.4 Recursive Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```php
 function binarySearchRecursive(
@@ -1690,6 +1834,8 @@ function binarySearchRecursive(
 
 ## 13.5 Recursion Risks in PHP
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 Deep recursion can consume substantial stack/memory.
 
 When recursion depth can become very large, consider an iterative solution using an explicit stack.
@@ -1705,9 +1851,13 @@ Recursive DFS
 
 # 14. Searching Algorithms
 
+Searching asks whether, where, or under what condition a target can be found. Start with linear search as the no-precondition baseline, then use binary search when ordering or monotonicity lets you safely discard large parts of the search space.
+
 ---
 
 ## 14.1 Linear Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```php
 function linearSearch(array $arr, mixed $target): int
@@ -1737,6 +1887,8 @@ Use when:
 ---
 
 ## 14.2 Binary Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 Requirement:
 
@@ -1778,6 +1930,8 @@ O(log n)
 
 ## 14.3 First Occurrence
 
+To find the first occurrence in sorted data, binary search does not stop immediately on equality. Record the matching index, then continue searching the left half because an earlier equal value may exist. This remains `O(log n)` time.
+
 For:
 
 ```text
@@ -1815,11 +1969,15 @@ function firstOccurrence(array $arr, int $target): int
 
 # 15. Sorting Algorithms
 
+Sorting rearranges values according to an ordering rule so later operations can exploit structure. Learn not only the code but also stability, in-place behavior, best/average/worst complexity, comparator requirements, and when a language's built-in sort is preferable to a manual algorithm.
+
 Sorting is one of the most important algorithm categories.
 
 ---
 
 ## 15.1 Bubble Sort
+
+Bubble sort repeatedly compares adjacent elements and swaps pairs that are out of order. After each full pass, one extreme value has moved to its final end position. It is easy to learn but `O(n²)` in average/worst cases; with an early-exit flag it can be `O(n)` on already sorted input.
 
 Repeatedly swap adjacent out-of-order values.
 
@@ -1861,6 +2019,8 @@ Use primarily for learning.
 
 ## 15.2 Selection Sort
 
+Selection sort repeatedly chooses the smallest (or largest) remaining element and places it into the next final position. It performs `O(n²)` comparisons regardless of initial order and only `O(n)` swaps, so it is mostly educational or useful when writes are unusually expensive. The usual in-place form is not stable.
+
 Find smallest item and place it at the next position.
 
 ```php
@@ -1897,6 +2057,8 @@ O(n²)
 
 ## 15.3 Insertion Sort
 
+Insertion sort grows a sorted prefix one element at a time. For each new value, it shifts larger prefix elements to the right until the correct insertion position opens. It is stable with the usual comparison, in-place, `O(n²)` in the average/worst case, and `O(n)` on already or nearly sorted data.
+
 Good educational algorithm and often effective for very small/nearly sorted collections.
 
 ```php
@@ -1923,6 +2085,8 @@ function insertionSort(array $arr): array
 ---
 
 ## 15.4 Merge Sort
+
+Merge sort divides the sequence into halves, recursively sorts each half, and merges two sorted halves in linear time. Its recurrence leads to `O(n log n)` time in all standard cases; array implementations typically need `O(n)` auxiliary merge storage. Merge sort is stable when equal elements are taken from the left half first.
 
 Divide the input, sort halves, merge them.
 
@@ -1978,6 +2142,8 @@ Space: O(n)
 
 ## 15.5 Quick Sort — Educational Implementation
 
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
+
 ```php
 function quickSort(array $arr): array
 {
@@ -2029,6 +2195,8 @@ This version also allocates additional arrays and is intended for clarity.
 
 ## 15.6 PHP Native Sorting
 
+Sorting all values is often the simplest selection baseline. It is appropriate when ordered output is useful elsewhere or input size is moderate; it does unnecessary work when only one rank is needed and no other sorted-order benefit exists.
+
 Ascending values:
 
 ```php
@@ -2061,6 +2229,8 @@ For production code, prefer well-tested built-ins unless the goal is specificall
 
 ## 15.7 Stable vs Unstable Sorting
 
+Sorting all values is often the simplest selection baseline. It is appropriate when ordered output is useful elsewhere or input size is moderate; it does unnecessary work when only one rank is needed and no other sorted-order benefit exists.
+
 A stable sort preserves the relative order of equal elements.
 
 Suppose:
@@ -2078,6 +2248,8 @@ This matters in multi-level sorting and business reports.
 
 # 16. Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Two pointers use two indices moving through data.
 
 Common forms:
@@ -2091,6 +2263,8 @@ read + write
 ---
 
 ## 16.1 Pair Sum in Sorted Array
+
+With sorted input, place one pointer at each end. If the sum is too small, moving the left pointer right is the only move that can increase it; if the sum is too large, move the right pointer left. This invariant gives `O(n)` time and `O(1)` extra space after sorting is already available.
 
 ```php
 function pairSumSorted(array $arr, int $target): array
@@ -2132,6 +2306,8 @@ O(n²)
 
 ## 16.2 Remove Duplicates from Sorted Array
 
+Because the array is sorted, equal values appear next to one another. A read pointer scans every element while a write pointer marks where the next distinct value belongs. The algorithm runs in `O(n)` time and can overwrite the input in place using `O(1)` extra space; the returned length/count tells the caller which prefix contains the unique values.
+
 ```php
 function removeDuplicatesSorted(array &$arr): int
 {
@@ -2156,6 +2332,8 @@ function removeDuplicatesSorted(array &$arr): int
 
 ## 16.3 When to Recognize Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Look for:
 
 - sorted array
@@ -2171,6 +2349,8 @@ Look for:
 
 # 17. Sliding Window
 
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
+
 Sliding window is used for contiguous ranges.
 
 Examples:
@@ -2183,6 +2363,8 @@ Examples:
 ---
 
 ## 17.1 Fixed Window
+
+A fixed-size sliding window maintains an aggregate for exactly `k` consecutive elements. Build the first window, then for each shift subtract/remove the outgoing contribution and add the incoming one. This turns many `O(nk)` repeated-window calculations into `O(n)`.
 
 Find maximum sum of any `k` consecutive values.
 
@@ -2230,6 +2412,8 @@ O(nk)
 
 ## 17.2 Variable Window
 
+A variable-size sliding window expands one boundary and shrinks the other whenever the validity constraint is violated. This is linear when each boundary moves forward at most `n` times and window state can be updated incrementally.
+
 Longest substring without repeating characters:
 
 ```php
@@ -2258,9 +2442,13 @@ function lengthOfLongestSubstring(string $s): int
 
 # 18. Prefix Sum and Difference Array
 
+Prefix sums and difference arrays are complementary preprocessing techniques. Prefix sums make repeated range queries cheap; difference arrays make many range updates cheap before one final reconstruction. Their correctness depends on a clear indexing convention and careful boundary handling.
+
 ---
 
 ## 18.1 Prefix Sum
+
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
 
 For:
 
@@ -2363,6 +2551,8 @@ Excellent for:
 
 # 19. Intervals
 
+Interval problems represent ranges such as time spans, coordinates, or reservations. Before coding, define whether endpoints are inclusive or exclusive and whether touching intervals overlap; that decision controls sorting, merge conditions, sweep-line events, and off-by-one behavior.
+
 Interval problems usually contain:
 
 ```text
@@ -2380,6 +2570,8 @@ Typical tasks:
 ---
 
 ## 19.1 Merge Intervals
+
+To merge overlapping intervals, first sort by start coordinate. Keep the last merged interval; if the next interval overlaps under the chosen endpoint convention, extend the end, otherwise start a new merged interval. Sorting dominates at `O(n log n)`; the scan itself is `O(n)`.
 
 ```php
 function mergeIntervals(array $intervals): array
@@ -2416,6 +2608,8 @@ function mergeIntervals(array $intervals): array
 
 # 20. Binary Search Patterns
 
+Binary search applies when a search space is ordered or when a yes/no feasibility condition changes monotonically. Each iteration discards roughly half of the remaining candidates, giving `O(log n)` iterations. Correct boundary handling is the main difficulty: define exactly what `left`, `right`, and `mid` mean and decide whether the interval is closed or half-open.
+
 Binary search is not only for finding a value.
 
 It is also used for finding a **boundary** or searching an **answer space**.
@@ -2423,6 +2617,8 @@ It is also used for finding a **boundary** or searching an **answer space**.
 ---
 
 ## 20.1 Lower Bound Concept
+
+A lower bound returns the first position whose value is **not less than** the target (equivalently, the insertion position before existing equal values). The binary-search invariant must preserve all possible answers, including the position immediately after the final element when every value is smaller.
 
 Find the first position where:
 
@@ -2501,6 +2697,8 @@ Recognize phrases such as:
 
 # 21. Trees
 
+A tree is a connected acyclic hierarchical structure with nodes linked by parent/child relationships. Tree algorithms are easiest to understand recursively: define what one subtree call returns, choose a traversal order, and account for tree height because recursion/operation cost can degrade on skewed trees.
+
 A tree is a hierarchical data structure.
 
 Example:
@@ -2527,6 +2725,8 @@ Terms:
 
 ## 21.1 Binary Tree Node
 
+A binary tree node has at most two children, conventionally `left` and `right`. Unlike a BST, a general binary tree has no ordering rule unless the problem states one; searches therefore usually require traversal rather than directional comparison.
+
 ```php
 class TreeNode
 {
@@ -2550,7 +2750,11 @@ class TreeNode
 
 ## 21.2 DFS Traversals
 
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
+
 ### Preorder
+
+Preorder traversal visits **node → left subtree → right subtree**. It is useful when the parent must be processed before its children, such as copying a tree, serializing certain tree formats, or producing prefix-style expression order. A complete traversal visits every node once, so time is `O(n)`.
 
 ```text
 Root → Left → Right
@@ -2571,6 +2775,8 @@ function preorder(?TreeNode $node): void
 
 ### Inorder
 
+Inorder traversal visits **left subtree → node → right subtree**. On a Binary Search Tree with a consistent ordering rule, this produces keys in sorted order. A complete traversal is `O(n)` time and uses `O(h)` call-stack/explicit-stack space for tree height `h`.
+
 ```text
 Left → Root → Right
 ```
@@ -2589,6 +2795,8 @@ function inorder(?TreeNode $node): void
 ```
 
 ### Postorder
+
+Postorder traversal visits **left subtree → right subtree → node**. Because children are processed before their parent, it is useful for deleting trees, computing subtree aggregates, and many tree-DP problems. A complete traversal is `O(n)` time and uses `O(h)` traversal stack space.
 
 ```text
 Left → Right → Root
@@ -2610,6 +2818,8 @@ function postorder(?TreeNode $node): void
 ---
 
 ## 21.3 Level Order Traversal — BFS
+
+Level-order traversal is BFS on a tree. Use a queue to process nodes in increasing depth; if the output is grouped by levels, capture the queue size at the start of each level so newly enqueued children belong to the next group.
 
 ```php
 function levelOrder(?TreeNode $root): array
@@ -2653,6 +2863,8 @@ function levelOrder(?TreeNode $root): array
 
 ## 21.4 Maximum Depth
 
+Maximum tree depth is the number of nodes (or edges, depending on the chosen convention) on the longest root-to-leaf path. A recursive solution returns `1 + max(leftDepth, rightDepth)` for a non-null node. It visits each node once: `O(n)` time and `O(h)` stack space.
+
 ```php
 function maxDepth(?TreeNode $root): int
 {
@@ -2689,6 +2901,8 @@ function maxDepth(?TreeNode $root): int
 
 # 22. Binary Search Trees
 
+A Binary Search Tree (BST) maintains an ordering invariant: values in one subtree compare before the node and values in the other compare after it, according to the chosen duplicate policy. Operations depend on tree height, so an unbalanced BST can degrade from `O(log n)` expected/balanced behavior to `O(n)`.
+
 A Binary Search Tree generally maintains:
 
 ```text
@@ -2701,6 +2915,8 @@ Duplicate handling depends on the design.
 ---
 
 ## 22.1 Search
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 ```php
 function searchBST(?TreeNode $root, int $target): ?TreeNode
@@ -2737,6 +2953,8 @@ O(n)
 
 ## 22.2 Insert
 
+Insertion must preserve the data structure's invariant. For an ordered tree, compare the new key at each node and descend to the appropriate child until an empty position is found; for duplicate keys, follow the policy defined by the problem. Runtime is proportional to the structure's height.
+
 ```php
 function insertBST(?TreeNode $root, int $value): TreeNode
 {
@@ -2757,6 +2975,8 @@ function insertBST(?TreeNode $root, int $value): TreeNode
 ---
 
 ## 22.3 Validate BST
+
+Validating a BST requires checking the **entire allowed range** for each node, not only comparing a node with its immediate children. Pass lower/upper bounds (or use inorder ordering) so descendants cannot violate an ancestor's constraint. Decide how duplicates are handled before choosing strict or non-strict comparisons.
 
 Use numeric bounds.
 
@@ -2800,6 +3020,8 @@ Max Heap → largest on top
 
 ## 23.1 PHP `SplPriorityQueue`
 
+`SplPriorityQueue` is PHP's built-in priority queue. `insert($value, $priority)` adds an item, and extraction returns the item with the greatest priority according to the queue's comparison behavior. Use it when repeated highest-priority selection matters; do not assume it preserves FIFO order among equal priorities unless you explicitly encode a tie-breaker.
+
 PHP's SPL priority queue behaves as a max-priority queue.
 
 ```php
@@ -2816,6 +3038,8 @@ echo $queue->extract(); // important-job
 
 ## 23.2 Min Heap
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 ```php
 $heap = new SplMinHeap();
 
@@ -2830,6 +3054,8 @@ echo $heap->extract(); // 10
 
 ## 23.3 Max Heap
 
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
+
 ```php
 $heap = new SplMaxHeap();
 
@@ -2843,6 +3069,8 @@ echo $heap->extract(); // 30
 ---
 
 ## 23.4 Top K Largest
+
+A min-heap of size `k` can maintain the `k` largest values seen so far. Push candidates and remove the smallest whenever the heap exceeds `k`; at the end, the heap contains the desired top `k`. This uses `O(n log k)` time and `O(k)` extra space, often better than sorting all `n` items.
 
 Use a min heap of size `k`.
 
@@ -2884,6 +3112,8 @@ O(n log k)
 ---
 
 ## 23.5 Heap Use Cases
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 - top K
 - task scheduling
@@ -2927,6 +3157,8 @@ Excellent for:
 
 ## 24.1 Trie Node
 
+A trie stores keys by shared prefixes. Each step consumes one symbol, so lookup time depends mainly on key length rather than on the number of stored keys. Tries are useful for autocomplete, prefix counting, dictionary search, and word-grid problems, but they can use substantially more memory than a hash-based set or map.
+
 ```php
 class TrieNode
 {
@@ -2940,6 +3172,8 @@ class TrieNode
 ---
 
 ## 24.2 Trie
+
+A trie stores keys by shared prefixes. Each step consumes one symbol, so lookup time depends mainly on key length rather than on the number of stored keys. Tries are useful for autocomplete, prefix counting, dictionary search, and word-grid problems, but they can use substantially more memory than a hash-based set or map.
 
 ```php
 class Trie
@@ -3003,6 +3237,8 @@ class Trie
 
 # 25. Graphs
 
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
+
 A graph consists of:
 
 ```text
@@ -3024,6 +3260,8 @@ Examples:
 
 ## 25.1 Directed vs Undirected
 
+In a directed graph, an edge `u → v` does not imply `v → u`; in an undirected graph the connection is symmetric. This distinction changes adjacency storage, degree definitions, cycle detection, reachability, and many graph algorithms.
+
 Undirected:
 
 ```text
@@ -3039,6 +3277,8 @@ A → B
 ---
 
 ## 25.2 Weighted Graph
+
+A weighted graph associates a cost/value with each edge, such as distance or time. The sign and type of weights matter: BFS only handles equal/unweighted costs, Dijkstra requires non-negative weights, and negative edges need algorithms such as Bellman-Ford or DAG relaxation.
 
 Edges have cost:
 
@@ -3058,6 +3298,8 @@ Cost might represent:
 
 ## 25.3 Adjacency List
 
+An adjacency list stores, for each vertex, the vertices (and optionally edge weights) directly connected to it. It uses `O(V + E)` space and is usually preferred for sparse graphs because traversing a vertex touches only its actual outgoing/incident edges. For undirected graphs, each edge is normally stored in both endpoint lists.
+
 ```php
 $graph = [
     'A' => ['B', 'C'],
@@ -3072,6 +3314,8 @@ For sparse graphs, adjacency lists are generally convenient.
 ---
 
 ## 25.4 BFS
+
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
 
 Uses a queue.
 
@@ -3110,6 +3354,8 @@ Uses:
 ---
 
 ## 25.5 DFS
+
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
 
 Recursive:
 
@@ -3167,6 +3413,8 @@ function dfsIterative(array $graph, string $start): array
 
 ## 25.6 Connected Components
 
+A connected component is a maximal group of vertices reachable from one another (for the relevant directed/undirected definition). Scan all vertices; whenever an unvisited vertex is found, run BFS/DFS to mark one new component. Across the entire graph, adjacency-list traversal is `O(V + E)`.
+
 For every unvisited node:
 
 ```text
@@ -3184,6 +3432,8 @@ Useful for:
 ---
 
 ## 25.7 Cycle Detection — Undirected Graph
+
+In an undirected graph, DFS/BFS can detect a cycle by seeing an already visited neighbor that is **not** the edge back to the current vertex's parent. Union-Find is another option when edges are processed incrementally: an edge joining two vertices already in the same set closes a cycle.
 
 DFS carries the parent.
 
@@ -3213,6 +3463,8 @@ function hasUndirectedCycle(
 ---
 
 ## 25.8 Topological Sort — Kahn's Algorithm
+
+A topological ordering places every prerequisite before the items that depend on it. It exists only for a **directed acyclic graph (DAG)**. Common implementations use Kahn's algorithm with indegrees and a queue, or DFS with postorder; if all vertices cannot be ordered, the dependency graph contains a cycle.
 
 Only for DAGs:
 
@@ -3282,6 +3534,8 @@ function topologicalSort(array $graph): array
 
 ## 25.9 Dijkstra Shortest Path
 
+Dijkstra's algorithm finds shortest paths from one source when every edge weight is non-negative. Keep the best known distance per vertex and use a min-priority queue; when a stale queue entry is popped, skip it. Typical adjacency-list complexity is `O((V + E) log V)`.
+
 Use when:
 
 ```text
@@ -3346,6 +3600,8 @@ $graph = [
 
 ## 25.10 Bellman-Ford
 
+Bellman-Ford finds single-source shortest paths even when some edges are negative. Relax every edge up to `V-1` times because a simple shortest path uses at most `V-1` edges; one additional successful relaxation indicates a reachable negative cycle. Complexity is `O(VE)`.
+
 Useful when negative edge weights may exist.
 
 Concept:
@@ -3365,6 +3621,8 @@ O(VE)
 ---
 
 ## 25.11 Floyd-Warshall
+
+Floyd-Warshall computes all-pairs shortest paths by progressively allowing each vertex as an intermediate point. Its core transition is `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`. It uses `O(V³)` time and `O(V²)` distance storage and can handle negative edges, but not negative cycles when meaningful finite shortest paths are required.
 
 All-pairs shortest path.
 
@@ -3408,6 +3666,8 @@ Applications:
 
 # 26. Union-Find / Disjoint Set Union
 
+Union-Find, also called Disjoint Set Union (DSU), maintains a collection of non-overlapping groups under two main operations: `find` identifies a representative and `union` merges groups. Path compression plus union by rank/size makes a long sequence of operations effectively near-constant time in practice. It is useful for dynamic connectivity, cycle detection in undirected graphs, Kruskal's MST, and component grouping.
+
 Union-Find efficiently tracks connected groups.
 
 Operations:
@@ -3427,6 +3687,8 @@ operations become extremely fast in practice.
 ---
 
 ## 26.1 Implementation
+
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
 
 ```php
 class DisjointSet
@@ -3488,6 +3750,8 @@ Use cases:
 
 # 27. Greedy Algorithms
 
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
+
 A greedy algorithm chooses what appears best **right now**.
 
 It works only when local optimal choices can lead to a global optimal solution.
@@ -3495,6 +3759,8 @@ It works only when local optimal choices can lead to a global optimal solution.
 ---
 
 ## 27.1 Interval Scheduling
+
+For the classic maximum-number-of-non-overlapping-intervals problem, sorting by finishing time and repeatedly choosing the earliest finishing compatible interval is optimal. The greedy choice leaves as much room as possible for future intervals; sorting dominates at `O(n log n)`.
 
 Select maximum non-overlapping meetings.
 
@@ -3531,6 +3797,8 @@ function maxNonOverlappingMeetings(array $meetings): array
 
 ## 27.2 Greedy Warning
 
+A greedy algorithm commits to a locally best-looking choice without revisiting earlier decisions. That can be very efficient, but it is correct only when the problem has a property that makes local choices compatible with a global optimum. A convincing greedy solution should include a justification such as an exchange argument, cut property, or invariant—not merely an intuition that the choice looks best.
+
 Greedy does **not** work for every optimization problem.
 
 Classic example:
@@ -3565,6 +3833,8 @@ Dynamic programming is required for arbitrary coin sets.
 
 # 28. Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Backtracking explores possibilities and abandons invalid branches.
 
 Template:
@@ -3588,6 +3858,8 @@ function backtrack(...)
 ---
 
 ## 28.1 Generate Subsets
+
+Generating all subsets explores two choices for each element: include it or exclude it. That creates `2^n` possible subsets, so exponential output size is unavoidable. Backtracking should add a **copy** of the current path to the result because the same mutable path is modified during later recursive calls.
 
 ```php
 function subsets(array $nums): array
@@ -3630,6 +3902,8 @@ Total subsets:
 ---
 
 ## 28.2 Generate Permutations
+
+Generating permutations chooses one unused item for each next position, recursively explores the remainder, and then undoes the choice. There are `n!` outputs for distinct items, so factorial work is inherent. With duplicate input values, add a duplicate-skipping rule if unique permutations are required.
 
 ```php
 function permutations(array $nums): array
@@ -3675,6 +3949,8 @@ function permutations(array $nums): array
 
 ## 28.3 Classic Backtracking Problems
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 - subsets
 - permutations
 - combinations
@@ -3688,6 +3964,8 @@ function permutations(array $nums): array
 ---
 
 # 29. Divide and Conquer
+
+Divide and conquer splits a problem into smaller independent subproblems, solves them recursively, and combines their results. Merge sort is a classic example: divide the array, sort each half, then merge the sorted halves. It differs from dynamic programming because divide-and-conquer subproblems usually do not overlap heavily.
 
 Divide and conquer:
 
@@ -3708,6 +3986,8 @@ Examples:
 ---
 
 ## 29.1 Fast Power
+
+Fast exponentiation computes `base^exp` by repeatedly squaring the base and using the binary representation of the exponent. Each step halves the remaining exponent, reducing multiplication count from `O(exp)` to `O(log exp)`. A modular variant applies `% mod` after multiplications to keep values bounded.
 
 Instead of multiplying `x` by itself `n` times:
 
@@ -3747,6 +4027,8 @@ O(log n)
 
 # 30. Dynamic Programming
 
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
+
 Dynamic programming solves problems with:
 
 1. **overlapping subproblems**
@@ -3762,6 +4044,8 @@ Tabulation  = bottom-up
 ---
 
 ## 30.1 Fibonacci with Memoization
+
+Memoized Fibonacci stores the result for each `n` the first time it is computed. Later calls return the cached value instead of expanding the same recursive subtree again, reducing exponential recursion to `O(n)` distinct states and `O(n)` memo/stack space.
 
 ```php
 function fibMemo(int $n, array &$memo = []): int
@@ -3796,6 +4080,8 @@ O(n)
 
 ## 30.2 Fibonacci with Tabulation
 
+Tabulation computes DP states iteratively from base cases toward the target. The table shape and iteration order must ensure every referenced dependency is already computed; this often avoids recursion-depth limits.
+
 ```php
 function fibTab(int $n): int
 {
@@ -3816,6 +4102,8 @@ function fibTab(int $n): int
 ---
 
 ## 30.3 Space Optimization
+
+Space optimization removes DP states that are no longer needed. If `dp[i]` depends only on a fixed number of earlier rows/values, replace the full table with rolling variables or a small rolling array. Do this only after the full state transition is correct, because update order can accidentally overwrite a dependency.
 
 Only previous two values are needed.
 
@@ -3848,6 +4136,8 @@ O(1)
 ---
 
 ## 30.4 Climbing Stairs
+
+Climbing Stairs is a simple DP model: if the final move can be one or two steps, the number of ways to reach step `i` is the sum of the ways to reach `i-1` and `i-2`. Define base cases carefully; conventions for `n = 0` depend on whether 'do nothing' counts as one valid way.
 
 If each move can be 1 or 2 steps:
 
@@ -3899,6 +4189,8 @@ Important related problems:
 
 ## 30.6 Coin Change
 
+The minimum-coin problem asks for the fewest coins needed to form each amount. A common DP state stores the best answer for amount `x`; each coin proposes `1 + dp[x - coin]` when that smaller amount is reachable. Use a sentinel larger than any possible answer and distinguish 'unreachable' from a valid zero-coin base case.
+
 Minimum coins:
 
 ```php
@@ -3927,6 +4219,8 @@ function minCoins(array $coins, int $amount): int
 ---
 
 ## 30.7 Longest Common Subsequence
+
+The Longest Common Subsequence (LCS) asks for the longest sequence that appears in two inputs in the same relative order, without requiring contiguity. A classic DP state `dp[i][j]` describes prefixes of the two sequences: matching symbols extend the answer; otherwise the transition skips one side. The standard table takes `O(mn)` time.
 
 Given:
 
@@ -3962,6 +4256,8 @@ Applications:
 
 ## 30.8 Longest Increasing Subsequence
 
+The Longest Increasing Subsequence (LIS) keeps elements in original order but not necessarily contiguously. A simple DP is `O(n²)`; a tails/binary-search method maintains the smallest possible tail for each subsequence length and runs in `O(n log n)`. The tails array is not necessarily the actual LIS unless predecessor information is also stored.
+
 Classic DP:
 
 ```text
@@ -3994,7 +4290,11 @@ Ask:
 
 ## 30.10 Common DP Categories
 
+DP categories differ mainly in state dimensions and transition shape. Classifying a problem as 1D, 2D, knapsack, interval, tree, or state-machine DP is useful only after you can state exactly what one DP state represents.
+
 ### 1D DP
+
+A 1D DP uses one primary state dimension such as index, amount, or position. Typical transitions depend on a small number of earlier states, which often allows rolling-variable space optimization after correctness is established.
 
 - Fibonacci
 - climbing stairs
@@ -4003,11 +4303,15 @@ Ask:
 
 ### 2D DP
 
+A 1D DP uses one primary state dimension such as index, amount, or position. Typical transitions depend on a small number of earlier states, which often allows rolling-variable space optimization after correctness is established.
+
 - grid paths
 - LCS
 - edit distance
 
 ### Knapsack DP
+
+Knapsack-style DP tracks choices under a capacity/resource constraint. The item reuse rule determines loop direction in optimized 1D tables: downward for 0/1 selection, upward for unbounded reuse.
 
 - subset sum
 - partition
@@ -4015,15 +4319,21 @@ Ask:
 
 ### Interval DP
 
+Interval DP defines a state over a contiguous range, commonly `dp[left][right]`, and combines answers from smaller subintervals. It appears in problems such as matrix-chain multiplication, optimal parenthesization, or bursting balloons. The challenge is choosing the interval length/order so every dependency has already been computed.
+
 - matrix chain multiplication
 - burst balloons
 
 ### Tree DP
 
+Tree DP computes a state for each node from states of its children (or from a rerooted parent/child relationship). A DFS usually establishes the processing order. Clearly define what each state means—for example, 'best answer in this subtree if the node is chosen'—because correctness depends on combining child states consistently.
+
 - maximum path-like computations
 - subtree decisions
 
 ### State Machine DP
+
+State-machine DP keeps a small logical state such as holding/not-holding stock, cooldown, previous choice, or parity. Each transition represents an allowed state change; drawing the state graph before coding often makes invalid transitions obvious.
 
 - stock buy/sell
 - cooldown states
@@ -4032,6 +4342,8 @@ Ask:
 ---
 
 # 31. Bit Manipulation
+
+Bit manipulation treats an integer as a sequence of binary bits. Operations such as AND (`&`), OR (`|`), XOR (`^`), complement (`~`), and shifts can test or modify individual bits efficiently. Use explicit parentheses around shift expressions when precedence could be unclear, and remember that signed integer width and overflow behavior are language-specific.
 
 Binary representation:
 
@@ -4055,6 +4367,8 @@ Operators:
 
 ## 31.1 Check Even/Odd
 
+The least-significant bit determines integer parity: an even number ends in binary `0`, while an odd number ends in `1`. Therefore `$n & 1` is `0` for even values and `1` for odd values.
+
 ```php
 $isOdd = ($n & 1) === 1;
 ```
@@ -4062,6 +4376,8 @@ $isOdd = ($n & 1) === 1;
 ---
 
 ## 31.2 XOR Properties
+
+XOR has three useful algebraic properties for DSA: `x ^ x = 0`, `x ^ 0 = x`, and order/grouping can be rearranged because XOR is associative and commutative. These properties enable cancellation tricks, parity/state toggling, and some prefix-XOR problems.
 
 ```text
 x ^ x = 0
@@ -4087,6 +4403,8 @@ function singleNumber(array $nums): int
 
 ## 31.3 Check Bit
 
+To test zero-based bit position `$k`, create a mask with `1 << $k` and AND it with `$n`. A non-zero result means that bit is set. This operation is useful in flags, masks, and subset-state algorithms.
+
 ```php
 function isBitSet(int $n, int $position): bool
 {
@@ -4098,6 +4416,8 @@ function isBitSet(int $n, int $position): bool
 
 ## 31.4 Set Bit
 
+Set zero-based bit `$k` by OR-ing the number with `1 << $k`. OR preserves existing `1` bits and forces only the selected position to `1`.
+
 ```php
 $n |= (1 << $position);
 ```
@@ -4106,6 +4426,8 @@ $n |= (1 << $position);
 
 ## 31.5 Clear Bit
 
+Clear zero-based bit `$k` by AND-ing the number with the complement of `1 << $k`. The complemented mask has `0` at the target position and `1` elsewhere, so only that bit is forced off.
+
 ```php
 $n &= ~(1 << $position);
 ```
@@ -4113,6 +4435,8 @@ $n &= ~(1 << $position);
 ---
 
 ## 31.6 Bitmask Use Cases
+
+A **bitmask** packs many Boolean states into the bits of one integer. It is useful for permission flags, representing subsets, visited-state compression, and small-state dynamic programming. Use it only when the number of flags fits the integer width and bit-level code remains maintainable.
 
 - permissions
 - subset enumeration
@@ -4131,6 +4455,8 @@ DELETE = 100
 
 # 32. Monotonic Stack and Monotonic Queue
 
+A monotonic stack keeps its elements in increasing or decreasing order by removing values that can no longer be useful. Each element is pushed and popped at most once, so many nearest-greater/nearest-smaller problems become `O(n)`. The crucial design decision is whether the stack stores values or indexes and which comparison preserves the needed candidate boundary.
+
 A monotonic stack keeps values increasing or decreasing.
 
 Common problems:
@@ -4144,6 +4470,8 @@ Common problems:
 ---
 
 ## 32.1 Next Greater Element
+
+Next-greater-element problems ask for the first later value that exceeds the current value. A decreasing monotonic stack stores unresolved indexes/values; when a larger value arrives, it resolves stack entries until monotonic order is restored. Each item is pushed and popped at most once, so the scan is `O(n)`.
 
 ```php
 function nextGreater(array $nums): array
@@ -4179,6 +4507,8 @@ O(n)
 ---
 
 ## 32.2 Monotonic Queue
+
+A monotonic queue, usually implemented with a deque, maintains candidates in sorted-by-value order while also expiring elements that leave a sliding range. It gives `O(n)` total processing for sliding-window maximum/minimum because each index enters and leaves the deque at most once.
 
 Useful for:
 
@@ -4217,6 +4547,8 @@ Common problems:
 
 ## 33.1 Four Directions
 
+For four-neighbor grid traversal, use direction offsets such as up, down, left, and right. For every candidate neighbor, check row and column bounds before indexing and then apply the problem's visited/value condition.
+
 ```php
 $directions = [
     [-1, 0], // up
@@ -4229,6 +4561,8 @@ $directions = [
 ---
 
 ## 33.2 Number of Islands Pattern
+
+Treat each land cell as a graph vertex connected to neighboring land cells. Scan the grid; each unvisited land cell starts one BFS/DFS that marks its entire island. Every cell is processed a constant number of times, so runtime is `O(rows × cols)`.
 
 For every cell:
 
@@ -4243,6 +4577,8 @@ This is simply **connected components on a grid**.
 ---
 
 ## 33.3 Flood Fill
+
+Flood fill explores all grid cells connected to a start cell under a movement rule and matching condition. BFS or DFS both work; mark a cell visited (or recolor it) when it is discovered to prevent repeated work. Runtime is `O(rows × cols)` in the worst case.
 
 ```php
 function floodFill(
@@ -4292,6 +4628,8 @@ function floodFill(
 
 # 34. String-Matching Algorithms
 
+String-matching algorithms search for one or more patterns inside text. Compare them by preprocessing cost, search complexity, memory, collision behavior, alphabet assumptions, and whether the same pattern or same text will be queried repeatedly.
+
 For small inputs:
 
 ```php
@@ -4305,6 +4643,8 @@ For DSA learning, understand the algorithms behind efficient pattern search.
 ---
 
 ## 34.1 Naive Search
+
+Naive pattern search tests the pattern at each possible text start until a mismatch or full match. Worst-case time is `O(nm)`; it is simple and correct for small inputs but repeats comparisons that KMP/Z can avoid.
 
 Try the pattern at every starting position.
 
@@ -4325,6 +4665,8 @@ m = pattern length
 
 ## 34.2 KMP — Knuth-Morris-Pratt
 
+Knuth-Morris-Pratt (KMP) searches for a pattern without rechecking characters that are already known to match. It preprocesses the pattern into a prefix/failure table, then uses that table to decide how far the pattern can shift after a mismatch. Preprocessing plus search runs in `O(m + n)` for pattern length `m` and text length `n`.
+
 KMP avoids restarting comparisons from scratch.
 
 It precomputes an LPS array:
@@ -4344,6 +4686,8 @@ Total:         O(n + m)
 ---
 
 ## 34.3 LPS Construction
+
+The KMP LPS table stores, for each pattern prefix, the length of its longest proper prefix that is also a suffix. On mismatch, reuse the previous border length instead of restarting, making preprocessing linear.
 
 ```php
 function buildLps(string $pattern): array
@@ -4374,6 +4718,8 @@ function buildLps(string $pattern): array
 ---
 
 ## 34.4 KMP Search
+
+Knuth-Morris-Pratt (KMP) searches for a pattern without rechecking characters that are already known to match. It preprocesses the pattern into a prefix/failure table, then uses that table to decide how far the pattern can shift after a mismatch. Preprocessing plus search runs in `O(m + n)` for pattern length `m` and text length `n`.
 
 ```php
 function kmpSearch(string $text, string $pattern): int
@@ -4410,6 +4756,8 @@ function kmpSearch(string $text, string $pattern): int
 
 ## 34.5 Rabin-Karp
 
+Rabin-Karp compares rolling hash values for the pattern and each same-length text window. Updating the rolling hash can be constant-time per shift, making the average scan efficient and especially useful when searching many patterns or repeated windows. Because different strings can share a hash, a hash match should be verified when correctness cannot tolerate collisions.
+
 Uses rolling hashes to compare candidate substrings.
 
 Useful conceptually for:
@@ -4425,11 +4773,15 @@ Hash collisions must be handled.
 
 # 35. Advanced Range Data Structures
 
+Range-query structures are useful when an array changes and you still need repeated queries such as sums, minima, maxima, or other associative aggregates. Fenwick trees are compact and excellent for prefix-style operations; segment trees are more general and can support complex queries and lazy range updates.
+
 When you repeatedly query or update ranges, basic loops can become expensive.
 
 ---
 
 ## 35.1 Fenwick Tree / Binary Indexed Tree
+
+A Fenwick Tree stores partial prefix aggregates in a compact array indexed by the least-significant set bit. Point updates and prefix-sum queries both take `O(log n)`, and a range sum is the difference of two prefix sums. Most implementations use 1-based internal indexing even when the input array is 0-based.
 
 Supports:
 
@@ -4448,6 +4800,8 @@ O(log n)
 ---
 
 ## 35.2 Fenwick Tree Implementation
+
+This implementation turns the surrounding concept into concrete state and operations. Identify what each field stores, which method mutates that state, and what invariant must remain true after every operation; those details matter more than memorizing the exact syntax.
 
 ```php
 class FenwickTree
@@ -4589,6 +4943,8 @@ Reservoir sampling solves this with constant memory.
 
 ## 37.1 Reservoir Sampling for One Item
 
+Reservoir sampling selects one item uniformly from a stream of unknown/large length using `O(1)` memory. When processing the `i`th item (1-based), replace the current sample with probability `1/i`; by induction, every seen item then has probability `1/i` of being the sample.
+
 ```php
 function reservoirSample(iterable $items): mixed
 {
@@ -4644,6 +5000,8 @@ Important ones include:
 
 ## 38.1 `SplDoublyLinkedList`
 
+`SplDoublyLinkedList` provides a linked deque/list structure with operations at both ends. It can be useful when frequent front/back insertions/removals are required and avoids treating PHP's general-purpose array as every possible data structure.
+
 ```php
 $list = new SplDoublyLinkedList();
 
@@ -4658,6 +5016,8 @@ echo $list->shift(); // 5
 
 ## 38.2 `SplFixedArray`
 
+`SplFixedArray` stores a fixed number of indexed elements and can use less memory than a general PHP array for dense numeric indexes. It lacks the flexibility and rich associative behavior of normal arrays, so use it only when fixed indexed storage is a real requirement.
+
 ```php
 $arr = new SplFixedArray(3);
 
@@ -4671,6 +5031,8 @@ Unlike a normal PHP array, its size is explicitly managed.
 ---
 
 ## 38.3 `SplObjectStorage`
+
+`SplObjectStorage` maps **object identity** to associated data and can also act like a set of objects. It is useful for visited-object tracking or metadata keyed by object instances, which ordinary scalar-key associative arrays do not express directly.
 
 ```php
 $storage = new SplObjectStorage();
@@ -4691,6 +5053,8 @@ Useful when object identity itself is the key.
 ---
 
 # 39. PHP Performance Considerations for DSA
+
+PHP arrays are ordered hash tables rather than compact low-level arrays, which affects memory and operation costs. For queue/heap/linked structures, SPL classes can be more appropriate; for large streams, generators can avoid loading everything into memory. Measure production workloads instead of assuming micro-benchmark results generalize.
 
 PHP is perfectly capable of expressing DSA solutions, but implementation details matter.
 
@@ -4719,6 +5083,8 @@ For production processing of huge datasets, memory usage deserves attention.
 
 ## 39.2 Avoid Repeated `array_shift()` for Large Queues
 
+The code below is a concrete example of **39.2 Avoid Repeated `array_shift()` for Large Queues**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
+
 This pattern:
 
 ```php
@@ -4740,6 +5106,8 @@ for heavy FIFO operations.
 ---
 
 ## 39.3 Avoid Repeated `count()` in Hot Loops When Appropriate
+
+Modern PHP's `count()` on arrays is constant-time, so caching it is not usually necessary for asymptotic reasons. In a very hot loop, storing a stable count can still avoid repeated calls, but do not cache it if the collection size changes or if clarity suffers without evidence of a bottleneck.
 
 Readable code:
 
@@ -4878,6 +5246,8 @@ This is highly useful for:
 
 ## 40.1 File Generator
 
+A generator yields values incrementally instead of building the entire result collection in memory. It is useful for large files/streams or pipelines where the caller can consume one item at a time; once materialized into an array, the memory advantage is lost.
+
 ```php
 function lines(string $file): Generator
 {
@@ -4909,11 +5279,15 @@ foreach (lines('large.log') as $line) {
 
 # 41. Problem-Solving Framework
 
+A problem-solving framework turns an unfamiliar prompt into a sequence of verifiable decisions. Clarify the contract, build a correct baseline, locate repeated work, choose a structure/pattern that removes it, state why the optimization is valid, and test the boundaries.
+
 Use the following framework for every problem.
 
 ---
 
 ## Step 1 — Restate the Problem
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Example:
 
@@ -4930,6 +5304,8 @@ Clarify:
 
 ## Step 2 — Create Examples
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 ```text
 Input:  [1,2,1,0,1], K=4
 Output: ?
@@ -4940,6 +5316,8 @@ Manual examples frequently reveal the pattern.
 ---
 
 ## Step 3 — Start with Brute Force
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Do not jump immediately into clever optimization.
 
@@ -4954,6 +5332,8 @@ Then analyze it.
 ---
 
 ## Step 4 — Find the Bottleneck
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Suppose brute force is:
 
@@ -4976,6 +5356,8 @@ Can you use:
 ---
 
 ## Step 5 — Identify the Pattern
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Useful pattern questions:
 
@@ -5009,6 +5391,8 @@ Dependency ordering?
 
 ## Step 6 — State Complexity Before Coding
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Example:
 
 ```text
@@ -5019,6 +5403,8 @@ Space: O(n)
 ---
 
 ## Step 7 — Code in Small Steps
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Avoid writing a giant function immediately.
 
@@ -5037,6 +5423,8 @@ $parent
 
 ## Step 8 — Dry Run
 
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
+
 Track variables:
 
 | Step | left | right | state |
@@ -5048,6 +5436,8 @@ Track variables:
 ---
 
 ## Step 9 — Test Edge Cases
+
+This step is part of turning a problem statement into a defensible solution. Do it explicitly before moving on: the result of this step should give you concrete information you can use to choose, verify, or explain the algorithm.
 
 Always test:
 
@@ -5069,11 +5459,15 @@ target at last position
 
 # 42. Common Interview Patterns
 
+Interview patterns are recognition shortcuts, not substitutes for reasoning. For each clue, confirm the necessary preconditions, state the invariant or state definition, and explain why the optimized approach eliminates the brute-force bottleneck.
+
 Learning patterns is more useful than memorizing hundreds of unrelated answers.
 
 ---
 
 ## Pattern 1 — Frequency Map
+
+A frequency map stores `value → count`. Scan the input once, incrementing the count for each value; later frequency queries are average `O(1)` with a hash map. This pattern is useful for duplicates, anagrams, counting categories, majority/frequency problems, and many sliding-window algorithms.
 
 Trigger:
 
@@ -5094,6 +5488,8 @@ associative array
 
 ## Pattern 2 — Two Pointers
 
+Two pointers maintain two indexes or references whose movement eliminates unnecessary repeated work. Common forms are opposite-end pointers on sorted data and same-direction read/write pointers for in-place filtering. The technique is most valuable when pointer movement can be justified by an invariant, such as sorted order or a maintained valid region.
+
 Trigger:
 
 ```text
@@ -5106,6 +5502,8 @@ opposite ends
 ---
 
 ## Pattern 3 — Sliding Window
+
+A sliding window tracks a contiguous range while updating only the information that changes when the range expands or shrinks. Fixed-size windows are used when the length is known; variable-size windows adjust a boundary until a validity condition is restored. The usual goal is to replace repeated recomputation of every subarray or substring with a single linear pass.
 
 Trigger:
 
@@ -5120,6 +5518,8 @@ fixed-length range
 
 ## Pattern 4 — Prefix Sum
 
+A prefix sum precomputes cumulative totals so that later range sums can be answered by subtraction. With the common convention `prefix[i] = sum of elements before i`, the sum of the half-open range `[left, right)` is `prefix[right] - prefix[left]`. Building the prefix array costs `O(n)` time and each range query then costs `O(1)`.
+
 Trigger:
 
 ```text
@@ -5131,6 +5531,8 @@ cumulative totals
 ---
 
 ## Pattern 5 — Fast/Slow Pointer
+
+Think of **fast/slow pointer** as a recognition pattern rather than a memorized solution. The clues below suggest that the technique may remove repeated work; confirm its preconditions and maintain an invariant that explains why pointer/state updates are safe.
 
 Trigger:
 
@@ -5144,6 +5546,8 @@ repeated state
 
 ## Pattern 6 — BFS
 
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
+
 Trigger:
 
 ```text
@@ -5155,6 +5559,8 @@ level
 ---
 
 ## Pattern 7 — DFS
+
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
 
 Trigger:
 
@@ -5168,6 +5574,8 @@ path exploration
 ---
 
 ## Pattern 8 — Heap
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 Trigger:
 
@@ -5183,6 +5591,8 @@ stream median
 
 ## Pattern 9 — Binary Search
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Trigger:
 
 ```text
@@ -5196,6 +5606,8 @@ maximum possible
 
 ## Pattern 10 — Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Trigger:
 
 ```text
@@ -5208,6 +5620,8 @@ search decision tree
 ---
 
 ## Pattern 11 — DP
+
+Think of **dp** as a recognition pattern rather than a memorized solution. The clues below suggest that the technique may remove repeated work; confirm its preconditions and maintain an invariant that explains why pointer/state updates are safe.
 
 Trigger:
 
@@ -5223,6 +5637,8 @@ choose/skip
 
 ## Pattern 12 — Union-Find
 
+Union-Find, also called Disjoint Set Union (DSU), maintains a collection of non-overlapping groups under two main operations: `find` identifies a representative and `union` merges groups. Path compression plus union by rank/size makes a long sequence of operations effectively near-constant time in practice. It is useful for dynamic connectivity, cycle detection in undirected graphs, Kruskal's MST, and component grouping.
+
 Trigger:
 
 ```text
@@ -5235,6 +5651,8 @@ cycle in undirected edges
 ---
 
 ## Pattern 13 — Monotonic Stack
+
+A monotonic stack keeps its elements in increasing or decreasing order by removing values that can no longer be useful. Each element is pushed and popped at most once, so many nearest-greater/nearest-smaller problems become `O(n)`. The crucial design decision is whether the stack stores values or indexes and which comparison preserves the needed candidate boundary.
 
 Trigger:
 
@@ -5249,6 +5667,8 @@ histogram
 
 ## Pattern 14 — Trie
 
+A trie stores keys by shared prefixes. Each step consumes one symbol, so lookup time depends mainly on key length rather than on the number of stored keys. Tries are useful for autocomplete, prefix counting, dictionary search, and word-grid problems, but they can use substantially more memory than a hash-based set or map.
+
 Trigger:
 
 ```text
@@ -5261,6 +5681,8 @@ many word lookups
 ---
 
 # 43. Real-World DSA Use Cases for PHP Developers
+
+Real systems use DSA through the operations they need: fast lookup, ordering, scheduling, routing, deduplication, top-k retrieval, dependency resolution, or range aggregation. The useful habit is to translate the business requirement into required operations and then choose the structure that makes those operations efficient.
 
 DSA is not limited to interview puzzles.
 
@@ -5287,6 +5709,8 @@ Discard timestamps outside the allowed window.
 
 ## 43.2 Job Scheduler
 
+A job scheduler often uses a **priority queue** when the next task should be selected by urgency rather than arrival order. Each queued job stores a priority and payload; extraction returns the highest- or lowest-priority job according to the queue's ordering rule. Insertion and extraction are typically `O(log n)` with a binary heap.
+
 Use:
 
 ```text
@@ -5304,6 +5728,8 @@ analytics job     → priority 1
 ---
 
 ## 43.3 Autocomplete
+
+Autocomplete is naturally modeled with a **trie**, where each edge represents the next character of a word. Searching a prefix takes time proportional to the prefix length before suggestions are enumerated or ranked. A production version may pair the trie with frequency scores or a heap for top suggestions.
 
 Use:
 
@@ -5329,6 +5755,8 @@ apply
 
 ## 43.4 Dependency Resolver
 
+A dependency resolver models packages or jobs as a directed graph: `A → B` can mean `A` must happen before `B`. Topological sorting returns a valid order when the graph is acyclic; if not all vertices can be ordered, a dependency cycle exists.
+
 Use:
 
 ```text
@@ -5346,6 +5774,8 @@ Applications:
 ---
 
 ## 43.5 Shortest Delivery Route
+
+Model delivery locations as graph vertices and roads as weighted edges. For non-negative road weights, Dijkstra's algorithm computes shortest distances from a source; the result can be augmented with predecessor links to reconstruct an actual route.
 
 Use graph shortest-path algorithms.
 
@@ -5367,6 +5797,8 @@ distance/travel time
 
 ## 43.6 Duplicate Transaction Detection
 
+Duplicate detection is a membership problem. Store a stable transaction identifier or an appropriate composite key in a hash-based lookup, then reject or flag a key that has already appeared. Average lookup is `O(1)`, so processing `n` transactions is `O(n)` on average.
+
 Use:
 
 ```text
@@ -5385,6 +5817,8 @@ customer + amount + merchant + short time interval
 
 ## 43.7 Dashboard Range Queries
 
+When a dashboard repeatedly asks for totals over ranges, precomputation avoids rescanning every row. Prefix sums answer static range-sum queries in `O(1)` after `O(n)` preprocessing; Fenwick or segment trees are better when updates must also be supported.
+
 For mostly static historical metrics:
 
 ```text
@@ -5402,6 +5836,8 @@ segment tree
 
 ## 43.8 Search Results Top K
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Use:
 
 ```text
@@ -5413,6 +5849,8 @@ Rather than sorting millions of items when only 10 are required.
 ---
 
 ## 43.9 Laravel Queue Concept
+
+A queue follows **First In, First Out (FIFO)** order: the earliest enqueued item is processed first. The key operations are enqueue, dequeue, front/peek, and emptiness checking. Queues are a natural fit for breadth-first search, scheduling, buffering, and any workflow that must preserve arrival order.
 
 A framework queue abstracts infrastructure, but the conceptual DSA model remains FIFO/priority scheduling.
 
@@ -5446,6 +5884,8 @@ full table scan
 
 ## 43.11 LRU Cache for Expensive API Results
 
+An **LRU (Least Recently Used) cache** evicts the entry that has gone unused for the longest time when capacity is full. The classic `O(1)` design combines a hash map for lookup with a doubly linked list for recency ordering; caching is appropriate only when stale-data and invalidation rules are acceptable.
+
 Use:
 
 ```text
@@ -5457,6 +5897,8 @@ to support fast lookup and eviction.
 ---
 
 ## 43.12 Fraud Relationship Detection
+
+Fraud relationships can be modeled as a graph whose vertices are accounts and whose edges represent transfers, shared identifiers, or other relationships. Connected components, BFS/DFS, cycle analysis, or specialized graph scoring can then reveal clusters; the graph model itself does not prove fraud and must be interpreted with business rules.
 
 Model:
 
@@ -5472,11 +5914,15 @@ Graph traversal can reveal suspicious clusters and relationships.
 
 # 44. Testing DSA Code in PHP
 
+Testing DSA code means exercising both algorithmic correctness and boundary behavior. Include empty/minimal inputs, duplicates, already-ordered and reverse-ordered inputs, extreme numeric values, disconnected structures, and cases that force every branch of the algorithm.
+
 A correct algorithm requires tests.
 
 ---
 
 ## 44.1 Simple Assertions
+
+A simple assertion compares the actual result with a known expected result. Assertions are useful for tiny examples and interview practice because they fail close to the defect, but a real project should use a test framework for clearer reports and independent test cases.
 
 ```php
 assert(binarySearch([1, 3, 5, 7], 5) === 2);
@@ -5487,9 +5933,13 @@ assert(binarySearch([1, 3, 5, 7], 8) === -1);
 
 ## 44.2 Test Categories
 
+Good DSA tests cover more than a normal example. Include representative input, the smallest valid input, duplicates, boundary values, absent targets, and invalid input when the function contract defines validation behavior. The exact categories depend on the algorithm's preconditions.
+
 For each function test:
 
 ### Normal
+
+The code below is a concrete example of **Normal**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
 
 ```text
 [1,2,3]
@@ -5497,11 +5947,15 @@ For each function test:
 
 ### Empty
 
+The code below is a concrete example of **Empty**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
+
 ```text
 []
 ```
 
 ### Single
+
+The code below is a concrete example of **Single**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
 
 ```text
 [7]
@@ -5509,17 +5963,23 @@ For each function test:
 
 ### Duplicate
 
+The code below is a concrete example of **Duplicate**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
+
 ```text
 [2,2,2]
 ```
 
 ### Boundary
 
+The code below is a concrete example of **Boundary**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
+
 ```text
 first/last positions
 ```
 
 ### Invalid
+
+The code below is a concrete example of **Invalid**. Read it by identifying the input/state first, then trace each mutation or decision until the produced value/output. When reusing the pattern, preserve its required preconditions and include the cost of nested library operations in the complexity analysis.
 
 ```text
 wrong k
@@ -5529,6 +5989,8 @@ negative constraints when not allowed
 ---
 
 ## 44.3 PHPUnit Example
+
+This PHPUnit test class verifies two contracts of `binarySearch()`: it returns index `2` when target `5` is present in `[1, 3, 5, 7]`, and it returns `-1` when target `4` is absent. `assertSame(expected, actual)` checks both value and type, which makes the expected output explicit.
 
 ```php
 final class BinarySearchTest extends PHPUnit\Framework\TestCase
@@ -5555,6 +6017,8 @@ final class BinarySearchTest extends PHPUnit\Framework\TestCase
 
 # 45. Benchmarking
 
+Benchmarking measures observed runtime or memory under a specific environment; complexity analysis predicts growth independently of that machine. Warm up where relevant, run multiple iterations, use representative input sizes/distributions, and avoid drawing conclusions from tiny inputs where interpreter/runtime overhead dominates.
+
 Do not optimize purely by intuition.
 
 Measure when performance matters.
@@ -5562,6 +6026,8 @@ Measure when performance matters.
 ---
 
 ## 45.1 `hrtime()`
+
+`hrtime(true)` returns a high-resolution monotonic timestamp as an integer number of nanoseconds on supported PHP builds. The example records a timestamp before and after `someAlgorithm($input)`, subtracts them, and prints elapsed nanoseconds. Benchmark multiple runs and realistic inputs because a single timing can be distorted by runtime noise.
 
 ```php
 $start = hrtime(true);
@@ -5578,6 +6044,8 @@ echo "Nanoseconds: $elapsedNs" . PHP_EOL;
 ---
 
 ## 45.2 Memory
+
+`memory_get_usage()` reports memory currently allocated to the PHP process from PHP's memory manager, while `memory_get_peak_usage()` reports the highest observed usage. Measure before and after representative work, but remember that allocator behavior means a simple subtraction is only an approximation of an algorithm's true auxiliary memory.
 
 ```php
 $before = memory_get_usage(true);
@@ -5605,9 +6073,13 @@ echo 'Approx delta: ' . ($after - $before) . PHP_EOL;
 
 # 46. Common Mistakes
 
+DSA bugs are often caused by incorrect boundaries, stale state, missing visited checks, wrong base cases, or an invariant that was never made explicit. Debug by reducing the input, tracing state changes line by line, and checking the first point where the program diverges from the expected invariant.
+
 ---
 
 ## Mistake 1 — Optimizing Before Understanding
+
+This mistake is common because the code can look plausible on normal inputs. Use a minimal counterexample, state the violated invariant/assumption, and fix the reasoning before optimizing or memorizing a corrected snippet.
 
 Bad approach:
 
@@ -5649,11 +6121,15 @@ Constraints often reveal the expected complexity.
 
 ## Mistake 3 — Using Binary Search on Unsorted Data
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Binary search requires monotonic ordering/conditions.
 
 ---
 
 ## Mistake 4 — Forgetting Duplicate Cases
+
+This mistake is common because the code can look plausible on normal inputs. Use a minimal counterexample, state the violated invariant/assumption, and fix the reasoning before optimizing or memorizing a corrected snippet.
 
 Many algorithms fail with:
 
@@ -5666,6 +6142,8 @@ Always test duplicates.
 ---
 
 ## Mistake 5 — Off-by-One Errors
+
+Off-by-one bugs happen when an endpoint is included/excluded incorrectly. Write the interval convention explicitly—such as `[left, right]` or `[left, right)`—and test empty, one-element, and boundary-position cases before trusting the loop.
 
 Typical danger:
 
@@ -5685,6 +6163,8 @@ Choose one binary-search interval convention and stay consistent.
 
 ## Mistake 6 — Modifying Array While Iterating Without a Clear Plan
 
+This mistake is common because the code can look plausible on normal inputs. Use a minimal counterexample, state the violated invariant/assumption, and fix the reasoning before optimizing or memorizing a corrected snippet.
+
 Mutation during iteration can cause confusing behavior.
 
 Prefer explicit index management or create a result array.
@@ -5692,6 +6172,8 @@ Prefer explicit index management or create a result array.
 ---
 
 ## Mistake 7 — Confusing Values and Indices
+
+This mistake is common because the code can look plausible on normal inputs. Use a minimal counterexample, state the violated invariant/assumption, and fix the reasoning before optimizing or memorizing a corrected snippet.
 
 For monotonic stacks, often store:
 
@@ -5705,11 +6187,15 @@ not values, because you need both location and value.
 
 ## Mistake 8 — Using Recursion Without a Base Case
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 Results in runaway recursion.
 
 ---
 
 ## Mistake 9 — Forgetting Visited Nodes in Graphs
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 Without:
 
@@ -5723,11 +6209,15 @@ a cycle can cause repeated traversal forever.
 
 ## Mistake 10 — Marking BFS Visited Too Late
 
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
+
 Usually mark a node visited when it is **enqueued**, not only after dequeueing, to prevent many duplicate queue entries.
 
 ---
 
 ## Mistake 11 — Wrong Heap Direction
+
+A heap is a partially ordered tree structure commonly used to implement a priority queue. A min-heap exposes the smallest item; a max-heap exposes the largest. Insert and removal of the root are typically `O(log n)`, while reading the root is `O(1)`, making heaps ideal for top-k, scheduling, streaming minima/maxima, and graph algorithms such as Dijkstra or Prim.
 
 Remember:
 
@@ -5741,13 +6231,19 @@ For minimum-distance Dijkstra, commonly use negative distances or an appropriate
 
 ## Mistake 12 — Treating PHP Strings as Unicode Character Arrays
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 Byte-oriented indexing is fine for ASCII-style coding problems but not generally equivalent to Unicode character processing.
 
 ---
 
 # 47. Interview Cheat Sheet
 
+Use this cheat sheet for quick recall after you understand the underlying techniques. For every one-line rule, be able to state its preconditions, invariant, typical complexity, and at least one counterexample where the shortcut would be invalid.
+
 ## Complexity
+
+For **Interview Cheat Sheet**, derive complexity from the number of processed elements/states and the cost of each data-structure operation. Include auxiliary structures and recursion depth in space complexity rather than reporting only the main loop.
 
 ```text
 Array scan              O(n)
@@ -5764,6 +6260,8 @@ Union-Find              almost O(1) amortized in practice
 ---
 
 ## Pattern → Tool
+
+This table is a recognition aid: each problem clue suggests a data structure or algorithm worth considering, not a guaranteed solution. Always verify the input constraints, required operations, and correctness invariant before choosing the listed tool.
 
 ```text
 Duplicate / frequency
@@ -5810,6 +6308,8 @@ Next greater/smaller
 
 ## Binary Search Template
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 ```php
 $left = 0;
 $right = count($arr) - 1;
@@ -5833,6 +6333,8 @@ while ($left <= $right) {
 
 ## BFS Template
 
+Breadth-first search explores a graph or tree level by level using a queue. In an unweighted graph, the first time BFS reaches a vertex is through a path with the minimum number of edges from the start. With adjacency-list representation, a complete traversal is `O(V + E)` when each vertex is processed once.
+
 ```php
 $queue = new SplQueue();
 $queue->enqueue($start);
@@ -5855,6 +6357,8 @@ while (!$queue->isEmpty()) {
 
 ## DFS Template
 
+Depth-first search explores one branch as far as possible before returning to try another branch. It can be implemented recursively or with an explicit stack and is widely used for connected components, cycle detection, tree processing, path exploration, topological reasoning, and many backtracking-style searches. Track visited state in cyclic graphs to avoid endless revisits.
+
 ```php
 function dfs($node, $graph, &$visited)
 {
@@ -5871,6 +6375,8 @@ function dfs($node, $graph, &$visited)
 ---
 
 ## Backtracking Template
+
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
 
 ```php
 function backtrack(...)
@@ -5892,6 +6398,8 @@ function backtrack(...)
 
 ## DP Template
 
+A dynamic-programming template separates three decisions: define the **state**, write the **transition** from smaller states, and establish **base cases**. The code template is only a skeleton; the meaning of each index and returned value must be derived from the current problem.
+
 ```text
 1. Define state.
 2. Define transition.
@@ -5905,11 +6413,15 @@ function backtrack(...)
 
 # 48. Practice Roadmap
 
+A practice roadmap should progress from understanding operations to recognizing patterns under mixed conditions. Advance when you can derive and explain a solution without copying, not merely when you have completed a fixed number of exercises.
+
 A structured progression prevents overwhelm.
 
 ---
 
 ## Phase 1 — Foundations
+
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
 
 Learn:
 
@@ -5931,6 +6443,8 @@ Solve 25–40 easy problems.
 
 ## Phase 2 — Core Patterns
 
+This phase groups skills that reinforce one another. Do not judge progress only by the number of topics completed; the target is being able to recognize the pattern, implement it without copying, analyze complexity, and explain edge cases.
+
 Learn:
 
 - two pointers
@@ -5949,6 +6463,8 @@ Solve 40–60 problems.
 ---
 
 ## Phase 3 — Trees and Graphs
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 Learn:
 
@@ -5970,6 +6486,8 @@ Solve 50+ problems.
 
 ## Phase 4 — Advanced Patterns
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 Learn:
 
 - heap
@@ -5989,6 +6507,8 @@ Solve 60–100 problems.
 
 ## Phase 5 — Advanced DSA
 
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
+
 Learn:
 
 - Dijkstra
@@ -6004,7 +6524,11 @@ Learn:
 
 ## Suggested Weekly Routine
 
+This routine rotates theory, implementation, problem solving, review, and rest across the week. Treat it as a starting point rather than a fixed schedule: reduce the problem count when review quality drops, and spend extra time re-solving mistakes.
+
 ### Monday
+
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
 
 ```text
 Learn one concept.
@@ -6013,11 +6537,15 @@ Implement from scratch.
 
 ### Tuesday
 
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
+
 ```text
 Solve 3 easy problems.
 ```
 
 ### Wednesday
+
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
 
 ```text
 Solve 2 medium problems.
@@ -6025,11 +6553,15 @@ Solve 2 medium problems.
 
 ### Thursday
 
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
+
 ```text
 Review failed problems.
 ```
 
 ### Friday
+
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
 
 ```text
 Solve timed interview set.
@@ -6037,11 +6569,15 @@ Solve timed interview set.
 
 ### Saturday
 
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
+
 ```text
 Build one mini application using the concept.
 ```
 
 ### Sunday
+
+Use this day's activity as one part of the weekly learning cycle. The objective is deliberate practice and review quality; adjust the duration or problem count to your current level rather than rushing through the task.
 
 ```text
 Revision + handwritten complexity notes.
@@ -6050,6 +6586,8 @@ Revision + handwritten complexity notes.
 ---
 
 # 49. Problem Practice Catalog
+
+The catalog is a deliberate-practice menu rather than a completion checklist. Choose problems that isolate one pattern first, then mix categories so you must recognize the technique from constraints and structure rather than from the chapter label.
 
 Use this catalog to practice patterns rather than random questions.
 
@@ -6232,6 +6770,8 @@ Use this catalog to practice patterns rather than random questions.
 
 ## Backtracking
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 1. Subsets.
 2. Subsets with duplicates.
 3. Permutations.
@@ -6272,11 +6812,15 @@ Use this catalog to practice patterns rather than random questions.
 
 # 50. Mini Projects
 
+Mini projects connect abstract structures to persistent state and user-visible behavior. For each project, identify the dominant operations first, choose the data structure based on those operations, and document what would become slower or harder if a different structure were used.
+
 Projects help connect DSA to actual PHP development.
 
 ---
 
 ## Project 1 — Autocomplete Engine
+
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
 
 Use:
 
@@ -6302,6 +6846,8 @@ for ranked suggestions.
 ---
 
 ## Project 2 — Task Scheduler
+
+A scheduler often needs efficient priority selection plus state for queued/completed work. A priority queue handles the next highest/lowest-priority task, while maps can support task lookup/cancellation. Define tie-breaking and deadline semantics so scheduling is deterministic.
 
 Use:
 
@@ -6330,6 +6876,8 @@ Features:
 
 ## Project 3 — Social Network Explorer
 
+A social network is naturally a graph where people are vertices and relationships are edges. BFS/DFS support reachability and degrees of separation, while sets/maps support neighbor membership; large-scale recommendations often require more specialized ranking/indexing beyond basic traversal.
+
 Use:
 
 ```text
@@ -6348,6 +6896,8 @@ Features:
 
 ## Project 4 — Route Finder
 
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
+
 Use:
 
 ```text
@@ -6364,6 +6914,8 @@ Features:
 ---
 
 ## Project 5 — LRU API Cache
+
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
 
 Use:
 
@@ -6383,6 +6935,8 @@ Features:
 
 ## Project 6 — Search Index
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Use:
 
 ```text
@@ -6401,6 +6955,8 @@ Example index:
 ---
 
 ## Project 7 — Log Analyzer
+
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
 
 Use:
 
@@ -6425,6 +6981,8 @@ This is an excellent practical PHP DSA project.
 
 ## Project 8 — Meeting Room Scheduler
 
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
+
 Use:
 
 ```text
@@ -6441,6 +6999,8 @@ minimum rooms required
 ---
 
 ## Project 9 — Dependency Build Tool
+
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
 
 Use:
 
@@ -6467,6 +7027,8 @@ C → B → A
 
 ## Project 10 — Analytics Range Engine
 
+This project turns the data structures or patterns listed below into a small system with observable behavior. Build the simplest working version first, then add tests and measure whether the chosen structure actually improves the target operation.
+
 Use:
 
 ```text
@@ -6486,6 +7048,8 @@ Support:
 
 # 51. Final Revision Checklist
 
+Treat this section as an evidence-based self-check. Mark an item complete only when you can explain it in simple language, implement or apply it without copying, analyze its trade-offs, and recognize cases where it should not be used.
+
 Before saying "I know DSA in PHP", make sure you can explain and implement these without blindly copying.
 
 ## Foundations
@@ -6499,6 +7063,8 @@ Before saying "I know DSA in PHP", make sure you can explain and implement these
 
 ## Arrays and Strings
 
+A string is a sequence of characters, but its exact behavior depends on the language's string model and character encoding. DSA string problems commonly need indexing/traversal, frequency counting, substring handling, comparison, prefix/suffix reasoning, or pattern matching. Always check whether the task assumes simple ASCII-like characters or full Unicode text.
+
 - [ ] frequency map
 - [ ] two pointers
 - [ ] sliding window
@@ -6507,6 +7073,8 @@ Before saying "I know DSA in PHP", make sure you can explain and implement these
 - [ ] interval merging
 
 ## Search and Sort
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 - [ ] linear search
 - [ ] binary search
@@ -6519,6 +7087,8 @@ Before saying "I know DSA in PHP", make sure you can explain and implement these
 
 ## Linear Data Structures
 
+This subsection focuses on **Linear Data Structures**. Use the items below as concrete criteria: understand what each item means, why it is relevant in this context, and what evidence in code or a problem would make you apply it.
+
 - [ ] linked list
 - [ ] reverse linked list
 - [ ] cycle detection
@@ -6528,6 +7098,8 @@ Before saying "I know DSA in PHP", make sure you can explain and implement these
 - [ ] monotonic stack
 
 ## Trees
+
+For tree revision, make sure you can explain recursive and iterative traversal, BFS level order, BST ordering, height/depth, balanced versus skewed shapes, and how recursion depth affects space. Practice both returning computed values and mutating/building tree structures.
 
 - [ ] binary tree
 - [ ] preorder
@@ -6541,12 +7113,16 @@ Before saying "I know DSA in PHP", make sure you can explain and implement these
 
 ## Heaps
 
+This subsection focuses on **Heaps**. Use the items below as concrete criteria: understand what each item means, why it is relevant in this context, and what evidence in code or a problem would make you apply it.
+
 - [ ] min heap
 - [ ] max heap
 - [ ] priority queue
 - [ ] top K
 
 ## Graphs
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 - [ ] adjacency list
 - [ ] BFS
@@ -6560,6 +7136,8 @@ Before saying "I know DSA in PHP", make sure you can explain and implement these
 - [ ] Union-Find
 
 ## Advanced
+
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
 
 - [ ] trie
 - [ ] backtracking
@@ -6631,9 +7209,13 @@ Official documentation:
 
 # Appendix B — Choosing the Right Data Structure
 
+A data structure is the organization chosen for data because that organization makes some operations cheaper than others. When selecting one, ask which operations must be fast—indexing, insertion, deletion, lookup, ordering, minimum/maximum retrieval, or relationship traversal—and what memory trade-off is acceptable.
+
 Ask:
 
 ### Do I need very fast key lookup?
+
+A hash map/associative array is usually the first choice for average `O(1)` lookup by key. Verify the exact update/query operations before choosing it.
 
 ```text
 Hash map
@@ -6641,11 +7223,15 @@ Hash map
 
 ### Do I need unique membership?
 
+Use a set abstraction when the main requirement is storing unique values and testing membership quickly. Verify the exact update/query operations before choosing it.
+
 ```text
 Set-like map
 ```
 
 ### Do I need LIFO?
+
+Use a stack when the most recently added item must be processed first. Verify the exact update/query operations before choosing it.
 
 ```text
 Stack
@@ -6653,11 +7239,15 @@ Stack
 
 ### Do I need FIFO?
 
+Use a queue when items must be processed in arrival order. Verify the exact update/query operations before choosing it.
+
 ```text
 Queue
 ```
 
 ### Do I need highest/lowest priority?
+
+Use a heap-backed priority queue when the next item is selected by priority rather than insertion order. Verify the exact update/query operations before choosing it.
 
 ```text
 Heap / Priority Queue
@@ -6665,11 +7255,15 @@ Heap / Priority Queue
 
 ### Do I need hierarchical relationships?
 
+Use a tree when data naturally has parent/child hierarchy and traversal follows that structure. Verify the exact update/query operations before choosing it.
+
 ```text
 Tree
 ```
 
 ### Do I need arbitrary relationships?
+
+Use a graph when entities can connect many-to-many without a single hierarchy. Verify the exact update/query operations before choosing it.
 
 ```text
 Graph
@@ -6677,11 +7271,15 @@ Graph
 
 ### Do I need fast prefix search?
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 ```text
 Trie
 ```
 
 ### Do I need repeated prefix/range sums with updates?
+
+A Fenwick tree is a compact choice for prefix sums and point updates in `O(log n)` time. Verify the exact update/query operations before choosing it.
 
 ```text
 Fenwick Tree
@@ -6689,11 +7287,15 @@ Fenwick Tree
 
 ### Do I need more flexible range queries?
 
+A segment tree supports customizable associative range queries and updates, usually in `O(log n)` time. Verify the exact update/query operations before choosing it.
+
 ```text
 Segment Tree
 ```
 
 ### Do I need O(1)-style cache lookup plus usage ordering?
+
+`O(1)` means the amount of work does not grow with the number of input elements. It does **not** mean the operation takes exactly one CPU instruction; it means the step count is bounded by a constant with respect to input size. Examples include reading a known array index or checking a stored variable.
 
 ```text
 Hash map + doubly linked list
@@ -6804,7 +7406,11 @@ That explanation demonstrates understanding rather than memorization.
 
 # Appendix F — 30-Day DSA with PHP Study Plan
 
+Use this plan as a sequence of skill dependencies rather than a rigid calendar. Spend extra time where you cannot yet explain the invariant, implement without copying, or analyze complexity; mastery is more important than keeping pace with a date label.
+
 ## Days 1–3
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 Big O
@@ -6815,6 +7421,8 @@ basic math
 
 ## Days 4–6
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 strings
 frequency maps
@@ -6824,6 +7432,8 @@ anagrams
 
 ## Days 7–9
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 two pointers
 sliding window
@@ -6831,6 +7441,8 @@ prefix sums
 ```
 
 ## Days 10–11
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 sorting
@@ -6840,12 +7452,16 @@ binary search boundaries
 
 ## Days 12–13
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 linked lists
 slow/fast pointers
 ```
 
 ## Days 14–15
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 stack
@@ -6854,6 +7470,8 @@ monotonic stack
 ```
 
 ## Days 16–18
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 trees
@@ -6864,6 +7482,8 @@ BST
 
 ## Days 19–21
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 graphs
 components
@@ -6873,6 +7493,8 @@ Union-Find
 
 ## Days 22–23
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 heap
 priority queue
@@ -6881,6 +7503,8 @@ top K
 
 ## Days 24–25
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 ```text
 backtracking
 subsets
@@ -6888,6 +7512,8 @@ permutations
 ```
 
 ## Days 26–28
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 ```text
 dynamic programming
@@ -6898,6 +7524,8 @@ knapsack
 
 ## Day 29
 
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
+
 ```text
 Dijkstra
 trie
@@ -6905,6 +7533,8 @@ bit manipulation
 ```
 
 ## Day 30
+
+Treat this block as focused revision. Re-derive at least one implementation from memory, solve a fresh problem, and retry one earlier mistake so the topic is reinforced through recall rather than rereading.
 
 ```text
 mock interview
@@ -6916,7 +7546,11 @@ solve 5 mixed problems without notes
 
 # Appendix G — 12-Week Mastery Roadmap
 
+Use this plan as a sequence of skill dependencies rather than a rigid calendar. Spend extra time where you cannot yet explain the invariant, implement without copying, or analyze complexity; mastery is more important than keeping pace with a date label.
+
 ## Weeks 1–2 — Fundamentals
+
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
 
 Target:
 
@@ -6937,6 +7571,8 @@ Study:
 
 ## Weeks 3–4 — Pattern Recognition
 
+Use this schedule as a pacing guide rather than a strict quota. If a topic still feels mechanical, spend additional time tracing examples and re-solving mistakes before increasing difficulty.
+
 Target:
 
 ```text
@@ -6954,6 +7590,8 @@ Study:
 ---
 
 ## Weeks 5–6 — Stack, Queue, Trees
+
+A stack follows **Last In, First Out (LIFO)** order: the most recently pushed item is the first one removed. The core operations are push, pop, peek/top, and an emptiness check. Stacks are useful when later work depends on the most recent unfinished item, such as expression evaluation, undo, DFS, bracket matching, monotonic-stack problems, and simulated recursion.
 
 Target:
 
@@ -6973,6 +7611,8 @@ Study:
 ---
 
 ## Weeks 7–8 — Graphs and Heaps
+
+A graph models entities as vertices and relationships as edges. Before choosing an algorithm, determine whether the graph is directed or undirected, weighted or unweighted, cyclic or acyclic, and connected or disconnected. Those properties decide whether BFS, DFS, topological sorting, shortest-path algorithms, minimum-spanning-tree algorithms, or connectivity structures are appropriate.
 
 Target:
 
@@ -6994,6 +7634,8 @@ Study:
 
 ## Weeks 9–10 — Backtracking and DP
 
+Backtracking explores a decision tree by making a choice, recursively exploring what follows, and then undoing that choice before trying the next option. It is appropriate when the task asks for all valid combinations, permutations, placements, paths, or constraint-satisfying configurations. Pruning impossible branches early is often the difference between a practical and an impractical solution.
+
 Target:
 
 ```text
@@ -7013,6 +7655,8 @@ Study:
 ---
 
 ## Weeks 11–12 — Advanced and Interview Preparation
+
+These items combine or extend core patterns. Add them only after the prerequisite structure is comfortable; for each one, learn the invariant and complexity rather than memorizing a finished template.
 
 Study:
 
@@ -7034,7 +7678,11 @@ Target:
 
 # Appendix H — Final Principles
 
+These principles summarize the habits that make DSA knowledge transferable: derive rather than memorize, connect constraints to complexity, choose structures by required operations, test edge cases, and revisit mistakes until the reasoning is reproducible without notes.
+
 ### Principle 1
+
+Treat this principle as a decision rule for solving and reviewing DSA problems. Apply it while explaining correctness, complexity, implementation choices, and the mistakes you want to avoid on the next attempt.
 
 Do not memorize solutions.
 
@@ -7048,6 +7696,8 @@ trade-offs
 
 ### Principle 2
 
+Treat this principle as a decision rule for solving and reviewing DSA problems. Apply it while explaining correctness, complexity, implementation choices, and the mistakes you want to avoid on the next attempt.
+
 Always know why your chosen data structure fits the problem.
 
 ### Principle 3
@@ -7057,6 +7707,8 @@ A correct `O(n²)` solution is better than an incorrect `O(n)` solution.
 First make it correct. Then improve it.
 
 ### Principle 4
+
+Treat this principle as a decision rule for solving and reviewing DSA problems. Apply it while explaining correctness, complexity, implementation choices, and the mistakes you want to avoid on the next attempt.
 
 Complexity is part of the solution.
 
@@ -7068,6 +7720,8 @@ space
 ```
 
 ### Principle 5
+
+Treat this principle as a decision rule for solving and reviewing DSA problems. Apply it while explaining correctness, complexity, implementation choices, and the mistakes you want to avoid on the next attempt.
 
 Use PHP's strengths.
 
@@ -7100,6 +7754,8 @@ Re-solve failed problems.
 A problem you could not solve is often more valuable than an easy problem you solved immediately.
 
 ### Principle 9
+
+Treat this principle as a decision rule for solving and reviewing DSA problems. Apply it while explaining correctness, complexity, implementation choices, and the mistakes you want to avoid on the next attempt.
 
 Write tests.
 
@@ -7134,11 +7790,15 @@ That habit is the real goal of studying DSA.
 
 # Extended Advanced Reference
 
+These topics extend the core toolkit for problems with stronger performance, query, or modeling requirements. Study them after the foundational data structures and patterns are comfortable so the additional invariants and implementation complexity remain understandable.
+
 The following topics go beyond the minimum interview syllabus but are important for a genuinely broad DSA reference.
 
 ---
 
 # Appendix I — Additional Sorting Algorithms
+
+Sorting rearranges values according to an ordering rule so later operations can exploit structure. Learn not only the code but also stability, in-place behavior, best/average/worst complexity, comparator requirements, and when a language's built-in sort is preferable to a manual algorithm.
 
 ## I.1 Heap Sort
 
@@ -7334,6 +7994,8 @@ Performance depends heavily on the input distribution.
 
 ## I.5 Sorting Decision Guide
 
+Sorting all values is often the simplest selection baseline. It is appropriate when ordered output is useful elsewhere or input size is moderate; it does unnecessary work when only one rank is needed and no other sorted-order benefit exists.
+
 ```text
 General production sorting
 → PHP built-in sort functions
@@ -7358,7 +8020,11 @@ Digit-oriented fixed-width values
 
 # Appendix J — Advanced Tree Concepts
 
+Advanced tree techniques build on traversal, subtree state, ancestor relationships, balancing, and range/order information. Define the tree type and invariant first—binary, search-ordered, rooted, weighted, balanced—because the valid algorithms depend on those properties.
+
 ## J.1 Balanced Search Trees
+
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
 
 A normal BST can degrade to:
 
@@ -7497,6 +8163,8 @@ when a suitable index exists.
 
 ## J.6 Tree Traversal: Iterative Inorder
 
+Traversal means visiting each relevant element/node in a defined order. The important state is the current position and the rule for advancing to the next one. A full traversal is usually `O(n)` for a linear structure, while trees/graphs additionally require a stack/queue or recursion and, for cyclic graphs, visited tracking.
+
 ```php
 function inorderIterative(?TreeNode $root): array
 {
@@ -7526,6 +8194,8 @@ This avoids recursive traversal.
 
 ## J.7 Lowest Common Ancestor in BST
 
+The lowest common ancestor (LCA) is the deepest node whose subtree contains both targets. A recursive binary-tree solution returns a target when found; if left and right recursive results are both non-null, the current node is the LCA. Clarify whether both target nodes are guaranteed to exist.
+
 ```php
 function lcaBST(
     ?TreeNode $root,
@@ -7553,6 +8223,8 @@ The BST ordering avoids searching the entire tree.
 ---
 
 # Appendix K — Advanced Graph Algorithms
+
+Advanced graph problems are defined less by their story and more by graph properties: edge weights, direction, cycles, connectivity, negative edges, or repeated connectivity changes. Verify those properties first because they determine whether shortest path, MST, SCC, bridge/articulation, flow, or specialized traversal algorithms are valid.
 
 ## K.1 Bipartite Graph
 
@@ -7626,6 +8298,8 @@ Applications:
 
 ## K.3 Kosaraju Algorithm
 
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
+
 High-level steps:
 
 ```text
@@ -7696,6 +8370,8 @@ Like bridges, articulation points are found using DFS low-link analysis.
 
 ## K.6 Kruskal Minimum Spanning Tree
 
+A minimum spanning tree (MST) connects all vertices of a connected, weighted, undirected graph with minimum total edge weight and no cycles. Kruskal's algorithm grows the MST by globally smallest safe edges; Prim's grows outward from the current tree. If the graph is disconnected, the corresponding result is a minimum spanning forest rather than one spanning tree.
+
 Algorithm:
 
 ```text
@@ -7745,6 +8421,8 @@ function kruskalMST(int $vertices, array $edges): array
 ---
 
 ## K.7 Prim Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 Prim grows an MST from a starting node.
 
@@ -7827,7 +8505,11 @@ Because no cycles exist, states can be processed in a valid dependency order.
 
 # Appendix L — More Dynamic Programming Patterns
 
+Dynamic programming is useful when many candidate solutions reuse the same subproblems and the answer can be composed from smaller states. The core design work is to define the **state**, derive the **transition**, set correct **base cases**, and choose an evaluation order. Memoization computes states on demand; tabulation computes them in an explicit order.
+
 ## L.1 House Robber
+
+House Robber is a take/skip DP. For each house, compare skipping it (keep the previous best) with taking it (add its value to the best solution that excludes the adjacent previous house). Only the previous two DP values are needed, so the common optimized solution is `O(n)` time and `O(1)` extra space.
 
 At each house:
 
@@ -7873,6 +8555,8 @@ function maxNonAdjacentSum(array $nums): int
 
 ## L.2 Unique Grid Paths
 
+A unique-grid-paths DP counts ways to reach each cell from allowed predecessor cells. For the common right/down version without obstacles, `dp[r][c] = dp[r-1][c] + dp[r][c-1]`; initialize the starting boundaries carefully and return the value for the destination cell.
+
 State:
 
 ```text
@@ -7900,6 +8584,8 @@ O(cols)
 ---
 
 ## L.3 Edit Distance
+
+Edit Distance measures the minimum inserts, deletes, and replacements needed to transform one string into another. A DP state over prefixes considers matching equal characters or taking one operation plus the best neighboring subproblem. Standard complexity is `O(mn)` time and `O(mn)` space before row optimization.
 
 Operations:
 
@@ -7964,6 +8650,8 @@ The core skill is not memorizing stock formulas; it is learning to model state c
 
 ## L.5 Palindrome DP
 
+A palindrome reads the same forward and backward under the problem's comparison rules. The standard two-pointer check compares the leftmost and rightmost relevant characters and moves inward, stopping on the first mismatch. Time is `O(n)` and extra space can be `O(1)` when normalization is not stored separately.
+
 Common palindrome problems:
 
 - longest palindromic substring
@@ -8002,7 +8690,11 @@ This can reduce memory dramatically.
 
 # Appendix M — Advanced Array Patterns
 
+These topics extend the core toolkit for problems with stronger performance, query, or modeling requirements. Study them after the foundational data structures and patterns are comfortable so the additional invariants and implementation complexity remain understandable.
+
 ## M.1 Kadane's Algorithm
+
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
 
 Maximum contiguous subarray sum:
 
@@ -8179,7 +8871,11 @@ updates + flexible associative range queries
 
 # Appendix O — String Algorithms Beyond KMP
 
+Knuth-Morris-Pratt (KMP) searches for a pattern without rechecking characters that are already known to match. It preprocesses the pattern into a prefix/failure table, then uses that table to decide how far the pattern can shift after a mismatch. Preprocessing plus search runs in `O(m + n)` for pattern length `m` and text length `n`.
+
 ## O.1 Z Algorithm
+
+The Z algorithm computes, for each position, the length of the longest substring starting there that matches the prefix of the whole string. By reusing a previously matched interval, it runs in linear time. A common pattern-search trick concatenates `pattern + separator + text` and looks for Z-values equal to the pattern length.
 
 The Z array stores:
 
@@ -8224,6 +8920,8 @@ Important:
 
 ## O.3 Manacher's Algorithm
 
+An algorithm is a finite, unambiguous procedure that converts an input into the required output. A useful explanation of an algorithm should state its preconditions, the main invariant or idea that keeps it correct, when it stops, and its time and space complexity.
+
 Finds palindromic radii for all centers in linear time.
 
 Complexity:
@@ -8238,11 +8936,15 @@ This is more advanced than typical PHP backend interview requirements, but usefu
 
 # Appendix P — Computational Complexity Concepts
 
+Computational complexity goes beyond memorizing Big-O labels. It includes upper/lower/tight bounds, amortized behavior, expected versus worst-case analysis, input-sensitive complexity, and the distinction between theoretical growth and measured runtime on a concrete platform.
+
 Big O is only one piece of algorithm analysis.
 
 ---
 
 ## P.1 Big O
+
+**Big O** describes an asymptotic upper growth bound. In everyday DSA discussion it is commonly used to communicate the dominant growth rate of running time or auxiliary space as input size becomes large.
 
 Upper growth bound.
 
@@ -8251,6 +8953,8 @@ Commonly used to describe algorithmic time/space scaling.
 ---
 
 ## P.2 Big Omega
+
+**Big Omega (`Ω`)** describes an asymptotic lower bound: beyond some input size, the function grows at least as quickly as the stated bound up to a constant factor. It is not automatically the same thing as an algorithm's best case.
 
 Lower bound concept.
 
@@ -8263,6 +8967,8 @@ Written:
 ---
 
 ## P.3 Big Theta
+
+**Big Theta (`Θ`)** is a tight asymptotic bound: the function is bounded both above and below by the same growth class up to constant factors. For example, a loop that always processes every one of `n` elements is `Θ(n)`.
 
 Tight asymptotic bound.
 
@@ -8283,6 +8989,8 @@ A loop that always processes all `n` items is:
 ---
 
 ## P.4 Best, Average, Worst Case
+
+Best-, average-, and worst-case analysis describe different input situations for the **same input size**. For example, linear search is `O(1)` in the best case when the target is first and `O(n)` in the worst case; an average case also requires assumptions about input distribution.
 
 Linear search:
 
@@ -8389,6 +9097,8 @@ For interviews, you usually explain this informally rather than writing a formal
 
 # Appendix S — Recursion Tree Analysis
 
+Recursion solves a problem by calling the same routine on a smaller or simpler state. Every recursive solution needs a **base case** that stops further calls and a **progress rule** that moves toward that base case. Also account for call-stack space: even an algorithm with little explicit memory usage may use `O(depth)` stack space.
+
 Consider:
 
 ```text
@@ -8457,7 +9167,11 @@ You do not need to memorize every theorem case to benefit from recurrence intuit
 
 # Appendix U — Real-World Scenario Walkthroughs
 
+Use this section to practice translating problem wording into required operations and constraints. The mapping is a starting hypothesis: confirm the technique's preconditions and explain the invariant before committing to it.
+
 ## U.1 Detect Duplicate Invoice Number
+
+This scenario is a hash-lookup problem: construct a stable key for the invoice number (and any additional fields required by the business uniqueness rule), then test whether the key has already been seen. The example should return or report duplicates explicitly; average processing is `O(n)` with `O(n)` extra storage.
 
 Requirement:
 
@@ -8502,6 +9216,8 @@ Hash set
 ---
 
 ## U.2 Find Top 10 Expensive Transactions
+
+There are two common approaches. Sorting all `n` transactions is straightforward and costs `O(n log n)`. When only ten results are required, a min-heap limited to size `10` keeps the current best candidates in `O(n log 10)` time and `O(10)` extra heap space.
 
 Options:
 
@@ -8572,6 +9288,8 @@ Possible operations:
 ---
 
 ## U.5 Workflow Approval Dependency
+
+Approval prerequisites form a directed dependency graph. Topological sorting can produce an order that respects every prerequisite, while failure to process all nodes signals a cycle that makes the dependency rules impossible to satisfy as written.
 
 Tasks:
 
@@ -8685,6 +9403,8 @@ when weights are non-negative.
 
 ## U.10 Search Suggestions
 
+Searching a search-ordered structure relies on its ordering invariant to discard one side after each comparison. State the target and the current node/index explicitly, and define what happens when the target is absent. The runtime depends on the structure's height or search-space reduction.
+
 Requirements:
 
 ```text
@@ -8710,7 +9430,11 @@ Trie nodes + ranked metadata / heap-like selection
 
 # Appendix V — PHP Coding Interview Conventions
 
+Interview code should make assumptions and contracts obvious. Use clear PHP types where helpful, choose arrays versus SPL structures intentionally, avoid hidden mutation, state numeric/Unicode assumptions, and explain any language-specific operation whose complexity differs from a textbook array.
+
 ## V.1 Use Clear Function Signatures
+
+A clear interview function signature makes the contract visible: parameter names communicate inputs, type declarations communicate expected shapes, and the return type communicates the result. Avoid hidden globals unless the problem specifically requires shared state.
 
 Good:
 
@@ -8727,6 +9451,8 @@ function f($a, $x)
 ---
 
 ## V.2 State Assumptions
+
+State assumptions before coding—for example, whether input is sorted, may be empty, contains duplicates, fits in an integer range, or may be mutated. An assumption that changes correctness or complexity should be part of the solution explanation.
 
 Example:
 
@@ -8797,6 +9523,8 @@ Using an SPL queue/priority queue is normally reasonable unless prohibited.
 ---
 
 ## V.5 Avoid Clever One-Liners
+
+Dense one-liners can hide invariants, side effects, or complexity. In interviews and maintainable production code, prefer a few named steps when they make the algorithm easier to dry-run and verify.
 
 Interview code should optimize for:
 

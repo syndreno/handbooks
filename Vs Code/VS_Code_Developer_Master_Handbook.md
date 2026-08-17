@@ -2,7 +2,7 @@
 
 > **A practical, beginner-friendly-to-advanced guide for getting maximum value from VS Code as a professional developer**
 >
-> **Verified against current official documentation:** 13 August 2026  
+> **Version-sensitive VS Code behavior checked against current official documentation:** 14 August 2026  
 > **Primary shortcut notation:** Windows / Linux, with macOS equivalents for the most important shortcuts  
 > **VS Code terminology:** VS Code calls plugins **extensions**. This handbook uses “extension” as the correct term.
 
@@ -55,7 +55,7 @@ Do **not** try to memorize everything in one reading.
 
 Use this handbook in four passes:
 
-### Pass 1 — Become comfortable
+## Pass 1 — Become comfortable
 
 Learn:
 
@@ -68,7 +68,7 @@ Learn:
 - settings;
 - Git basics.
 
-### Pass 2 — Become fast
+## Pass 2 — Become fast
 
 Learn:
 
@@ -82,7 +82,7 @@ Learn:
 - split editors;
 - tasks.
 
-### Pass 3 — Become professional
+## Pass 3 — Become professional
 
 Learn:
 
@@ -96,7 +96,7 @@ Learn:
 - extension management;
 - security.
 
-### Pass 4 — Become highly optimized
+## Pass 4 — Become highly optimized
 
 Learn:
 
@@ -285,6 +285,38 @@ This is much better than enabling every extension for every project.
 
 # 4. Install and Configure VS Code Correctly
 
+A good VS Code setup has two parts: **the editor itself** and **the development tools your project actually needs**. Installing dozens of extensions before the compiler, runtime, SDK, package manager, or Git is correctly installed usually creates confusing symptoms rather than a better environment.
+
+A practical setup order is:
+
+```text
+Install VS Code
+    ↓
+Install Git and required language/runtime/SDK
+    ↓
+Verify commands in a normal terminal
+    ↓
+Open the project folder
+    ↓
+Install the minimum language/framework extensions
+    ↓
+Configure formatting, linting, testing, and debugging
+```
+
+## Verify the underlying toolchain first
+
+Examples:
+
+```bash
+node --version
+python --version
+git --version
+dotnet --version
+java -version
+```
+
+Use only the commands relevant to your stack. If a runtime command fails outside VS Code, fix that installation or `PATH` problem before blaming an extension.
+
 ## 4.1 Recommended first setup
 
 After installing VS Code:
@@ -305,6 +337,12 @@ Run:
 ```bash
 code --version
 ```
+
+Expected output is a VS Code version plus build/platform information. The exact values vary by release.
+
+On Windows, the normal installer adds VS Code to `%PATH%`; restart already-open terminals after installation. On macOS, use the Command Palette command **Shell Command: Install 'code' command in PATH** when needed. Linux package installations normally provide the `code` launcher, but packaging method can affect the executable name.
+
+If `code` is not recognized, do not reinstall extensions. Fix the launcher/PATH setup first.
 
 Useful commands:
 
@@ -632,6 +670,21 @@ Examples:
 ## 8.3 Remote settings
 
 When you work through WSL, SSH, or a container, some settings can apply specifically to that remote environment.
+
+This matters because a remote window has **two environments**:
+
+```text
+Local computer                  Remote environment
+VS Code UI                      Source code
+Local UI extensions             Runtime / compiler / SDK
+Keyboard + display              Workspace extensions
+                                Terminal processes
+                                Debug/test processes
+```
+
+For example, a font-size setting belongs to the local user interface, while a Python interpreter path or tool executable may belong to the remote environment. VS Code and extensions decide which settings are valid at each scope.
+
+When troubleshooting a remote project, always check **where the setting and extension are running** before changing paths.
 
 ## 8.4 Language-specific settings
 
@@ -1637,7 +1690,21 @@ This helps answer:
 
 # 16. Testing Inside VS Code
 
-VS Code provides a Testing interface that language/test extensions can integrate with.
+VS Code provides a Testing interface that language/test extensions can integrate with. The editor does not magically understand every test framework by itself: a language or testing extension must provide test discovery and execution support.
+
+A useful mental model is:
+
+```text
+Your test framework
+    ↓
+Language/test extension or adapter
+    ↓
+VS Code Testing view
+    ↓
+Run / debug / inspect results
+```
+
+Before debugging a VS Code testing problem, confirm that the tests run from the framework's own CLI. If `pytest`, `npm test`, `dotnet test`, `mvn test`, or the equivalent project command fails, fix the project/test configuration first.
 
 Possible capabilities:
 
@@ -1697,7 +1764,20 @@ This is much faster than adding print statements repeatedly.
 
 # 17. Git and Source Control
 
-VS Code contains built-in Git integration when Git is installed.
+VS Code has built-in Git integration, but it uses the **Git installation available in the environment where the repository is opened**. For a normal local workspace that means your local Git installation; for Remote - SSH, WSL, or a Dev Container, Git may need to be available in that remote environment. Confirm with:
+
+```bash
+git --version
+```
+
+Also configure your Git identity before your first commit when needed:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+VS Code's Source Control view is a graphical workflow over the repository; it is not a replacement for understanding branches, commits, remotes, merges, rebases, and the Git CLI.
 
 Open Source Control:
 
@@ -1876,6 +1956,19 @@ Emmet is extremely useful for HTML/CSS-oriented work.
 
 Remote development is one of VS Code’s highest-value capabilities.
 
+The important idea is that the **VS Code user interface can stay local while code execution happens elsewhere**. In common remote workflows, VS Code installs or connects to a VS Code Server component in the remote environment so language services, terminals, tasks, debugging, and workspace extensions can run close to the source code and runtime.
+
+```text
+Local VS Code UI
+    │
+    ├── WSL extension ───────► Linux distribution
+    ├── Remote - SSH ────────► SSH host / VM / server
+    ├── Dev Containers ──────► development container
+    └── Remote Tunnels ──────► remote machine through a tunnel
+```
+
+This avoids many problems caused by editing remote files locally while executing them with a different filesystem, runtime, or dependency set.
+
 ## 19.1 WSL
 
 Use the WSL extension when:
@@ -2038,7 +2131,22 @@ Better use:
 6. Review the diff.
 ```
 
-## 20.2 Useful AI scenarios
+## 20.2 Choose the right AI surface
+
+Modern VS Code provides more than one AI/agent surface. The normal editor window is best when code editing, debugging, terminals, notebooks, and repository context remain central. The **Agents window** is an agent-first experience intended for orchestrating higher-level work and multiple sessions across projects; as of August 2026 it is still documented as a Preview feature.
+
+A practical rule:
+
+| Need | Better starting point |
+|---|---|
+| Explain or edit code while actively programming | Editor + Chat |
+| Small inline transformation | Inline Chat |
+| Multi-file implementation in one workspace | Agent session |
+| Coordinate several high-level tasks/sessions | Agents window |
+
+AI availability, models, quotas, and enterprise controls depend on your account and organization.
+
+## 20.3 Useful AI scenarios
 
 ### Understand unfamiliar code
 
@@ -2086,7 +2194,7 @@ Generate developer documentation for this module based only on the code.
 Highlight configuration and failure modes.
 ```
 
-## 20.3 Plan before implementation
+## 20.4 Plan before implementation
 
 A strong agent workflow:
 
@@ -2106,9 +2214,21 @@ Review diff
 
 For risky changes, separate planning from execution.
 
-## 20.4 Custom agents
+## 20.5 Custom agents and instructions
 
-VS Code supports custom agent definitions, including workspace-level `.agent.md` files in supported workflows.
+VS Code supports custom agent definitions, including `.agent.md` files in supported customization locations. It also supports always-on project instructions such as `.github/copilot-instructions.md`, and current VS Code documentation can automatically detect an `AGENTS.md` file in a workspace for chat instructions.
+
+Use these for different purposes:
+
+```text
+Project instructions → rules that should apply broadly
+Custom agent         → a specialized role/workflow
+Prompt file          → a reusable task prompt
+Skill                → reusable agent capability/instructions
+MCP server           → external tools/data access
+```
+
+Keep instruction files short, testable, and repository-specific. Do not fill them with generic advice the model already knows.
 
 Possible custom agents:
 
@@ -2129,9 +2249,19 @@ A custom agent should specify:
 - expected output;
 - validation steps.
 
-## 20.5 MCP
+## 20.6 MCP and chat tools
 
-Model Context Protocol tools can extend an agent with external capabilities.
+Model Context Protocol tools can extend an agent with external capabilities. VS Code also supports **built-in tools** and **extension-provided tools**, so MCP is one tool source rather than the whole tool system.
+
+Think of the categories as:
+
+```text
+Built-in tools   → editor/workspace/terminal capabilities
+Extension tools  → capabilities contributed by installed extensions
+MCP tools        → tools exposed by configured MCP servers
+```
+
+Before starting a new or changed MCP server, review its configuration and capabilities. Treat an MCP server like executable integration software, not like passive documentation.
 
 Possible examples:
 
@@ -2144,7 +2274,7 @@ Security principle:
 
 > An AI tool should get the minimum access needed for the task.
 
-## 20.6 Agent permissions
+## 20.7 Agent permissions
 
 Modern VS Code agent workflows include approval/permission controls.
 
@@ -2160,7 +2290,7 @@ Be cautious with:
 - credentials;
 - external network access.
 
-## 20.7 Review AI-generated changes
+## 20.8 Review AI-generated changes
 
 Before commit:
 
@@ -3842,6 +3972,8 @@ Consider:
 
 # 29. Security and Workspace Trust
 
+VS Code is a development environment that can run code, tasks, extensions, debuggers, terminals, and AI tools. Security therefore depends on **what you open, what you install, and what you authorize**.
+
 VS Code extensions execute with significant permissions.
 
 Treat extensions like software installations.
@@ -3891,6 +4023,8 @@ Remember:
 
 > Extensions can have the same broad permissions as VS Code itself.
 
+Also note that command-line extension installation has different publisher-trust behavior from the normal Marketplace UI: do not treat a successful `code --install-extension ...` command as proof that the publisher is trustworthy.
+
 Therefore:
 
 - fewer is safer;
@@ -3898,7 +4032,9 @@ Therefore:
 - remove abandoned extensions;
 - review surprising behavior.
 
-## 29.5 AI security
+## 29.5 AI and MCP security
+
+AI agents may combine model output with tools that can read files, modify code, execute terminal commands, access network services, or call MCP/extension tools. Review tool approvals and keep high-impact capabilities scoped to the task.
 
 Never give autonomous tooling unrestricted access to:
 
@@ -4483,11 +4619,43 @@ code --help
 code --version
 ```
 
+## Open a file at a line and column
+
+```bash
+code --goto app.js:42:5
+```
+
+Use this when a script, compiler, or log gives you an exact source location.
+
+## Compare two files
+
+```bash
+code --diff old.txt new.txt
+```
+
+## Wait until files are closed
+
+```bash
+code --wait file.txt
+```
+
+Useful when another CLI tool launches VS Code as an editor.
+
+## Start without extensions
+
+```bash
+code --disable-extensions
+```
+
+Useful for troubleshooting whether an installed extension is causing a problem.
+
 ## List extensions
 
 ```bash
 code --list-extensions
 ```
+
+For profile-specific extension operations, the CLI also supports `--profile` on relevant extension-management commands. Check `code --help` for the exact syntax supported by your installed release.
 
 ## List extensions with versions
 
@@ -4624,13 +4792,20 @@ This handbook intentionally prioritizes VS Code’s current official documentati
 
 Because this area evolves quickly, re-check current documentation before standardizing organizational workflows.
 
+- Agents overview: https://code.visualstudio.com/docs/agents/overview
+- Agents window: https://code.visualstudio.com/docs/agents/run/agents-window
 - AI feature cheat sheet: https://code.visualstudio.com/docs/agents/reference/ai-features-cheat-sheet
 - Agent best practices: https://code.visualstudio.com/docs/agents/best-practices
 - Agent harnesses: https://code.visualstudio.com/docs/agents/run/agent-harnesses
+- Agent tools: https://code.visualstudio.com/docs/agents/run/tools
+- Agent customization: https://code.visualstudio.com/docs/agent-customization/overview
 - Custom agents: https://code.visualstudio.com/docs/agent-customization/custom-agents
+- Custom instructions: https://code.visualstudio.com/docs/agent-customization/custom-instructions
 - Agent Skills: https://code.visualstudio.com/docs/agent-customization/agent-skills
+- MCP servers: https://code.visualstudio.com/docs/agent-customization/mcp-servers
+- AI language models: https://code.visualstudio.com/docs/agent-customization/language-models
 - Agent permissions/approvals: https://code.visualstudio.com/docs/agents/run/approvals
-- AI security: https://code.visualstudio.com/docs/agents/run/security
+- AI security: https://code.visualstudio.com/docs/agents/security
 
 ---
 

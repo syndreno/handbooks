@@ -93,7 +93,7 @@ This handbook serves three purposes:
 2. **Reference manual** — search for a class, component, or concept when working on a project.
 3. **Scenario guide** — use the real-world examples to understand *why* and *when* a feature is useful.
 
-### Recommended learning order
+## Recommended learning order
 
 ```text
 HTML/CSS basics
@@ -130,6 +130,25 @@ You should know basic:
 - JavaScript basics for interactive components
 
 If you do not know Flexbox yet, you can still start Bootstrap, but learning Flexbox will make Bootstrap's layout system much easier to understand.
+
+
+## How to study efficiently
+
+Do not try to memorize every class. For each chapter, use this cycle:
+
+```text
+read the concept
+→ type the example
+→ resize the browser
+→ inspect the element in DevTools
+→ change one class
+→ predict the result
+→ verify the result
+```
+
+When learning a component, separate **structure**, **styling**, and **behavior**. For example, a modal needs correct HTML structure, Bootstrap classes for presentation, and Bootstrap JavaScript for opening/closing behavior.
+
+When using this handbook as a reference, copy the smallest relevant pattern and adapt it. Avoid copying a large example without understanding which classes are essential.
 
 ---
 
@@ -274,7 +293,7 @@ Scrollspy
 Tab
 ```
 
-### Important principle
+## Important principle
 
 Do not memorize thousands of classes individually.
 
@@ -295,6 +314,38 @@ px-3      horizontal padding
 ```
 
 Once you understand the pattern, dozens of classes become predictable.
+
+
+## How the layers work together
+
+A real Bootstrap component usually combines several layers at once:
+
+```html
+<div class="container py-4">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <article class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5">Invoice</h2>
+          <button class="btn btn-primary">Open</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+```
+
+Here:
+
+```text
+container/row/col-md-6 → layout
+g-3/py-4               → utilities
+card/card-body         → component
+h5                     → typography utility/component style
+btn/btn-primary        → button component
+```
+
+This is the main Bootstrap skill: combine a small number of predictable primitives instead of creating a custom class for every visual decision.
 
 ---
 
@@ -476,6 +527,24 @@ A standard Bootstrap page starts with:
 
 Without it, a phone browser may render the page using a wider virtual viewport, preventing the responsive layout from behaving as expected.
 
+
+## What each Bootstrap include does
+
+The CSS file provides layout, utilities, components, Reboot, and other styles. The JavaScript bundle activates interactive components such as collapse, dropdown, modal, offcanvas, tooltip, and popover.
+
+If a page uses only Bootstrap's CSS features, JavaScript is not required. If it uses an interactive plugin, load the appropriate JavaScript.
+
+Prefer loading your project stylesheet **after** Bootstrap when it contains deliberate project-level overrides:
+
+```html
+<link rel="stylesheet" href="bootstrap.min.css">
+<link rel="stylesheet" href="app.css">
+```
+
+For production, use a trusted package/CDN/build process and keep CSS and JavaScript from compatible Bootstrap versions.
+
+**Common mistake:** loading Bootstrap JavaScript twice, for example once from a CDN and once through a bundler. Duplicate plugin code can cause confusing behavior.
+
 ---
 
 # 6. Understanding Bootstrap Files
@@ -493,7 +562,7 @@ bootstrap.bundle.js
 bootstrap.bundle.min.js
 ```
 
-### `.min` files
+## `.min` files
 
 Minified files remove unnecessary formatting to reduce file size.
 
@@ -519,6 +588,24 @@ bootstrap.min.js
 ```
 
 may require Popper separately for components that depend on positioning.
+
+
+## Which file should you choose?
+
+For a simple page using prebuilt files:
+
+```text
+bootstrap.min.css
+bootstrap.bundle.min.js
+```
+
+is a common pairing. The bundle includes Popper, which Bootstrap uses for positioned UI such as dropdowns, popovers, and tooltips.
+
+If your build tool imports individual JavaScript plugins, do not also load the global bundle in the page. Choose one integration strategy.
+
+Source packages also contain Sass files. Those are useful when you want to change Bootstrap variables/maps or compile only selected parts of the framework.
+
+RTL builds are for right-to-left document direction. They are not a second theme; choose the build/direction strategy that matches the languages your application supports.
 
 ---
 
@@ -561,6 +648,24 @@ declared width = final rendered width
 
 This is much easier for layout calculations.
 
+
+## Why Reboot can surprise you
+
+Because Reboot applies global element-level rules, a plain HTML page can look different immediately after Bootstrap is loaded—even before you add component classes.
+
+This is intentional. Bootstrap creates a consistent baseline for typography, headings, forms, tables, and box sizing across browsers.
+
+When existing application styles change unexpectedly after adding Bootstrap, inspect global rules before writing overrides:
+
+```text
+1. inspect the element
+2. find the winning Bootstrap/Reboot declaration
+3. decide whether the project should accept the baseline
+4. override only when the design genuinely differs
+```
+
+Do not combine multiple resets/normalizers blindly. A second reset after Bootstrap can undo assumptions that Bootstrap components make.
+
 ---
 
 # 8. Responsive Design Fundamentals
@@ -598,6 +703,28 @@ not:
 ```text
 separate layout for every screen
 ```
+
+
+## Responsive classes are conditional overrides
+
+A responsive utility such as:
+
+```html
+<div class="d-none d-md-flex">
+```
+
+does not mean "desktop." It means:
+
+```text
+below md → display: none
+md and wider → display: flex
+```
+
+That distinction matters because breakpoints describe viewport ranges, not device categories. A tablet, resized desktop window, or split-screen browser can fall into the same range.
+
+Use the fewest breakpoint overrides that make the content comfortable. Start with a robust small-screen layout, resize gradually, and introduce a breakpoint only where the design needs a meaningful change.
+
+**Common mistake:** duplicating entire mobile and desktop interfaces when a single semantic DOM structure could be rearranged with grid/flex/display classes.
 
 ---
 
@@ -646,12 +773,46 @@ xl → left/start aligned
 xxl → left/start aligned
 ```
 
-### Scenario: mobile menu vs desktop menu
+## Scenario: mobile menu vs desktop menu
 
 ```html
 <div class="d-lg-none">Mobile menu</div>
 <div class="d-none d-lg-block">Desktop navigation</div>
 ```
+
+
+## Breakpoint infixes follow a pattern
+
+Many responsive classes use:
+
+```text
+{property}-{breakpoint}-{value}
+```
+
+Examples:
+
+```text
+d-md-flex
+text-lg-start
+p-xl-4
+col-md-6
+```
+
+The rule becomes active at that breakpoint and normally continues upward until another rule overrides it.
+
+```html
+<div class="p-2 p-md-3 p-xl-5">
+```
+
+means:
+
+```text
+xs/sm      → p-2
+md/lg      → p-3
+xl/xxl     → p-5
+```
+
+Do not add every possible breakpoint. Responsive CSS is easier to maintain when each change corresponds to a real layout need.
 
 ---
 
@@ -717,6 +878,27 @@ A mobile layout should use the whole screen, while desktop content should be con
   ...
 </div>
 ```
+
+
+## Container vs grid
+
+A container controls the **overall horizontal page region**; rows and columns control layout **inside** that region.
+
+Typical structure:
+
+```html
+<div class="container">
+  <div class="row">
+    <div class="col">...</div>
+  </div>
+</div>
+```
+
+You do not need a `.row` merely because you use a container. A normal article can be placed directly inside a container.
+
+Use `.container-fluid` when the application should use the full viewport width, but still consider whether individual content regions need their own maximum widths for readability.
+
+Nested containers are usually unnecessary. If a component needs internal spacing, utilities or its own layout are often clearer.
 
 ---
 
@@ -1006,7 +1188,7 @@ Conceptually:
 
 Bootstrap's standard Flexbox grid is the default and most widely used. Use Bootstrap CSS Grid when its two-dimensional layout model better matches your design and your project has enabled the required option.
 
-### Flexbox grid vs CSS Grid
+## Flexbox grid vs CSS Grid
 
 Use Flexbox grid when:
 
@@ -1019,6 +1201,24 @@ Consider CSS Grid when:
 - rows and columns both need stronger control
 - you need explicit placement
 - you are building dashboard-like layouts
+
+
+## Enabling and using the alternative
+
+Bootstrap's CSS Grid system is not the same thing as the default `.row`/`.col-*` Flexbox grid. It relies on CSS Grid and Bootstrap's grid-related CSS variables/classes.
+
+Do not mix mental models accidentally:
+
+```text
+.row + .col-* → standard Bootstrap Flexbox grid
+.grid + .g-col-* → Bootstrap CSS Grid alternative
+```
+
+Choose one for a region based on layout needs.
+
+CSS Grid is especially useful when alignment across rows and columns matters. The standard Bootstrap grid remains a strong default for familiar responsive page columns and has the broadest ecosystem of examples.
+
+If you customize/compile Bootstrap from Sass, confirm that the CSS Grid option is enabled before expecting `.grid`/`.g-col-*` behavior.
 
 ---
 
@@ -1175,6 +1375,27 @@ For a true circle, the rendered width and height should be equal.
 </figure>
 ```
 
+
+## Image classes do not replace good HTML
+
+Bootstrap can make an image responsive, but HTML should still provide meaningful `alt`, intrinsic `width`/`height` where known, and an appropriate image source.
+
+```html
+<img
+  src="product.jpg"
+  width="800"
+  height="600"
+  class="img-fluid"
+  alt="Blue travel backpack"
+>
+```
+
+The intrinsic dimensions let the browser reserve aspect-ratio space while `.img-fluid` allows the image to shrink with its container.
+
+Use `rounded-circle` only when the crop/content makes sense as a circle. For profile photos with inconsistent source dimensions, combine a square wrapper or fixed aspect ratio with `object-fit: cover` through project CSS/Bootstrap object-fit utilities where appropriate.
+
+Decorative images should use an empty `alt=""` rather than an invented description.
+
 ---
 
 # 16. Tables
@@ -1297,6 +1518,38 @@ Basic form:
 </form>
 ```
 
+
+## Bootstrap styles; HTML defines behavior
+
+Bootstrap classes do not replace native form semantics. Keep:
+
+```text
+<label for="...">
+<input name="..." type="...">
+required/min/max/pattern when appropriate
+fieldset/legend for grouped choices
+server-side validation
+```
+
+Bootstrap then improves presentation and layout.
+
+A good field unit is:
+
+```html
+<div class="mb-3">
+  <label for="invoiceNumber" class="form-label">Invoice number</label>
+  <input
+    id="invoiceNumber"
+    name="invoiceNumber"
+    class="form-control"
+    autocomplete="off"
+    required
+  >
+</div>
+```
+
+Use the correct input type (`email`, `date`, `number`, etc.) when it matches the data. Do not use Bootstrap validation colors as the only source of validation logic; the server must still validate submitted data.
+
 ---
 
 # 18. Form Controls
@@ -1345,6 +1598,31 @@ Basic form:
 disabled → cannot interact; normally not submitted by browser form submission
 readonly → cannot edit but still behaves as a form value in normal submission
 ```
+
+
+## States and inputs
+
+`.form-control` is appropriate for many textual controls, but not every form element uses it. Selects use `.form-select`; checks/radios use `.form-check-*`; range inputs use `.form-range`.
+
+For a required input, show an actual label and any help text explicitly:
+
+```html
+<label for="amount" class="form-label">Amount</label>
+<input
+  id="amount"
+  name="amount"
+  type="number"
+  class="form-control"
+  aria-describedby="amountHelp"
+>
+<div id="amountHelp" class="form-text">
+  Enter the invoice total before tax.
+</div>
+```
+
+`disabled` controls are normally excluded from native form submission. `readonly` applies only to controls that support it and is often better when the value should still be submitted/read.
+
+**Common mistake:** using placeholder text as the only label. Placeholders disappear as the user types.
 
 ---
 
@@ -2364,7 +2642,7 @@ offcanvas-top
 offcanvas-bottom
 ```
 
-### Responsive offcanvas
+## Responsive offcanvas
 
 Bootstrap supports responsive variants such as:
 
@@ -2380,6 +2658,23 @@ large+        → content remains visible
 ```
 
 Excellent for responsive dashboard sidebars.
+
+
+## Offcanvas vs modal vs collapse
+
+Choose the interaction based on purpose:
+
+```text
+offcanvas → secondary panel from a viewport edge
+modal     → focused task/dialog that interrupts the page
+collapse  → reveal/hide content in the normal page flow
+```
+
+An offcanvas is excellent for navigation or filters because it can preserve the main page while temporarily exposing secondary controls.
+
+Responsive offcanvas variants can turn the same content into a persistent sidebar at larger widths, reducing duplicated markup.
+
+When you add custom controls inside an offcanvas, keep keyboard focus order logical and provide a clear accessible label/title. Do not remove the built-in dismissal behavior unless you deliberately replace it with an equally usable interaction.
 
 ---
 
@@ -2416,7 +2711,7 @@ Carousel cycles through slides.
 </div>
 ```
 
-### UX caution
+## UX caution
 
 Carousels are often overused. If critical information is placed only on later slides, users may never see it. Use them when cycling content genuinely supports the task.
 
@@ -2476,6 +2771,26 @@ Tooltip → short hint
 Popover → richer small block with title/content
 ```
 
+
+## Parameters and programmatic use
+
+Both plugins support configuration through data attributes and JavaScript options. A programmatic pattern is:
+
+```js
+const tooltip = bootstrap.Tooltip.getOrCreateInstance(element, {
+  placement: "top",
+  trigger: "hover focus"
+});
+```
+
+The constructor/get-or-create call returns a component instance that can expose methods such as `show()`, `hide()`, `toggle()`, or `dispose()` depending on the plugin.
+
+Use `dispose()` when dynamically removed UI would otherwise leave plugin state/listeners behind.
+
+Tooltips should be short and supplementary. A user must not need hover alone to discover required instructions. Popovers can hold richer text, but interactive content inside floating UI needs careful accessibility and dismissal behavior.
+
+Always consult the matching Bootstrap version's plugin options when using non-default configuration.
+
 ---
 
 # 34. Toasts
@@ -2503,7 +2818,7 @@ const toast = bootstrap.Toast.getOrCreateInstance(toastElement);
 toast.show();
 ```
 
-### Toast container
+## Toast container
 
 ```html
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -2522,6 +2837,24 @@ Connection restored
 ```
 
 Do not use an auto-disappearing toast for critical errors that users must act on.
+
+
+## Timing and accessibility
+
+A toast is best for non-blocking feedback. Match the ARIA live-region behavior to the urgency of the message and do not make important text disappear before a user can act on it.
+
+Programmatic options can control behavior such as automatic hiding and delay:
+
+```js
+const toast = bootstrap.Toast.getOrCreateInstance(element, {
+  autohide: true,
+  delay: 5000
+});
+```
+
+Use a persistent alert, inline validation message, or modal when the user must read or resolve the message.
+
+If many notifications can arrive, manage the toast container so messages do not cover essential controls or grow without limit. A notification system needs application logic in addition to Bootstrap styling.
 
 ---
 
@@ -2635,6 +2968,33 @@ Conceptual structure:
 
 Always verify the current official markup for Scrollspy when using it because behavior and configuration can vary across Bootstrap releases.
 
+
+## What Scrollspy needs
+
+Scrollspy connects three things:
+
+```text
+scroll container
+↕
+sections with stable IDs
+↕
+navigation links targeting those IDs
+```
+
+If the active link is wrong, debug that relationship first:
+
+```text
+- correct data-bs-target?
+- link hrefs match section IDs?
+- correct scrolling element?
+- enough section height to cross thresholds?
+- layout changed after initialization?
+```
+
+When content is inserted, removed, or resized dynamically, the plugin may need to refresh/recalculate according to the Bootstrap API for your version.
+
+Scrollspy is a navigation enhancement. Keep real anchor links so the document remains understandable and navigable even without the active-state behavior.
+
 ---
 
 # 37. Utility Classes
@@ -2682,7 +3042,7 @@ visibility
 z-index
 ```
 
-### Utility-first vs component classes
+## Utility-first vs component classes
 
 Bootstrap is hybrid:
 
@@ -2692,6 +3052,25 @@ Utility classes   → mt-3, d-flex, text-center, shadow
 ```
 
 A strong Bootstrap developer knows when to combine both.
+
+
+## When to use a utility vs custom CSS
+
+Use a utility when the styling decision is small, standard, and already represented by Bootstrap:
+
+```html
+<div class="d-flex gap-3 align-items-center mb-4">
+```
+
+Create project CSS when the rule represents a reusable product-specific component or when a long/repeated utility combination needs a stable abstraction:
+
+```css
+.invoice-status { ... }
+```
+
+Avoid copying the same 15-class string across dozens of templates if it represents one product component that will evolve together.
+
+Utilities are powerful because they have predictable names and scope, but they do not remove the need for semantic HTML, component architecture, or design decisions.
 
 ---
 
@@ -3866,7 +4245,7 @@ modal.addEventListener('shown.bs.modal', () => {
 });
 ```
 
-### Why both `show` and `shown`?
+## Why both `show` and `shown`?
 
 ```text
 show.bs.modal   → action has started
@@ -3904,6 +4283,25 @@ modal.addEventListener('show.bs.modal', event => {
   }
 });
 ```
+
+
+## Event data and cancellation
+
+Bootstrap events are ordinary DOM events with Bootstrap-specific names. Some lifecycle events can be canceled with `event.preventDefault()` when the plugin documents them as cancelable.
+
+```js
+modal.addEventListener("show.bs.modal", event => {
+  if (!formIsReady()) {
+    event.preventDefault();
+  }
+});
+```
+
+Do not assume every event is cancelable; check the component documentation.
+
+`event.relatedTarget` is useful when the opening/closing action was triggered by another element and the plugin provides that relationship.
+
+When attaching listeners in component-based applications, clean them up when the surrounding component is destroyed. Otherwise repeatedly mounted UI can accumulate duplicate handlers.
 
 ---
 
@@ -4134,6 +4532,35 @@ end   ≈ left
 
 This makes layouts more adaptable to writing direction.
 
+
+## Build direction-aware project CSS too
+
+Loading Bootstrap's RTL build does not automatically fix custom CSS that hard-codes physical directions.
+
+Prefer:
+
+```css
+.panel {
+  padding-inline-start: 1rem;
+  border-inline-start: 4px solid var(--accent);
+}
+```
+
+over:
+
+```css
+.panel {
+  padding-left: 1rem;
+  border-left: 4px solid var(--accent);
+}
+```
+
+when the meaning is "start of the text flow."
+
+Also test icon direction, breadcrumbs, charts, date/number formatting, mixed LTR/RTL identifiers, and third-party widgets. RTL support is an application-wide concern, not only a stylesheet swap.
+
+Set the document's correct `lang` and `dir`; assistive technology and browser text algorithms use that information too.
+
 ---
 
 # 53. Icons
@@ -4163,11 +4590,30 @@ Icon-only button:
 </button>
 ```
 
-### Accessibility rule
+## Accessibility rule
 
 If visible text already describes the action, a decorative icon can be hidden from assistive technology.
 
 If the icon is the only visible content, give the button an accessible name with `aria-label` or visible/visually-hidden text.
+
+
+## Icon delivery choices
+
+Bootstrap Icons can be used through an icon font, SVG sprite, or individual SVG markup depending on your project setup. The best choice depends on bundling, styling, and accessibility needs.
+
+For decorative inline SVG:
+
+```html
+<svg aria-hidden="true" focusable="false" ...>
+  ...
+</svg>
+```
+
+For meaningful standalone imagery, provide an accessible name or visible text rather than assuming the graphic is self-explanatory.
+
+Do not use icons as the only distinction between destructive and safe actions without labels/tooltips or other clear context.
+
+Remember that Bootstrap Icons has its own version/package lifecycle. Updating Bootstrap CSS does not automatically update the icon package.
 
 ---
 

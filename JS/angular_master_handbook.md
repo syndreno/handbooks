@@ -1,9 +1,12 @@
 # Angular Master Handbook
 
-> **Beginner → Intermediate → Advanced → Enterprise**  
-> A single-file learning and reference handbook for modern Angular, with practical scenarios, mental models, code examples, architecture guidance, debugging tips, testing, performance, security, deployment, legacy concepts, interview preparation, and a learning roadmap.
+> **Revision pass:** beginner explanations, production guidance, and weak-section reinforcement reviewed August 2026 while preserving the original handbook structure.
 
-**Current baseline used by this handbook:** Angular **22.x** (official Angular documentation was at v22.1 in August 2026). Modern examples use **standalone components**, **Signals**, built-in template control flow (`@if`, `@for`, `@switch`), functional providers/guards/interceptors, and modern rendering APIs. A dedicated legacy section explains **NgModules**, older structural directives, decorator-based inputs/outputs, and other patterns you will still see in enterprise applications.
+> **Audience:** Beginner → Intermediate → Advanced → Production/Enterprise
+>
+> **Primary learning baseline:** Modern Angular **v22-era** patterns (standalone-first, Signals, built-in control flow, zoneless-ready/default, modern CLI/build/testing). Legacy patterns such as NgModule-first architecture, decorator inputs/outputs, `*ngIf`, `*ngFor`, Zone.js-dependent assumptions, and Karma/Jasmine are still explained because real projects may use them.
+>
+> **Goal:** One practical reference that teaches *what Angular concepts mean, why they exist, how to use them, when to use them, what mistakes to avoid, and how concepts connect in real applications*.
 
 ---
 
@@ -12,529 +15,367 @@
 1. [How to Use This Handbook](#1-how-to-use-this-handbook)
 2. [What Angular Is](#2-what-angular-is)
 3. [Prerequisites](#3-prerequisites)
-4. [Installing Angular and Creating a Project](#4-installing-angular-and-creating-a-project)
-5. [Angular CLI Mastery](#5-angular-cli-mastery)
-6. [Angular Project Structure](#6-angular-project-structure)
-7. [TypeScript Essentials for Angular](#7-typescript-essentials-for-angular)
-8. [The Angular Mental Model](#8-the-angular-mental-model)
-9. [Components](#9-components)
-10. [Templates](#10-templates)
-11. [Data Binding](#11-data-binding)
-12. [Built-in Template Control Flow](#12-built-in-template-control-flow)
-13. [Template Variables and `@let`](#13-template-variables-and-let)
-14. [Component Inputs](#14-component-inputs)
-15. [Component Outputs](#15-component-outputs)
-16. [Two-Way Binding and `model()`](#16-two-way-binding-and-model)
-17. [Content Projection](#17-content-projection)
-18. [Component Queries](#18-component-queries)
-19. [Component Lifecycle](#19-component-lifecycle)
-20. [Directives](#20-directives)
-21. [Pipes](#21-pipes)
-22. [Component Styling and View Encapsulation](#22-component-styling-and-view-encapsulation)
-23. [Dynamic Components](#23-dynamic-components)
-24. [Services](#24-services)
-25. [Dependency Injection](#25-dependency-injection)
-26. [Angular Signals](#26-angular-signals)
-27. [`computed`, `effect`, `linkedSignal`, and Async Resources](#27-computed-effect-linkedsignal-and-async-resources)
-28. [RxJS Fundamentals for Angular](#28-rxjs-fundamentals-for-angular)
-29. [Signals and RxJS Interoperability](#29-signals-and-rxjs-interoperability)
-30. [HTTP Client](#30-http-client)
-31. [HTTP Interceptors](#31-http-interceptors)
-32. [API Error Handling, Retry, Cancellation, and Caching](#32-api-error-handling-retry-cancellation-and-caching)
-33. [Angular Router Fundamentals](#33-angular-router-fundamentals)
-34. [Route Parameters, Query Parameters, and Route State](#34-route-parameters-query-parameters-and-route-state)
-35. [Lazy Loading and Preloading](#35-lazy-loading-and-preloading)
-36. [Route Guards](#36-route-guards)
-37. [Resolvers](#37-resolvers)
-38. [Nested Routes, Multiple Outlets, and Advanced Routing](#38-nested-routes-multiple-outlets-and-advanced-routing)
-39. [Forms Overview](#39-forms-overview)
-40. [Template-Driven Forms](#40-template-driven-forms)
-41. [Reactive Forms](#41-reactive-forms)
-42. [Signal Forms](#42-signal-forms)
-43. [Validation](#43-validation)
-44. [Dynamic Forms and FormArray](#44-dynamic-forms-and-formarray)
-45. [Custom Form Controls](#45-custom-form-controls)
-46. [State Management](#46-state-management)
-47. [Authentication and Authorization](#47-authentication-and-authorization)
-48. [Angular Security](#48-angular-security)
-49. [Browser Storage](#49-browser-storage)
-50. [Change Detection](#50-change-detection)
-51. [Zoneless Angular](#51-zoneless-angular)
-52. [Performance Optimization](#52-performance-optimization)
-53. [`@defer` and Deferrable Views](#53-defer-and-deferrable-views)
-54. [SSR, SSG, Hybrid Rendering, and Hydration](#54-ssr-ssg-hybrid-rendering-and-hydration)
-55. [Service Workers and PWA Concepts](#55-service-workers-and-pwa-concepts)
-56. [Animations](#56-animations)
-57. [Accessibility](#57-accessibility)
-58. [Internationalization](#58-internationalization)
-59. [Testing Strategy](#59-testing-strategy)
-60. [Component Testing](#60-component-testing)
-61. [Service and HTTP Testing](#61-service-and-http-testing)
-62. [Router and Form Testing](#62-router-and-form-testing)
-63. [End-to-End Testing](#63-end-to-end-testing)
-64. [Configuration and Environments](#64-configuration-and-environments)
-65. [Building for Production](#65-building-for-production)
-66. [Deployment: Nginx, Apache, IIS, and Static Hosting](#66-deployment-nginx-apache-iis-and-static-hosting)
-67. [Enterprise Project Architecture](#67-enterprise-project-architecture)
-68. [Feature-Based Folder Structure](#68-feature-based-folder-structure)
-69. [Reusable UI and Smart/Dumb Component Patterns](#69-reusable-ui-and-smartdumb-component-patterns)
-70. [Practical CRUD Scenario](#70-practical-crud-scenario)
-71. [Search, Debounce, Filter, Sort, and Pagination Scenario](#71-search-debounce-filter-sort-and-pagination-scenario)
-72. [File Upload Scenario](#72-file-upload-scenario)
-73. [Dashboard Scenario](#73-dashboard-scenario)
-74. [Role-Based Workflow Scenario](#74-role-based-workflow-scenario)
-75. [Optimistic UI and Caching Scenario](#75-optimistic-ui-and-caching-scenario)
-76. [WebSocket / Real-Time Concepts](#76-websocket--real-time-concepts)
-77. [Error Handling Architecture](#77-error-handling-architecture)
-78. [Logging and Observability](#78-logging-and-observability)
-79. [Angular Coding Standards](#79-angular-coding-standards)
-80. [Common Anti-Patterns](#80-common-anti-patterns)
-81. [Legacy Angular: NgModules and Older Syntax](#81-legacy-angular-ngmodules-and-older-syntax)
-82. [Migrating Older Angular Applications](#82-migrating-older-angular-applications)
-83. [Common Angular Errors and Debugging](#83-common-angular-errors-and-debugging)
-84. [Angular DevTools and Debugging Workflow](#84-angular-devtools-and-debugging-workflow)
-85. [Design Patterns Useful in Angular](#85-design-patterns-useful-in-angular)
-86. [Angular Interview Questions](#86-angular-interview-questions)
-87. [Practice Projects](#87-practice-projects)
-88. [12-Week Learning Roadmap](#88-12-week-learning-roadmap)
-89. [Angular Cheat Sheet](#89-angular-cheat-sheet)
-90. [Glossary](#90-glossary)
-91. [Official References](#91-official-references)
-92. [Advanced Template Primitives](#92-advanced-template-primitives-ng-template-ng-container-and-outlets)
-93. [Host Elements and Host Bindings](#93-host-elements-host-bindings-and-event-handling)
-94. [DOM Access and Renderer Safety](#94-dom-access-elementref-and-renderer-safety)
-95. [Advanced Dependency Injection](#95-advanced-dependency-injection-patterns)
-96. [Advanced Signals Patterns](#96-advanced-signals-patterns)
-97. [RxJS Operator Decision Guide](#97-rxjs-operator-decision-guide)
-98. [Advanced HTTP Patterns](#98-advanced-http-patterns)
-99. [Advanced Router Patterns](#99-advanced-router-patterns)
-100. [Advanced Forms Patterns](#100-advanced-forms-patterns)
-101. [Angular Material, CDK, and Component Libraries](#101-angular-material-cdk-and-component-libraries)
-102. [Image and Asset Performance](#102-image-and-asset-performance)
-103. [Custom Elements / Web Components](#103-custom-elements--web-components)
-104. [Creating Reusable Angular Libraries](#104-creating-reusable-angular-libraries)
-105. [Multi-Project Workspaces and Monorepos](#105-multi-project-workspaces-and-monorepo-thinking)
-106. [Linting, Formatting, and Quality Gates](#106-linting-formatting-and-quality-gates)
-107. [CI/CD and Release Strategy](#107-cicd-and-release-strategy)
-108. [Application Startup and Bootstrap](#108-application-startup-and-bootstrap)
-109. [Reusable Table Design Scenario](#109-reusable-table-design-scenario)
-110. [Angular Code Review Checklist](#110-angular-code-review-checklist)
-111. [Final A-to-Z Scenario Map](#111-final-a-to-z-scenario-map)
-112. [Final Mastery Checklist](#112-final-mastery-checklist)
+4. [Installation, CLI, and First Project](#4-installation-cli-and-first-project)
+5. [Workspace and Project Structure](#5-workspace-and-project-structure)
+6. [TypeScript Essentials for Angular](#6-typescript-essentials-for-angular)
+7. [Angular Mental Model](#7-angular-mental-model)
+8. [Components](#8-components)
+9. [Templates and Data Binding](#9-templates-and-data-binding)
+10. [Built-in Control Flow](#10-built-in-control-flow)
+11. [Signals and Modern Reactivity](#11-signals-and-modern-reactivity)
+12. [Inputs, Outputs, and Two-Way Binding](#12-inputs-outputs-and-two-way-binding)
+13. [Directives](#13-directives)
+14. [Pipes](#14-pipes)
+15. [Dependency Injection and Services](#15-dependency-injection-and-services)
+16. [Lifecycle and Render Hooks](#16-lifecycle-and-render-hooks)
+17. [View Queries, Content Queries, and DOM Access](#17-view-queries-content-queries-and-dom-access)
+18. [Content Projection and Template Composition](#18-content-projection-and-template-composition)
+19. [Forms Overview](#19-forms-overview)
+20. [Signal Forms](#20-signal-forms)
+21. [Reactive Forms](#21-reactive-forms)
+22. [Template-Driven Forms](#22-template-driven-forms)
+23. [Routing](#23-routing)
+24. [HTTP and API Integration](#24-http-and-api-integration)
+25. [RxJS in Angular](#25-rxjs-in-angular)
+26. [State Management](#26-state-management)
+27. [Error Handling](#27-error-handling)
+28. [Authentication and Authorization](#28-authentication-and-authorization)
+29. [Change Detection and Zoneless Angular](#29-change-detection-and-zoneless-angular)
+30. [Performance Optimization](#30-performance-optimization)
+31. [Deferrable Views](#31-deferrable-views)
+32. [SSR, SSG, Hydration, and Hybrid Rendering](#32-ssr-ssg-hydration-and-hybrid-rendering)
+33. [Styling, CSS, and Theming](#33-styling-css-and-theming)
+34. [Angular Animations and Native CSS Animation Strategy](#34-angular-animations-and-native-css-animation-strategy)
+35. [Accessibility](#35-accessibility)
+36. [Security](#36-security)
+37. [Testing](#37-testing)
+38. [Angular Material and CDK](#38-angular-material-and-cdk)
+39. [Internationalization](#39-internationalization)
+40. [PWA and Service Workers](#40-pwa-and-service-workers)
+41. [Web Workers](#41-web-workers)
+42. [Custom Libraries](#42-custom-libraries)
+43. [Monorepos and Large Workspaces](#43-monorepos-and-large-workspaces)
+44. [Environment and Configuration Management](#44-environment-and-configuration-management)
+45. [Build, Deployment, and CI/CD](#45-build-deployment-and-cicd)
+46. [Architecture Patterns](#46-architecture-patterns)
+47. [Enterprise Folder Structure](#47-enterprise-folder-structure)
+48. [Common Angular Anti-Patterns](#48-common-angular-anti-patterns)
+49. [Debugging Guide](#49-debugging-guide)
+50. [Migration Strategy for Legacy Angular Apps](#50-migration-strategy-for-legacy-angular-apps)
+51. [Real-World Mini Project: Product Admin Portal](#51-real-world-mini-project-product-admin-portal)
+52. [Interview and Revision Checklist](#52-interview-and-revision-checklist)
+53. [Learning Roadmap](#53-learning-roadmap)
+54. [Glossary](#54-glossary)
+55. [Official References](#55-official-references)
 
 ---
 
 # 1. How to Use This Handbook
 
-Do **not** try to memorize Angular API names. Learn Angular by repeatedly answering four questions:
+Angular is large because it solves many application-development problems in one ecosystem: UI composition, routing, dependency injection, forms, HTTP, testing, build tooling, server rendering, hydration, accessibility, and more.
 
-1. **Where does the state live?** Component, service, signal, form, store, URL, or server?
-2. **Who owns the state?** Parent, child, feature, application, or backend?
-3. **How does data move?** Input, output, DI, signal, observable, router, or HTTP?
-4. **When does the UI update?** After signal changes, observable emissions, form updates, routing, or async requests?
+Do **not** try to memorize every API. Learn in layers:
 
-A good progression is:
+1. **Foundation** — TypeScript, components, templates, binding, control flow.
+2. **Application building** — services, DI, routing, forms, HTTP.
+3. **Reactivity** — Signals and RxJS.
+4. **Production** — auth, testing, error handling, performance, security.
+5. **Advanced** — SSR/hydration, custom libraries, architecture, migrations.
 
-```text
-HTML/CSS/JavaScript
-        ↓
-TypeScript
-        ↓
-Components + Templates + Binding
-        ↓
-Services + Dependency Injection
-        ↓
-Routing + Forms + HTTP
-        ↓
-Signals + RxJS
-        ↓
-Architecture + Testing + Performance
-        ↓
-SSR + Security + Enterprise Patterns
-```
+Each major concept in this handbook includes:
 
-### Learning rule
+- **What it is**
+- **Why it exists**
+- **When to use it**
+- **Example**
+- **Common mistakes**
+- **Production advice**
+
+### Recommended practice pattern
 
 For every topic:
 
-- understand **what problem it solves**;
-- learn the **minimum syntax**;
-- implement one **small example**;
-- implement one **real application scenario**;
-- learn the **common mistake**;
-- understand **when not to use it**.
+1. Read the explanation.
+2. Type the example manually.
+3. Change one requirement.
+4. Break the code intentionally.
+5. Fix it without copying the original.
+6. Build a small feature using the concept.
 
 ---
 
 # 2. What Angular Is
 
-Angular is a full web application framework maintained by Google. It provides an integrated approach for building applications with:
+Angular is a TypeScript-first web framework maintained by Google for building applications ranging from small SPAs to large enterprise systems.
 
-- components;
-- templates;
-- routing;
-- dependency injection;
-- forms;
-- HTTP communication;
-- reactive state primitives;
-- testing support;
-- server-side rendering;
-- build tooling;
-- accessibility and internationalization support.
+Angular provides a coordinated set of first-party capabilities:
 
-Angular is especially useful for medium-to-large applications where teams benefit from strong conventions and built-in tooling.
+- component-based UI
+- templates and data binding
+- dependency injection
+- routing
+- forms
+- HTTP client
+- reactive primitives through Signals
+- RxJS interoperability
+- server-side rendering and hydration
+- testing utilities
+- build tooling through Angular CLI
+- accessibility and component tooling through CDK/Material
 
-## Angular vs a small UI library
+## Angular vs AngularJS
 
-A lightweight UI library may mainly solve **rendering**. Angular provides solutions for most layers of a frontend application.
+**AngularJS** means Angular **1.x**. It used controllers, `$scope`, digest cycles, and a very different architecture.
 
-```text
-Browser
-  │
-  ├── Angular Components
-  ├── Angular Router
-  ├── Forms
-  ├── Signals / RxJS
-  ├── Services + DI
-  ├── HttpClient
-  └── Build / SSR / Testing tooling
-          │
-          ▼
-       Backend API
-```
+**Angular** means Angular **2+**. It is a full rewrite centered around TypeScript, components, decorators/metadata, dependency injection, and a modern compilation/runtime model.
 
-## Typical Angular use cases
+Do not treat AngularJS tutorials as Angular tutorials.
 
-- enterprise portals;
-- banking dashboards;
-- HR applications;
-- procurement systems;
-- invoice/workflow systems;
-- admin dashboards;
-- e-commerce applications;
-- SaaS applications;
-- internal business tools;
-- public sites requiring SSR/SEO.
+## Angular is opinionated—but not rigid
+
+Angular gives strong defaults, but you still make architectural choices about:
+
+- feature boundaries
+- state placement
+- API abstractions
+- routing structure
+- reactive patterns
+- form strategy
+- SSR vs CSR
+- component granularity
+- third-party state libraries
 
 ---
 
 # 3. Prerequisites
+Before Angular, you need enough web and TypeScript knowledge to understand what Angular is automating. You do **not** need to be an expert, but you should be able to read HTML, basic CSS, modern JavaScript, modules, promises, objects/arrays, and TypeScript types.
 
-You should know the basics of:
+A useful readiness test is: can you build a small page that reads data, handles a button click, validates an input, and calls an API with JavaScript/TypeScript? If not, strengthen those fundamentals first; otherwise Angular syntax can hide the browser concepts you actually need to debug.
 
-### HTML
 
-Understand:
+You should know basic:
 
-- semantic elements;
-- forms;
-- inputs;
-- buttons;
-- tables;
-- attributes;
-- accessibility basics.
+- HTML
+- CSS
+- JavaScript ES2015+
+- TypeScript fundamentals
+- HTTP/REST basics
+- npm/package management
+- Git fundamentals
 
-### CSS
+## JavaScript concepts that matter most
 
-Understand:
+- `let` / `const`
+- arrays and objects
+- destructuring
+- spread syntax
+- functions and arrow functions
+- promises and `async`/`await`
+- modules: `import` / `export`
+- array methods: `map`, `filter`, `find`, `reduce`
+- optional chaining: `obj?.value`
+- nullish coalescing: `value ?? fallback`
 
-- selectors;
-- box model;
-- Flexbox;
-- Grid;
-- responsive design;
-- classes;
-- CSS variables.
+## TypeScript concepts that matter most
 
-### JavaScript
-
-Must know:
-
-- variables;
-- functions;
-- objects and arrays;
-- destructuring;
-- spread syntax;
-- modules;
-- classes;
-- promises;
-- `async/await`;
-- array methods (`map`, `filter`, `reduce`);
-- closures;
-- event loop basics.
-
-### TypeScript
-
-Angular is TypeScript-first. You should become comfortable with types, interfaces, generics, unions, classes, decorators, access modifiers, and type narrowing.
+- interfaces
+- type aliases
+- union types
+- generics
+- access modifiers
+- abstract classes
+- utility types
+- type narrowing
+- strict null checks
 
 ---
 
-# 4. Installing Angular and Creating a Project
+# 4. Installation, CLI, and First Project
 
-Check Node and npm:
+## Node.js
 
-```bash
-node -v
-npm -v
-```
+Angular requires supported Node.js versions. The exact supported range depends on the Angular version, so check the official compatibility table before upgrading an old project.
 
-Install the Angular CLI:
+## Install Angular CLI
 
 ```bash
 npm install -g @angular/cli
 ```
 
-Check it:
+Check versions:
 
 ```bash
+node -v
+npm -v
 ng version
 ```
 
-Create an application:
+Create a project:
 
 ```bash
-ng new employee-portal
-```
-
-Useful choices for a modern project:
-
-- routing: yes for most applications;
-- stylesheet: CSS/SCSS according to team preference;
-- SSR: enable if your application needs SEO or server/hybrid rendering.
-
-Start the development server:
-
-```bash
-cd employee-portal
+ng new shop-admin
+cd shop-admin
 ng serve
 ```
 
-Open:
+Open the development URL shown by the CLI.
 
-```text
-http://localhost:4200
-```
-
-## Create with SSR immediately
+## Useful CLI commands
 
 ```bash
-ng new customer-portal --ssr
-```
-
-## Important compatibility note
-
-Angular, TypeScript, Node.js, and RxJS versions have compatibility ranges. Do not randomly upgrade just one of them in an enterprise project. Check Angular's official version compatibility table before upgrades.
-
----
-
-# 5. Angular CLI Mastery
-
-The CLI automates repetitive development tasks.
-
-## Generate a component
-
-```bash
-ng generate component features/users/user-list
-```
-
-Short form:
-
-```bash
-ng g c features/users/user-list
-```
-
-## Generate a service
-
-```bash
-ng g s core/services/auth
-```
-
-## Generate a guard
-
-```bash
-ng g guard core/guards/auth
-```
-
-## Generate an interceptor
-
-```bash
-ng g interceptor core/interceptors/auth
-```
-
-## Build
-
-```bash
+ng new my-app
+ng serve
 ng build
-```
-
-## Production build
-
-Modern CLI configurations normally optimize production output automatically through the configured build target:
-
-```bash
-ng build --configuration production
-```
-
-## Run tests
-
-```bash
 ng test
+ng generate component features/orders/order-list
+ng generate service core/api/orders
+ng generate guard core/auth/auth
+ng generate interceptor core/http/auth
+ng add <package>
+ng update
 ```
 
-## Update Angular
+Short aliases are available, but explicit commands are easier for beginners.
+
+## Scenario: Creating a company dashboard
 
 ```bash
-ng update @angular/cli @angular/core
+ng new company-dashboard --routing --style=scss
 ```
 
-### Useful principle
+Then create feature UI:
 
-Before a major update:
-
-```text
-Read migration notes
-      ↓
-Create branch
-      ↓
-Update CLI + Core
-      ↓
-Fix compile errors
-      ↓
-Run unit tests
-      ↓
-Run E2E tests
-      ↓
-Test production build
+```bash
+ng g c features/employees/employee-list
+ng g c features/employees/employee-detail
+ng g s features/employees/data/employee-api
 ```
+
+The CLI helps keep naming and generated boilerplate consistent.
 
 ---
 
-# 6. Angular Project Structure
+# 5. Workspace and Project Structure
 
-A small modern project may look like:
-
-```text
-src/
-├── app/
-│   ├── app.config.ts
-│   ├── app.routes.ts
-│   ├── app.ts
-│   ├── app.html
-│   └── app.css
-├── assets/
-├── environments/
-├── index.html
-├── main.ts
-└── styles.css
-```
-
-A larger project should be feature-oriented:
+A modern Angular application usually contains files similar to:
 
 ```text
-src/app/
-├── core/
-│   ├── auth/
-│   ├── guards/
-│   ├── interceptors/
-│   ├── services/
-│   └── tokens/
-├── shared/
-│   ├── components/
-│   ├── directives/
-│   ├── pipes/
-│   └── utils/
-├── features/
-│   ├── dashboard/
-│   ├── invoices/
-│   ├── users/
-│   └── reports/
-├── layout/
-│   ├── header/
-│   ├── sidebar/
-│   └── shell/
-├── app.routes.ts
-└── app.config.ts
+shop-admin/
+├─ angular.json
+├─ package.json
+├─ tsconfig.json
+├─ public/
+└─ src/
+   ├─ index.html
+   ├─ main.ts
+   ├─ styles.scss
+   └─ app/
+      ├─ app.ts
+      ├─ app.html
+      ├─ app.css
+      ├─ app.config.ts
+      └─ app.routes.ts
 ```
 
-## Core vs Shared
+Exact generated names can vary by Angular/CLI generation style.
 
-**Core** contains application-wide infrastructure:
+## Important files
 
-- authentication;
-- API configuration;
-- global error handling;
-- interceptors;
-- guards;
-- singleton services.
+### `package.json`
 
-**Shared** contains reusable presentation/utilities:
+Contains dependencies and scripts.
 
-- buttons;
-- modal components;
-- pipes;
-- directives;
-- reusable form controls.
+```json
+{
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test"
+  }
+}
+```
 
-**Features** contain business capabilities:
+### `angular.json`
 
-- invoice approval;
-- employee management;
-- product catalog;
-- reporting.
+Workspace build, serve, test, assets, styles, budgets, and builder configuration.
+
+### `main.ts`
+
+Bootstraps the application.
+
+```ts
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { App } from './app/app';
+
+bootstrapApplication(App, appConfig)
+  .catch(err => console.error(err));
+```
+
+### `app.config.ts`
+
+A common location for application-wide providers.
+
+```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient()
+  ]
+};
+```
+
+## Feature-first structure
+
+Prefer organizing large applications by business feature instead of technical file type.
+
+```text
+app/
+├─ core/
+│  ├─ auth/
+│  ├─ http/
+│  └─ layout/
+├─ shared/
+│  ├─ ui/
+│  ├─ directives/
+│  └─ pipes/
+├─ features/
+│  ├─ orders/
+│  ├─ invoices/
+│  └─ users/
+├─ app.config.ts
+└─ app.routes.ts
+```
+
+This scales better than one giant `components/`, `services/`, and `models/` directory.
 
 ---
 
-# 7. TypeScript Essentials for Angular
+# 6. TypeScript Essentials for Angular
+Angular applications are TypeScript applications, so TypeScript is not optional background knowledge. Focus first on the type features that appear constantly in Angular code: interfaces/type aliases, unions, generics, access modifiers, classes, function types, `unknown`, nullability, and inference.
 
-## Types
+Remember the boundary: TypeScript checks code **before runtime**. An interface does not validate JSON returned by an API. Use runtime validation when data crosses an untrusted boundary and correctness/security requires it.
 
-```ts
-let employeeName: string = 'Asha';
-let age: number = 30;
-let active: boolean = true;
-```
-
-## Arrays
-
-```ts
-const roles: string[] = ['Admin', 'Finance', 'User'];
-```
 
 ## Interfaces
 
 ```ts
-interface Employee {
+export interface User {
   id: number;
   name: string;
   email: string;
-  active: boolean;
+  role: 'admin' | 'user';
 }
 ```
 
-Usage:
+Use interfaces/types to describe data contracts.
 
-```ts
-const employee: Employee = {
-  id: 101,
-  name: 'Asha',
-  email: 'asha@example.com',
-  active: true,
-};
-```
-
-## Type aliases
-
-```ts
-type Status = 'pending' | 'approved' | 'rejected';
-```
-
-This is much safer than arbitrary strings:
-
-```ts
-let status: Status = 'pending';
-```
-
-## Optional properties
+## Optional fields
 
 ```ts
 interface Invoice {
@@ -543,333 +384,275 @@ interface Invoice {
 }
 ```
 
+`poNumber` may be missing.
+
+## Union types
+
+```ts
+type Status = 'draft' | 'pending' | 'approved' | 'rejected';
+```
+
+This is better than arbitrary strings because TypeScript catches invalid values.
+
 ## Generics
 
 ```ts
 interface ApiResponse<T> {
   data: T;
   message: string;
-  success: boolean;
 }
-```
 
-Usage:
-
-```ts
-const response: ApiResponse<Employee[]> = {
+const response: ApiResponse<User[]> = {
   data: [],
-  message: 'Loaded',
-  success: true,
+  message: 'OK'
 };
 ```
 
 ## Utility types
 
 ```ts
-type EmployeeUpdate = Partial<Employee>;
-type EmployeeSummary = Pick<Employee, 'id' | 'name'>;
-type NewEmployee = Omit<Employee, 'id'>;
+type UserCreate = Omit<User, 'id'>;
+type UserPatch = Partial<UserCreate>;
+type UserSummary = Pick<User, 'id' | 'name'>;
 ```
 
-## `unknown` vs `any`
+## Avoid `any`
 
-Avoid:
+Bad:
 
 ```ts
-let value: any;
+loadUser(data: any) {}
 ```
 
-Prefer:
+Better:
 
 ```ts
-let value: unknown;
-
-if (typeof value === 'string') {
-  console.log(value.toUpperCase());
-}
+loadUser(data: User) {}
 ```
 
-`any` disables type checking. `unknown` forces safe validation.
-
-## Enums vs unions
-
-For many frontend states, unions are simple and tree-shake-friendly:
-
-```ts
-type PaymentStatus = 'draft' | 'submitted' | 'paid';
-```
-
-## Classes
-
-```ts
-class User {
-  constructor(
-    public id: number,
-    public name: string,
-  ) {}
-}
-```
-
-## `readonly`
-
-Use it when a reference should not be replaced:
-
-```ts
-readonly apiUrl = '/api/users';
-```
-
-Angular code often uses `readonly` with injected services and signals:
-
-```ts
-readonly loading = signal(false);
-```
+If data is genuinely unknown, prefer `unknown` and validate/narrow it.
 
 ---
 
-# 8. The Angular Mental Model
+# 7. Angular Mental Model
+Think of Angular as a system that connects **state, templates, dependency injection, and platform services**. A component exposes state and behavior; its template reads that state and emits user events; services provide reusable non-view responsibilities; the router/forms/HTTP systems connect components to application workflows.
 
-The application is a **tree of components**.
+When debugging, ask which layer owns the problem instead of treating “Angular” as one black box.
 
-```text
-App
-├── Header
-├── Sidebar
-└── Router Outlet
-    ├── Dashboard
-    ├── Users
-    │   ├── UserList
-    │   └── UserCard
-    └── Reports
-```
 
-Each component normally has:
+A useful mental model is:
 
 ```text
-Component class  → state + behavior
-Template         → UI
-Styles           → presentation
-Dependencies     → services/tools
+User action
+   ↓
+Component / template
+   ↓
+Signal / form / service / RxJS stream
+   ↓
+Business logic
+   ↓
+HTTP / router / storage / backend
+   ↓
+State changes
+   ↓
+Angular updates affected UI
 ```
 
-A typical request flow:
+Angular applications are trees of components. Data normally travels:
 
-```text
-User clicks button
-      ↓
-Component handler runs
-      ↓
-Service calls backend
-      ↓
-State is updated
-      ↓
-Angular updates template
-```
+- **down** through inputs
+- **up** through outputs/events
+- **across features** through shared state/services
+- **from backend** through HTTP/resource/RxJS
 
-Keep business/API logic out of large templates. Keep components focused on orchestration and UI behavior; move reusable domain/API logic into services or dedicated state layers.
+A well-designed app keeps UI components focused on presentation and moves reusable business/data logic into services or feature state classes.
 
 ---
 
-# 9. Components
+# 8. Components
 
-A component is Angular's main UI building block.
+A component owns a portion of the UI.
 
 ```ts
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-welcome',
-  template: `<h1>Welcome to Angular</h1>`,
+  template: `
+    <h1>Welcome {{ name }}</h1>
+  `
 })
-export class WelcomeComponent {}
+export class Welcome {
+  name = 'Angular Learner';
+}
 ```
 
-Use it:
+Use it in another component:
 
 ```html
 <app-welcome />
 ```
 
-## External files
+## Component responsibilities
 
-```ts
-@Component({
-  selector: 'app-user-card',
-  templateUrl: './user-card.html',
-  styleUrl: './user-card.css',
-})
-export class UserCard {}
-```
+A component can contain:
 
-## Standalone components
-
-Modern Angular components are standalone by default. Dependencies are imported directly into the component:
-
-```ts
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-
-@Component({
-  selector: 'app-home',
-  imports: [RouterLink],
-  template: `<a routerLink="/users">Users</a>`,
-})
-export class Home {}
-```
+- local UI state
+- event handlers
+- input/output APIs
+- injected services
+- signal/computed values
+- lifecycle behavior
+- template imports
 
 ## Keep components focused
 
-Bad:
-
-```text
-InvoiceComponent
-  ├── API calls
-  ├── complex tax calculations
-  ├── auth decisions
-  ├── CSV generation
-  ├── 1,500 lines template
-  └── 2,000 lines TypeScript
-```
-
-Better:
+Bad component:
 
 ```text
 InvoicePage
-  ├── InvoiceHeader
-  ├── InvoiceLineTable
-  ├── ApprovalPanel
-  └── InvoiceState / InvoiceService
+- fetches invoice
+- calculates tax
+- authorizes user
+- formats date
+- stores token
+- controls modal
+- sends audit events
+- renders 1,500 lines of HTML
 ```
 
----
+Better split:
 
-# 10. Templates
+```text
+InvoicePage
+├─ InvoiceSummary
+├─ InvoiceLineTable
+├─ TaxSummary
+└─ ApprovalPanel
 
-Templates are HTML enhanced with Angular syntax.
+InvoiceStore / InvoiceApi / AuthService
+```
+
+## Inline vs external template
+
+Inline is useful for tiny components.
 
 ```ts
 @Component({
-  template: `
-    <h1>{{ title }}</h1>
-    <button (click)="refresh()">Refresh</button>
-  `,
+  selector: 'app-badge',
+  template: `<span class="badge">{{ text }}</span>`
 })
-export class Dashboard {
-  title = 'Dashboard';
-
-  refresh() {
-    console.log('Refreshing');
-  }
-}
 ```
 
-## Template expressions
-
-```html
-<p>{{ firstName + ' ' + lastName }}</p>
-<p>{{ total * taxRate }}</p>
-<p>{{ user?.address?.city }}</p>
-```
-
-Keep template expressions lightweight. Avoid expensive methods executed repeatedly:
-
-Bad:
-
-```html
-<div>{{ calculateHugeReport() }}</div>
-```
-
-Better:
+External files are better for larger UI.
 
 ```ts
-readonly report = computed(() => calculateHugeReport(this.source()));
-```
-
-```html
-<div>{{ report() }}</div>
+@Component({
+  selector: 'app-order-page',
+  templateUrl: './order-page.html',
+  styleUrl: './order-page.scss'
+})
 ```
 
 ---
 
-# 11. Data Binding
+# 9. Templates and Data Binding
 
-Angular has several important binding directions.
+Angular templates extend HTML with Angular syntax.
 
 ## Interpolation
 
-Component → view:
-
 ```html
-<h2>{{ username }}</h2>
+<h2>{{ product.name }}</h2>
+<p>{{ price * quantity }}</p>
 ```
+
+Use for rendering text expressions.
 
 ## Property binding
 
 ```html
-<img [src]="profileImageUrl" [alt]="username" />
-<button [disabled]="saving">Save</button>
+<img [src]="product.imageUrl" [alt]="product.name">
+<button [disabled]="isSaving()">Save</button>
 ```
+
+The value goes **from component → DOM/component property**.
 
 ## Attribute binding
 
-Useful for ARIA and attributes that are not DOM properties:
-
 ```html
-<button [attr.aria-label]="buttonLabel">Save</button>
+<td [attr.colspan]="columnSpan">Total</td>
 ```
+
+Useful when you need an actual HTML attribute instead of a DOM property.
 
 ## Class binding
 
 ```html
-<div [class.active]="selected">...</div>
+<div [class.active]="selected()">Item</div>
 ```
 
+Multiple classes:
+
 ```html
-<div [class]="statusClass">...</div>
+<div [class]="statusClasses()">...</div>
 ```
 
 ## Style binding
 
 ```html
-<div [style.width.px]="progress">...</div>
+<div [style.width.px]="progress()">...</div>
 ```
 
 ## Event binding
 
-View → component:
-
 ```html
 <button (click)="save()">Save</button>
-<input (input)="onInput($event)" />
-```
-
-## Event object
-
-```ts
-onInput(event: Event) {
-  const input = event.target as HTMLInputElement;
-  console.log(input.value);
-}
+<input (input)="search($event)">
 ```
 
 ## Two-way binding
 
+Classic forms example:
+
 ```html
-<input [(ngModel)]="name" />
+<input [(ngModel)]="name">
 ```
 
-Think of `[(...)]` as:
+Conceptually:
 
 ```text
-[property] + (propertyChange)
+component value → input
+input event → component value
 ```
 
-The nickname is **banana in a box**.
+Modern Angular also supports model-based component two-way binding, discussed later.
+
+## Template expressions
+
+Keep template expressions simple.
+
+Avoid:
+
+```html
+<div>{{ veryExpensiveCalculateEverything(order, tax, user, permissions) }}</div>
+```
+
+Prefer derived state:
+
+```ts
+total = computed(() => calculateTotal(this.order()));
+```
+
+```html
+<div>{{ total() }}</div>
+```
 
 ---
 
-# 12. Built-in Template Control Flow
+# 10. Built-in Control Flow
 
-Modern Angular has built-in `@if`, `@for`, and `@switch` blocks.
+Modern Angular has built-in control-flow syntax.
 
 ## `@if`
 
@@ -881,15 +664,15 @@ Modern Angular has built-in `@if`, `@for`, and `@switch` blocks.
 }
 ```
 
-### Scenario: API state
+## `@else if`
 
 ```html
-@if (loading()) {
-  <app-spinner />
-} @else if (error()) {
-  <app-error [message]="error()!" />
+@if (status() === 'approved') {
+  <span>Approved</span>
+} @else if (status() === 'rejected') {
+  <span>Rejected</span>
 } @else {
-  <app-user-list [users]="users()" />
+  <span>Pending</span>
 }
 ```
 
@@ -897,779 +680,71 @@ Modern Angular has built-in `@if`, `@for`, and `@switch` blocks.
 
 ```html
 @for (user of users(); track user.id) {
-  <app-user-card [user]="user" />
-} @empty {
-  <p>No users found.</p>
+  <p>{{ user.name }}</p>
 }
 ```
 
-### Why `track` matters
+Tracking is important because it helps Angular reuse DOM elements efficiently.
 
-Tracking helps Angular identify which list item corresponds to which DOM node.
-
-Prefer a stable unique identifier:
-
-```html
-@for (invoice of invoices(); track invoice.id) {
-  <tr>...</tr>
-}
-```
-
-Avoid using an unstable object or random value.
-
-Useful contextual variables:
+Useful loop variables:
 
 ```html
 @for (item of items(); track item.id; let i = $index; let first = $first) {
-  <p>{{ i + 1 }}. {{ item.name }}</p>
+  <div>{{ i + 1 }}. {{ item.name }}</div>
+}
+```
+
+## `@empty`
+
+```html
+@for (invoice of invoices(); track invoice.id) {
+  <app-invoice-row [invoice]="invoice" />
+} @empty {
+  <p>No invoices found.</p>
 }
 ```
 
 ## `@switch`
 
 ```html
-@switch (status()) {
-  @case ('pending') {
-    <span>Waiting for approval</span>
-  }
-  @case ('approved') {
-    <span>Approved</span>
-  }
-  @case ('rejected') {
-    <span>Rejected</span>
-  }
-  @default {
-    <span>Unknown</span>
-  }
+@switch (role()) {
+  @case ('admin') { <app-admin-panel /> }
+  @case ('manager') { <app-manager-panel /> }
+  @default { <app-user-panel /> }
 }
 ```
 
-Excellent for business workflow statuses.
-
----
-
-# 13. Template Variables and `@let`
-
-## Template reference variables
-
-```html
-<input #searchBox />
-<button (click)="search(searchBox.value)">Search</button>
-```
-
-`#searchBox` references the DOM element or component/directive instance.
-
 ## `@let`
 
-Use `@let` to avoid repeating expressions:
+Use a local template variable for a calculated expression.
 
 ```html
 @let fullName = user().firstName + ' ' + user().lastName;
 <h2>{{ fullName }}</h2>
-<p>Assigned to {{ fullName }}</p>
 ```
 
-With async pipe:
+## Legacy equivalents
+
+Older code often uses:
 
 ```html
-@let user = user$ | async;
-
-@if (user) {
-  <h2>{{ user.name }}</h2>
-}
+<div *ngIf="isOpen">...</div>
+<li *ngFor="let item of items">...</li>
 ```
+
+Understand these for maintenance, but prefer built-in control flow in new code.
 
 ---
 
-# 14. Component Inputs
+# 11. Signals and Modern Reactivity
 
-Inputs pass data **parent → child**.
-
-Modern input API:
-
-```ts
-import { Component, input } from '@angular/core';
-
-@Component({
-  selector: 'app-user-card',
-  template: `<h3>{{ user().name }}</h3>`,
-})
-export class UserCard {
-  user = input.required<User>();
-}
-```
-
-Parent:
-
-```html
-<app-user-card [user]="selectedUser()" />
-```
-
-## Default input
-
-```ts
-size = input<'small' | 'medium' | 'large'>('medium');
-```
-
-## Aliases
-
-```ts
-title = input('', { alias: 'cardTitle' });
-```
-
-Use sparingly; mismatched names can confuse maintainers.
-
-## Input transforms
-
-Transforms are useful for normalizing incoming values. Prefer explicit typed transforms rather than surprising behavior.
-
-## Principle
-
-A child should normally **not mutate an object owned by its parent**.
-
-Bad:
-
-```ts
-this.user().name = 'Changed';
-```
-
-Better:
-
-- emit an event;
-- update shared state through an intentional API;
-- use a `model()` only when two-way value ownership is appropriate.
-
----
-
-# 15. Component Outputs
-
-Outputs send events **child → parent**.
-
-```ts
-import { Component, output } from '@angular/core';
-
-@Component({
-  selector: 'app-delete-button',
-  template: `<button (click)="requestDelete()">Delete</button>`,
-})
-export class DeleteButton {
-  deleted = output<number>();
-
-  requestDelete() {
-    this.deleted.emit(101);
-  }
-}
-```
-
-Parent:
-
-```html
-<app-delete-button (deleted)="deleteUser($event)" />
-```
-
-## Event naming
-
-Prefer business events:
-
-```text
-invoiceApproved
-userSelected
-searchChanged
-fileUploaded
-```
-
-Avoid implementation-style names:
-
-```text
-buttonClicked
-handleAction
-valueEvent
-```
-
-Business event names communicate intent.
-
-## Outputs do not replace services
-
-Use output for direct component communication. If unrelated parts of the application need shared coordination, prefer a shared service/store.
-
----
-
-# 16. Two-Way Binding and `model()`
-
-A `model()` input is useful when the child intentionally edits a value owned together with its parent.
-
-Child:
-
-```ts
-import { Component, model } from '@angular/core';
-
-@Component({
-  selector: 'app-quantity-picker',
-  template: `
-    <button (click)="decrement()">-</button>
-    {{ quantity() }}
-    <button (click)="increment()">+</button>
-  `,
-})
-export class QuantityPicker {
-  quantity = model(1);
-
-  increment() {
-    this.quantity.update(v => v + 1);
-  }
-
-  decrement() {
-    this.quantity.update(v => Math.max(1, v - 1));
-  }
-}
-```
-
-Parent:
-
-```ts
-quantity = signal(2);
-```
-
-```html
-<app-quantity-picker [(quantity)]="quantity" />
-```
-
-Use `model()` for controls such as:
-
-- quantity picker;
-- date picker;
-- switch/toggle;
-- custom selector.
-
-Do not turn every input into two-way binding. Explicit one-way data flow is easier to reason about.
-
----
-
-# 17. Content Projection
-
-Content projection lets a parent provide markup inside a reusable child container.
-
-Card:
-
-```ts
-@Component({
-  selector: 'app-card',
-  template: `
-    <section class="card">
-      <ng-content />
-    </section>
-  `,
-})
-export class Card {}
-```
-
-Usage:
-
-```html
-<app-card>
-  <h2>Invoice #1001</h2>
-  <p>Amount: ₹12,500</p>
-</app-card>
-```
-
-## Multiple slots
-
-```html
-<header>
-  <ng-content select="[card-title]" />
-</header>
-
-<section>
-  <ng-content />
-</section>
-
-<footer>
-  <ng-content select="[card-actions]" />
-</footer>
-```
-
-Usage:
-
-```html
-<app-card>
-  <h2 card-title>Invoice</h2>
-  <p>Main content</p>
-  <button card-actions>Approve</button>
-</app-card>
-```
-
-### Use case
-
-Create reusable shells:
-
-- modal;
-- card;
-- page header;
-- accordion;
-- dialog layout;
-- dashboard widget.
-
----
-
-# 18. Component Queries
-
-Queries obtain references to child components, directives, or DOM elements.
-
-Modern APIs include `viewChild`, `viewChildren`, `contentChild`, and `contentChildren`.
-
-Example:
-
-```ts
-import { Component, ElementRef, viewChild } from '@angular/core';
-
-@Component({
-  template: `<input #searchInput />`,
-})
-export class SearchPage {
-  searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
-
-  focusSearch() {
-    this.searchInput()?.nativeElement.focus();
-  }
-}
-```
-
-## When queries are appropriate
-
-- focus an input;
-- integrate a third-party widget;
-- call a deliberate child API;
-- measure an element after rendering.
-
-## Avoid excessive parent-child imperative calls
-
-If you frequently write:
-
-```ts
-this.child.doThis();
-this.child.changeThat();
-this.child.refreshSomething();
-```
-
-consider whether data flow should instead be modeled with inputs, signals, or a shared state service.
-
----
-
-# 19. Component Lifecycle
-
-A component moves through creation, change detection, rendering, and destruction.
-
-Common lifecycle APIs:
-
-```text
-constructor
-ngOnChanges
-ngOnInit
-ngDoCheck
-ngAfterContentInit
-ngAfterContentChecked
-ngAfterViewInit
-ngAfterViewChecked
-afterNextRender
-afterEveryRender
-ngOnDestroy / DestroyRef
-```
-
-## `constructor`
-
-Use mainly for standard class initialization. Dependency injection through `inject()` is commonly performed in fields.
-
-## `ngOnInit`
-
-Runs once after initial inputs are initialized.
-
-```ts
-ngOnInit() {
-  this.loadInitialData();
-}
-```
-
-But with signal inputs and computed state, you may not need `ngOnInit` as often as in older Angular code.
-
-## `ngOnChanges`
-
-Useful when reacting to input changes in legacy/decorator-style flows or when you need the previous/current values.
-
-## `ngAfterViewInit`
-
-Use when a task depends on the initialized view.
-
-Do not arbitrarily change parent-visible state here; it can lead to change-detection errors such as `ExpressionChangedAfterItHasBeenCheckedError`.
-
-## `DestroyRef`
-
-Modern cleanup can use `DestroyRef`:
-
-```ts
-private destroyRef = inject(DestroyRef);
-
-constructor() {
-  const id = setInterval(() => console.log('tick'), 1000);
-
-  this.destroyRef.onDestroy(() => clearInterval(id));
-}
-```
-
-For RxJS, prefer `takeUntilDestroyed()` where appropriate.
-
----
-
-# 20. Directives
-
-Directives add behavior to existing elements/components.
-
-## Attribute directive example
-
-```ts
-import { Directive, ElementRef, inject } from '@angular/core';
-
-@Directive({
-  selector: '[appAutoFocus]',
-})
-export class AutoFocusDirective {
-  private el = inject(ElementRef<HTMLInputElement>);
-
-  ngAfterViewInit() {
-    this.el.nativeElement.focus();
-  }
-}
-```
-
-Usage:
-
-```html
-<input appAutoFocus />
-```
-
-## Host bindings/listeners using `host`
-
-```ts
-@Directive({
-  selector: '[appClickable]',
-  host: {
-    '[class.clickable]': 'true',
-    '(keydown.enter)': 'activate()',
-  },
-})
-export class ClickableDirective {
-  activate() {
-    console.log('Activated');
-  }
-}
-```
-
-## Good directive use cases
-
-- permission behavior;
-- autofocus;
-- tooltip trigger;
-- input formatting;
-- click-outside behavior;
-- reusable DOM behavior.
-
-Avoid directives that secretly perform unrelated business processes.
-
----
-
-# 21. Pipes
-
-Pipes transform values for display.
-
-Built-ins include formatting for:
-
-- dates;
-- numbers;
-- currency;
-- percentages;
-- JSON;
-- async values.
-
-Examples:
-
-```html
-<p>{{ invoiceDate | date:'dd-MMM-yyyy' }}</p>
-<p>{{ amount | currency:'INR' }}</p>
-<p>{{ ratio | percent:'1.0-2' }}</p>
-```
-
-## Custom pipe
-
-```ts
-import { Pipe, PipeTransform } from '@angular/core';
-
-@Pipe({
-  name: 'statusLabel',
-})
-export class StatusLabelPipe implements PipeTransform {
-  transform(value: string): string {
-    return value.replaceAll('_', ' ').toUpperCase();
-  }
-}
-```
-
-```html
-{{ 'pending_for_approval' | statusLabel }}
-```
-
-## Pure pipes
-
-Pure pipes recalculate when their input references change. They work well with immutable data.
-
-Avoid using a pipe for actions with side effects or server calls.
-
----
-
-# 22. Component Styling and View Encapsulation
-
-Component styles normally apply to the component's view without becoming arbitrary global styles.
-
-```ts
-@Component({
-  styles: `
-    .title {
-      font-weight: 700;
-    }
-  `,
-})
-export class Example {}
-```
-
-## Global styles
-
-Use global styles for:
-
-- resets;
-- typography tokens;
-- CSS variables;
-- application theme;
-- utility styles intentionally shared across features.
-
-## CSS variables
-
-```css
-:root {
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --radius: 0.5rem;
-}
-```
-
-## Avoid deep selector hacks
-
-If a child component must expose custom styling, prefer:
-
-- CSS variables;
-- documented classes;
-- inputs controlling visual variants;
-- a proper theming API.
-
----
-
-# 23. Dynamic Components
-
-Sometimes the component type is selected at runtime.
-
-Use cases:
-
-- dashboard widget registry;
-- dynamic form fields;
-- plugin-style UI;
-- modal body selected by type;
-- CMS-driven component rendering.
-
-`NgComponentOutlet` is convenient for template-driven dynamic rendering.
-
-Conceptual example:
-
-```html
-<ng-container *ngComponentOutlet="currentComponent" />
-```
-
-For advanced control, use `ViewContainerRef.createComponent()`.
-
-Rule: do not use dynamic components when a normal `@if` or router configuration is simpler.
-
----
-
-# 24. Services
-
-Services hold reusable logic that is not tied directly to one visual component.
-
-```ts
-import { Injectable } from '@angular/core';
-
-@Injectable({ providedIn: 'root' })
-export class TaxService {
-  calculateTax(amount: number, rate: number): number {
-    return amount * rate;
-  }
-}
-```
-
-Usage:
-
-```ts
-private taxService = inject(TaxService);
-```
-
-## Good service responsibilities
-
-- API communication;
-- authentication/session state;
-- feature state;
-- calculations;
-- caching;
-- configuration;
-- browser integrations.
-
-## Bad service design
-
-A `CommonService` containing 100 unrelated methods is a warning sign.
-
-Prefer:
-
-```text
-AuthService
-InvoiceApi
-InvoiceState
-CurrencyFormatter
-PermissionService
-FileDownloadService
-```
-
----
-
-# 25. Dependency Injection
-
-Dependency Injection (DI) means a class receives its dependencies instead of constructing them itself.
-
-Bad coupling:
-
-```ts
-class InvoicePage {
-  api = new InvoiceApi();
-}
-```
-
-Better:
-
-```ts
-class InvoicePage {
-  private api = inject(InvoiceApi);
-}
-```
-
-Angular's injector controls how dependencies are created and shared.
-
-## `providedIn: 'root'`
-
-```ts
-@Injectable({ providedIn: 'root' })
-export class AuthService {}
-```
-
-Creates an application-level injectable that can be tree-shaken when unused.
-
-## Component-level provider
-
-```ts
-@Component({
-  providers: [EditorState],
-})
-export class EditorPage {}
-```
-
-Each component instance receives its own `EditorState` instance.
-
-### Scenario
-
-You open two independent editors on one screen. Component-level state prevents them from sharing accidental data.
-
-## `InjectionToken`
-
-Useful for non-class configuration:
-
-```ts
-export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
-```
-
-Provider:
-
-```ts
-{ provide: API_BASE_URL, useValue: 'https://api.example.com' }
-```
-
-Inject:
-
-```ts
-private apiUrl = inject(API_BASE_URL);
-```
-
-## Provider strategies
-
-```text
-useClass
-useValue
-useFactory
-useExisting
-```
-
-### Factory example
-
-```ts
-{
-  provide: Logger,
-  useFactory: () => {
-    const env = inject(AppEnvironment);
-    return env.production ? new RemoteLogger() : new ConsoleLogger();
-  },
-}
-```
-
-## Hierarchical DI
-
-Providers can exist at application, route, component, and other injector scopes.
-
-Mental model:
-
-```text
-Application injector
-      ↓
-Route injector
-      ↓
-Parent component injector
-      ↓
-Child component injector
-```
-
-When Angular resolves a token, it searches the relevant injector hierarchy.
-
-## Injection context
-
-`inject()` only works where Angular has an injection context, such as:
-
-- dependency-created class field initializers;
-- provider factories;
-- functional guards;
-- functional interceptors;
-- explicitly created injection contexts.
-
-Do not call `inject()` inside an arbitrary utility function executed later unless that function is deliberately run inside an injection context.
-
----
-
-# 26. Angular Signals
-
-Signals are Angular's fine-grained reactive state primitive.
+A **Signal** is a reactive value. Angular tracks where it is read and can update consumers when it changes.
 
 ## Writable signal
 
 ```ts
+import { signal } from '@angular/core';
+
 count = signal(0);
 ```
 
@@ -1685,7 +760,7 @@ Set:
 this.count.set(10);
 ```
 
-Update from old value:
+Update based on old value:
 
 ```ts
 this.count.update(v => v + 1);
@@ -1694,761 +769,915 @@ this.count.update(v => v + 1);
 Template:
 
 ```html
-<p>{{ count() }}</p>
+<p>Count: {{ count() }}</p>
+<button (click)="count.update(v => v + 1)">+</button>
 ```
 
-## Object state
+## `computed`
+
+Use for derived state.
 
 ```ts
-user = signal<User | null>(null);
+quantity = signal(2);
+unitPrice = signal(250);
+
+total = computed(() => this.quantity() * this.unitPrice());
 ```
 
-Update immutably:
+Do not store state that can be calculated reliably from other state.
+
+Bad:
 
 ```ts
-this.user.update(user =>
-  user ? { ...user, name: 'Updated Name' } : user
-);
+quantity = signal(2);
+unitPrice = signal(250);
+total = signal(500); // can become inconsistent
 ```
 
-## Why signals matter
-
-They give Angular precise knowledge of what state is consumed by what reactive code/template.
-
-Use signals for:
-
-- UI state;
-- component state;
-- feature state;
-- derived state;
-- state shared through a service.
-
-### Example: invoice page
+Better:
 
 ```ts
-invoices = signal<Invoice[]>([]);
-selectedId = signal<number | null>(null);
-loading = signal(false);
+total = computed(() => this.quantity() * this.unitPrice());
 ```
 
----
+## `effect`
 
-# 27. `computed`, `effect`, `linkedSignal`, and Async Resources
-
-## `computed()`
-
-Derived state should normally be computed instead of manually synchronized.
+Use an effect for imperative side effects when reactive dependencies change.
 
 ```ts
-firstName = signal('Asha');
-lastName = signal('Patel');
-
-fullName = computed(() => `${this.firstName()} ${this.lastName()}`);
+constructor() {
+  effect(() => {
+    console.log('Selected user:', this.selectedUserId());
+  });
+}
 ```
 
-### Scenario: totals
+Typical effects:
+
+- logging/analytics
+- integration with non-Angular APIs
+- persistence to browser storage
+- imperative synchronization
+
+Avoid using effects to copy derived values between signals when `computed` can express the relationship.
+
+## Scenario: Search filtering
 
 ```ts
-items = signal<LineItem[]>([]);
+search = signal('');
+users = signal<User[]>([]);
 
-total = computed(() =>
-  this.items().reduce((sum, item) => sum + item.qty * item.price, 0)
-);
-```
-
-Avoid:
-
-```ts
-items = signal([]);
-total = signal(0);
-// manually update total every time items changes
-```
-
-Duplicated state creates synchronization bugs.
-
-## `effect()`
-
-Use effects for **side effects** caused by reactive state.
-
-```ts
-effect(() => {
-  localStorage.setItem('theme', this.theme());
+filteredUsers = computed(() => {
+  const q = this.search().trim().toLowerCase();
+  return this.users().filter(user =>
+    user.name.toLowerCase().includes(q)
+  );
 });
 ```
 
-Good effect use cases:
+```html
+<input
+  [value]="search()"
+  (input)="search.set($any($event.target).value)"
+>
 
-- analytics;
-- logging;
-- browser APIs;
-- third-party library synchronization;
-- storage synchronization.
-
-Bad use:
-
-```ts
-effect(() => {
-  this.total.set(this.price() * this.quantity());
-});
+@for (user of filteredUsers(); track user.id) {
+  <p>{{ user.name }}</p>
+}
 ```
 
-Use `computed()` instead.
+## `linkedSignal`
 
-## `untracked()`
+A linked signal is useful when writable state depends on other reactive state but should still be manually changeable.
 
-Sometimes you need to read a signal without making it a reactive dependency.
+Typical scenario: a selected item should default to the first item whenever the available list changes, while still allowing the user to choose another item afterward.
 
-Conceptually:
+## Async Signals: `resource` and `httpResource`
 
-```ts
-effect(() => {
-  const id = this.selectedId();
-  const snapshot = untracked(() => this.debugState());
-  console.log(id, snapshot);
-});
-```
+Modern Angular includes resource APIs for async state.
 
-## `linkedSignal()`
-
-`linkedSignal()` is useful when writable state depends on other reactive state but still needs user overrides.
-
-Scenario: selected shipping method should reset when available methods change.
+Conceptual `httpResource` example:
 
 ```ts
-shippingOptions = signal([
-  { id: 1, name: 'Standard' },
-  { id: 2, name: 'Express' },
-]);
+import { httpResource } from '@angular/common/http';
 
-selected = linkedSignal(() => this.shippingOptions()[0]);
-```
-
-Unlike a normal `computed`, the linked signal remains writable.
-
-## `resource()`
-
-A resource bridges asynchronous loading into signal-based state.
-
-Conceptual pattern:
-
-```ts
 userId = signal(1);
-
-userResource = resource({
-  params: () => ({ id: this.userId() }),
-  loader: ({ params }) => fetch(`/api/users/${params.id}`).then(r => r.json()),
-});
-```
-
-You can react to loading, error, and value state through the resource API.
-
-## `httpResource()`
-
-For HTTP-driven signal state, modern Angular also provides a reactive HTTP resource API. It is useful when the request naturally depends on signals and the page wants resource status represented as signals.
-
-### Choose between `HttpClient` and resources
-
-Use regular `HttpClient` when:
-
-- implementing commands/mutations such as POST/PUT/DELETE;
-- RxJS composition is natural;
-- existing application architecture is observable-based.
-
-Consider `httpResource()` when:
-
-- loading data based on reactive parameters;
-- the UI is signal-centric;
-- you want loading/value/error state represented reactively.
-
----
-
-# 28. RxJS Fundamentals for Angular
-
-RxJS represents streams of values over time.
-
-## Observable mental model
-
-```text
-Observable
-  emits → value 1
-  emits → value 2
-  emits → value 3
-  completes
-```
-
-Example:
-
-```ts
-this.http.get<User[]>('/api/users').subscribe(users => {
-  console.log(users);
-});
-```
-
-## Common operators
-
-### `map`
-
-Transform values:
-
-```ts
-users$.pipe(
-  map(users => users.filter(u => u.active))
-);
-```
-
-### `filter`
-
-Filter stream emissions:
-
-```ts
-source$.pipe(filter(value => value > 10));
-```
-
-### `tap`
-
-Side effect without changing the value:
-
-```ts
-source$.pipe(tap(value => console.log(value)));
-```
-
-### `switchMap`
-
-Cancel the previous inner stream when a new value arrives.
-
-Perfect for search:
-
-```ts
-search$.pipe(
-  debounceTime(300),
-  distinctUntilChanged(),
-  switchMap(term => this.api.search(term))
-);
-```
-
-If the user types:
-
-```text
-a → an → angu → angular
-```
-
-old requests are abandoned as newer search terms arrive.
-
-### `concatMap`
-
-Queues operations and preserves order.
-
-Use case: sequential uploads or ordered saves.
-
-### `mergeMap`
-
-Runs inner streams concurrently.
-
-Use case: independent parallel operations.
-
-### `exhaustMap`
-
-Ignores new triggers while one operation is active.
-
-Great for preventing double-submit:
-
-```text
-Click Save
-  request starts
-Click Save again → ignored until first finishes
-```
-
-### `catchError`
-
-```ts
-source$.pipe(
-  catchError(error => {
-    return of(fallbackValue);
-  })
-);
-```
-
-### `finalize`
-
-```ts
-this.loading.set(true);
-
-this.api.load().pipe(
-  finalize(() => this.loading.set(false))
-).subscribe();
-```
-
-### `forkJoin`
-
-Wait for several completing observables:
-
-```ts
-forkJoin({
-  user: this.api.getUser(),
-  roles: this.api.getRoles(),
-  settings: this.api.getSettings(),
-});
-```
-
-Good for page initialization when independent requests can run in parallel.
-
-### `combineLatest`
-
-Combine latest values from ongoing streams.
-
-Useful for filters:
-
-```text
-search term + selected status + selected department
-                      ↓
-                 filtered result
-```
-
-## Subject types
-
-- `Subject` — multicast event stream;
-- `BehaviorSubject` — stores latest value;
-- `ReplaySubject` — replays N previous values.
-
-In new Angular code, signals often replace `BehaviorSubject` for synchronous application/UI state, but RxJS remains extremely important for asynchronous event streams and API orchestration.
-
----
-
-# 29. Signals and RxJS Interoperability
-
-Angular applications often use both.
-
-Think:
-
-```text
-Signals → current reactive state
-RxJS    → streams/events/async composition
-```
-
-Useful interop APIs include:
-
-- `toSignal()` — Observable → Signal;
-- `toObservable()` — Signal → Observable;
-- `takeUntilDestroyed()` — automatic subscription cleanup.
-
-## Observable to signal
-
-```ts
-users = toSignal(this.api.getUsers(), { initialValue: [] });
+user = httpResource(() => `/api/users/${this.userId()}`);
 ```
 
 Template:
 
 ```html
-@for (user of users(); track user.id) {
-  <p>{{ user.name }}</p>
+@if (user.hasValue()) {
+  <h2>{{ user.value().name }}</h2>
+} @else if (user.error()) {
+  <p>Could not load user.</p>
+} @else if (user.isLoading()) {
+  <p>Loading...</p>
 }
 ```
 
-## Signal to observable
+Use `HttpClient` directly for mutations such as POST/PUT/DELETE where command-style control is usually clearer.
 
-```ts
-query = signal('');
-query$ = toObservable(this.query);
-```
+## Signals vs RxJS
 
-Then:
+Use Signals primarily for:
 
-```ts
-results$ = this.query$.pipe(
-  debounceTime(300),
-  distinctUntilChanged(),
-  switchMap(query => this.api.search(query))
-);
-```
+- component/view state
+- synchronous derived state
+- fine-grained reactive UI
+- local/global state containers
 
-## Avoid ideology
+Use RxJS primarily for:
 
-Do not force everything into signals or everything into RxJS. Use the abstraction that makes the flow clearest.
+- event streams
+- HTTP pipelines
+- cancellation
+- debouncing
+- combining async sources
+- WebSockets
+- stream transformation
+
+They are complementary, not enemies.
 
 ---
 
-# 30. HTTP Client
+# 12. Inputs, Outputs, and Two-Way Binding
 
-Configure `HttpClient` in `app.config.ts`:
+Components communicate through explicit APIs.
+
+## Modern signal input
 
 ```ts
-import { ApplicationConfig } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { Component, input } from '@angular/core';
 
-export const appConfig: ApplicationConfig = {
-  providers: [provideHttpClient()],
-};
+@Component({
+  selector: 'app-user-card',
+  template: `<h3>{{ name() }}</h3>`
+})
+export class UserCard {
+  name = input('Guest');
+}
 ```
 
-## GET
+Parent:
+
+```html
+<app-user-card [name]="currentUser().name" />
+```
+
+## Required input
 
 ```ts
+user = input.required<User>();
+```
+
+Use required inputs when the child cannot function correctly without that data.
+
+## Transforming input values
+
+Input transformations can normalize incoming values when appropriate. Keep transformations predictable and side-effect free.
+
+## Modern output
+
+```ts
+import { output } from '@angular/core';
+
+saved = output<User>();
+
+save(user: User) {
+  this.saved.emit(user);
+}
+```
+
+Parent:
+
+```html
+<app-user-editor (saved)="handleSaved($event)" />
+```
+
+## Model input for two-way component binding
+
+```ts
+value = model(0);
+```
+
+Parent concept:
+
+```html
+<app-counter [(value)]="count" />
+```
+
+Use two-way component binding when the child is genuinely editing a value owned/coordinated by the parent.
+
+## Legacy decorators
+
+Older applications use:
+
+```ts
+@Input() name = '';
+@Output() saved = new EventEmitter<User>();
+```
+
+These are important to understand for existing projects.
+
+## Avoid event chains
+
+Bad architecture:
+
+```text
+Child → output → Parent → output → Grandparent → output → Page
+```
+
+If many unrelated layers only relay events, consider a feature service/store.
+
+---
+
+# 13. Directives
+
+Directives attach behavior to existing elements/components.
+
+## Attribute directive example
+
+```ts
+import { Directive, ElementRef, inject } from '@angular/core';
+
+@Directive({
+  selector: '[appAutofocus]'
+})
+export class AutofocusDirective {
+  private el = inject(ElementRef<HTMLInputElement>);
+
+  ngAfterViewInit() {
+    this.el.nativeElement.focus();
+  }
+}
+```
+
+```html
+<input appAutofocus>
+```
+
+## Prefer host bindings/listeners through directive/component metadata or host APIs
+
+A directive should encapsulate reusable DOM behavior, not become a hidden business-logic container.
+
+## When to create a directive
+
+Good cases:
+
+- permission behavior
+- input formatting behavior
+- focus management
+- keyboard behavior
+- reusable host interactions
+
+Avoid creating a directive when plain CSS or a normal component is clearer.
+
+## Structural directives
+
+Historically, structural directives reshape template structure (`*ngIf`, `*ngFor`). In modern Angular, common conditional/list control flow is built into the template language, so custom structural directives are more specialized.
+
+---
+
+# 14. Pipes
+
+Pipes transform values for display.
+
+Built-ins include date, currency, decimal, percent, JSON, async, case conversion, etc.
+
+```html
+<p>{{ createdAt | date:'medium' }}</p>
+<p>{{ amount | currency:'INR' }}</p>
+<p>{{ customerName | uppercase }}</p>
+```
+
+## Custom pipe
+
+```ts
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'initials'
+})
+export class InitialsPipe implements PipeTransform {
+  transform(value: string): string {
+    return value
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(word => word[0]?.toUpperCase() ?? '')
+      .join('');
+  }
+}
+```
+
+```html
+<span>{{ 'Shoeb Shaikh' | initials }}</span>
+```
+
+## Pure vs impure pipes
+
+Pure pipes are preferable because Angular can avoid unnecessary re-execution when input identity does not change.
+
+Avoid impure pipes for expensive filtering/sorting on large lists. Derived signals or prepared view models are usually clearer.
+
+---
+
+# 15. Dependency Injection and Services
+
+Dependency Injection (DI) allows a class to request dependencies without constructing them directly.
+
+## Service example
+
+```ts
+import { Injectable } from '@angular/core';
+
 @Injectable({ providedIn: 'root' })
-export class UserApi {
-  private http = inject(HttpClient);
-
-  getUsers() {
-    return this.http.get<User[]>('/api/users');
+export class LoggerService {
+  log(message: string) {
+    console.log(message);
   }
 }
 ```
 
-## GET with query parameters
+Inject it:
 
 ```ts
-getUsers(search: string, page: number) {
-  return this.http.get<User[]>('/api/users', {
-    params: {
-      search,
-      page,
-    },
-  });
+import { inject } from '@angular/core';
+
+export class UserPage {
+  private logger = inject(LoggerService);
 }
 ```
 
-## POST
+## Why DI matters
+
+Without DI:
 
 ```ts
-createUser(payload: CreateUserRequest) {
-  return this.http.post<User>('/api/users', payload);
-}
+const api = new UserApi(new HttpClient(/* impossible setup here */));
 ```
 
-## PUT
+With DI:
 
 ```ts
-updateUser(id: number, payload: UpdateUserRequest) {
-  return this.http.put<User>(`/api/users/${id}`, payload);
-}
+private api = inject(UserApi);
 ```
 
-## PATCH
+Angular manages creation, scope, dependencies, and replacement during testing.
+
+## Injection tokens
+
+Use `InjectionToken` for configuration or values without a class type.
 
 ```ts
-changeStatus(id: number, status: UserStatus) {
-  return this.http.patch(`/api/users/${id}`, { status });
-}
+import { InjectionToken } from '@angular/core';
+
+export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 ```
 
-## DELETE
+Provider:
 
 ```ts
-deleteUser(id: number) {
-  return this.http.delete<void>(`/api/users/${id}`);
-}
+{ provide: API_BASE_URL, useValue: 'https://api.example.com' }
 ```
 
-## Typed DTOs
-
-Create separate types when backend request and frontend view models differ:
+Consumer:
 
 ```ts
-interface CreateInvoiceRequest {
-  vendorId: number;
-  invoiceNumber: string;
-  amount: number;
-}
-
-interface InvoiceDto {
-  id: number;
-  vendorName: string;
-  status: string;
-}
+private baseUrl = inject(API_BASE_URL);
 ```
 
-Do not use `any` just because the backend returns JSON.
+## Provider styles
+
+```ts
+{ provide: Token, useClass: SomeClass }
+{ provide: Token, useValue: value }
+{ provide: Token, useFactory: factoryFn }
+{ provide: Token, useExisting: ExistingToken }
+```
+
+## Hierarchical DI
+
+Providers can exist at different levels. A component-level provider can create a feature-local instance instead of using the application singleton.
+
+Scenario: each editor tab needs isolated draft state.
+
+```ts
+@Component({
+  selector: 'app-draft-editor',
+  providers: [DraftStore],
+  template: `...`
+})
+export class DraftEditor {}
+```
+
+Each editor instance receives its own `DraftStore`.
+
+## Service design
+
+Good service responsibilities:
+
+- API access
+- business rules
+- orchestration
+- state sharing
+- logging
+- authentication
+- caching
+
+Avoid a single `CommonService` with 80 unrelated methods.
 
 ---
 
-# 31. HTTP Interceptors
+# 16. Lifecycle and Render Hooks
 
-Interceptors apply cross-cutting behavior to requests/responses.
+Angular component lifecycle hooks help you react to component creation, input changes, rendered views, and destruction.
 
-Use cases:
+Common hooks:
 
-- authorization token;
-- correlation ID;
-- standardized error handling;
-- request timing;
-- API version header;
-- refresh-token coordination.
-
-Functional interceptor:
-
-```ts
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth = inject(AuthService);
-  const token = auth.token();
-
-  if (!token) {
-    return next(req);
-  }
-
-  const cloned = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return next(cloned);
-};
+```text
+ngOnChanges
+ngOnInit
+ngDoCheck
+ngAfterContentInit
+ngAfterContentChecked
+ngAfterViewInit
+ngAfterViewChecked
+ngOnDestroy
 ```
 
-Configure:
+## `ngOnInit`
+
+Use for initialization that depends on injected dependencies or already-set initial inputs.
 
 ```ts
-provideHttpClient(
-  withInterceptors([authInterceptor])
-)
+ngOnInit() {
+  this.loadReferenceData();
+}
 ```
 
-## Important
+## `ngOnChanges`
 
-HTTP requests are immutable. Clone a request when modifying it.
+Useful when classic/decorator inputs change and you need transition logic.
 
-## Keep interceptors focused
+For modern signal inputs, `computed`/`effect` often expresses reactive relationships more naturally.
 
-Avoid one giant interceptor containing:
+## `ngAfterViewInit`
 
-- auth;
-- spinner;
-- error translation;
-- logging;
-- retry;
-- caching;
-- refresh token;
-- routing.
+Use when logic requires initialized child views or DOM references.
 
-Compose small responsibilities where possible.
+## `ngOnDestroy`
+
+Cleanup is important for manual subscriptions, timers, browser listeners, and third-party libraries.
+
+Modern Angular also provides destruction-aware utilities such as `DestroyRef` and RxJS interop helpers.
+
+## Render hooks
+
+`afterNextRender` and `afterEveryRender` are useful for DOM work that should happen after Angular renders.
+
+Typical example:
+
+- measure an element after it becomes visible
+- initialize a non-Angular chart library after DOM exists
+
+Avoid manipulating DOM during arbitrary lifecycle phases when a render hook is more precise.
 
 ---
 
-# 32. API Error Handling, Retry, Cancellation, and Caching
+# 17. View Queries, Content Queries, and DOM Access
 
-## Local error handling
+Queries let a component access child elements/components/directives.
+
+## Template reference variable
+
+```html
+<input #searchBox>
+<button (click)="focusSearch(searchBox)">Focus</button>
+```
+
+## Modern signal view query concept
 
 ```ts
-this.api.getInvoice(id).pipe(
-  catchError(error => {
-    this.error.set('Unable to load invoice.');
-    return EMPTY;
-  })
-).subscribe(invoice => {
-  this.invoice.set(invoice);
+searchBox = viewChild<ElementRef<HTMLInputElement>>('searchBox');
+```
+
+Use queries when the parent truly needs a reference to a rendered child.
+
+## Do not overuse `ElementRef`
+
+Prefer:
+
+- bindings
+- directives
+- components
+- signals
+
+Use direct DOM access mainly for specialized browser APIs or third-party integration.
+
+## Content queries
+
+Content queries inspect content projected into a component through `<ng-content>`.
+
+Scenario: a reusable tabs component discovers projected tab panels.
+
+---
+
+# 18. Content Projection and Template Composition
+
+Content projection allows reusable components to accept caller-provided markup.
+
+## Basic projection
+
+Card component:
+
+```html
+<div class="card">
+  <ng-content />
+</div>
+```
+
+Usage:
+
+```html
+<app-card>
+  <h2>Invoice #1001</h2>
+  <p>Pending approval</p>
+</app-card>
+```
+
+## Multiple slots
+
+```html
+<header>
+  <ng-content select="[card-title]" />
+</header>
+<section>
+  <ng-content />
+</section>
+```
+
+Usage:
+
+```html
+<app-card>
+  <h2 card-title>Profile</h2>
+  <p>Profile content</p>
+</app-card>
+```
+
+## `ng-template`
+
+`ng-template` represents template content that is not rendered immediately by itself.
+
+Useful for:
+
+- custom cell templates
+- modal templates
+- reusable rendering slots
+- dynamic composition
+
+## `ng-container`
+
+Groups template logic without adding an extra DOM element.
+
+---
+
+# 19. Forms Overview
+
+Angular supports three important form approaches:
+
+| Approach | Best for | Main state model |
+|---|---|---|
+| Signal Forms | New signal-based apps | Writable signal + field tree |
+| Reactive Forms | Complex/enterprise/existing forms | `FormControl`, `FormGroup`, `FormArray` |
+| Template-driven | Small/simple forms | Template directives + component properties |
+
+Do not choose based on which syntax looks shortest. Choose based on complexity, type safety, team familiarity, and existing codebase.
+
+---
+
+# 20. Signal Forms
+
+Signal Forms provide a modern signal-based forms model.
+
+## Basic model
+
+```ts
+import { signal } from '@angular/core';
+import { form, FormField, required, email } from '@angular/forms/signals';
+
+interface LoginData {
+  email: string;
+  password: string;
+}
+
+loginModel = signal<LoginData>({
+  email: '',
+  password: ''
+});
+
+loginForm = form(this.loginModel, path => {
+  required(path.email, { message: 'Email is required' });
+  email(path.email, { message: 'Enter a valid email address' });
+  required(path.password, { message: 'Password is required' });
 });
 ```
 
-## Retry only when appropriate
-
-Do not blindly retry all errors.
-
-Reasonable candidates:
-
-- transient network failures;
-- temporary 5xx errors;
-- idempotent GET requests.
-
-Usually do not retry:
-
-- 400 validation error;
-- 401 without a refresh strategy;
-- 403 permission error;
-- destructive operations unless carefully designed.
-
-## Request cancellation
-
-`switchMap` is ideal when newer requests make older ones irrelevant.
-
-Example: autocomplete search.
-
-## Basic cache in service
+Component imports:
 
 ```ts
-@Injectable({ providedIn: 'root' })
-export class LookupService {
-  private departments = signal<Department[] | null>(null);
+@Component({
+  imports: [FormField],
+  templateUrl: './login.html'
+})
+```
 
-  loadDepartments() {
-    const cached = this.departments();
-    if (cached) return of(cached);
+Template:
 
-    return this.http.get<Department[]>('/api/departments').pipe(
-      tap(data => this.departments.set(data)),
-    );
-  }
+```html
+<input type="email" [formField]="loginForm.email">
+<input type="password" [formField]="loginForm.password">
+```
+
+Read model:
+
+```ts
+const credentials = this.loginModel();
+```
+
+Read field state:
+
+```ts
+const emailValue = this.loginForm.email().value();
+const isValid = this.loginForm.email().valid();
+```
+
+## Why Signal Forms are attractive
+
+- model-first
+- inferred typing
+- reactive field state
+- schema-style validation
+- integrates naturally with signal-based applications
+
+## Scenario: Registration form
+
+Use a signal model for:
+
+```ts
+{
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  confirmPassword: ''
 }
 ```
 
-Cache invalidation matters more than cache creation. Define:
+Then centralize required, email, length, and cross-field password matching rules in the form schema.
 
-- what invalidates cache;
-- TTL if needed;
-- whether user/session changes require clearing it.
+## Migration advice
+
+Do not rewrite every existing reactive form only because Signal Forms exist. Migrate where the new model reduces complexity and where team/test coverage supports the change.
 
 ---
 
-# 33. Angular Router Fundamentals
+# 21. Reactive Forms
 
-Configure routes:
+Reactive Forms remain extremely important in enterprise Angular.
+
+## Basic example
+
+```ts
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
+profileForm = new FormGroup({
+  name: new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required]
+  }),
+  email: new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.email]
+  })
+});
+```
+
+```html
+<form [formGroup]="profileForm" (ngSubmit)="save()">
+  <input formControlName="name">
+  <input formControlName="email">
+  <button type="submit" [disabled]="profileForm.invalid">Save</button>
+</form>
+```
+
+## `setValue` vs `patchValue`
+
+`setValue` expects the complete structure.
+
+```ts
+this.profileForm.setValue({
+  name: 'Asha',
+  email: 'asha@example.com'
+});
+```
+
+`patchValue` updates a subset.
+
+```ts
+this.profileForm.patchValue({
+  name: 'Asha'
+});
+```
+
+## `FormArray`
+
+Use for dynamic lists.
+
+Scenario: invoice line items.
+
+```ts
+lines = new FormArray([
+  new FormGroup({
+    description: new FormControl('', { nonNullable: true }),
+    quantity: new FormControl(1, { nonNullable: true }),
+    price: new FormControl(0, { nonNullable: true })
+  })
+]);
+```
+
+## Custom validator
+
+```ts
+import { AbstractControl, ValidationErrors } from '@angular/forms';
+
+export function positiveNumber(control: AbstractControl): ValidationErrors | null {
+  const value = Number(control.value);
+  return value > 0 ? null : { positiveNumber: true };
+}
+```
+
+## Async validator
+
+Useful for server checks such as username uniqueness. Add debounce/cancellation thoughtfully to avoid sending a request for every keystroke.
+
+## `valueChanges`
+
+```ts
+this.profileForm.controls.email.valueChanges
+  .subscribe(email => console.log(email));
+```
+
+In real code, manage subscription lifetime or convert/interoperate with signals.
+
+---
+
+# 22. Template-Driven Forms
+Template-driven forms keep much of the form declaration in HTML using directives such as `ngModel`. They are approachable for small forms because the template closely resembles normal HTML, but large dynamic forms can become harder to reason about and test than model-driven alternatives.
+
+Use them for simple forms with modest validation and dynamic behavior. Prefer Reactive Forms or Signal Forms when you need complex composition, dynamic controls, explicit state modeling, or heavy testability.
+
+
+Template-driven forms are convenient for small forms.
+
+```ts
+import { FormsModule } from '@angular/forms';
+```
+
+```html
+<form #form="ngForm" (ngSubmit)="submit()">
+  <input
+    name="email"
+    [(ngModel)]="email"
+    required
+    email
+  >
+
+  <button [disabled]="form.invalid">Submit</button>
+</form>
+```
+
+Use when:
+
+- form is simple
+- validation is straightforward
+- team prefers template-centric code
+
+Avoid for very dynamic forms with complicated cross-field state and large validation systems.
+
+---
+
+# 23. Routing
+
+The Angular Router maps URLs to application views.
+
+## Basic routes
 
 ```ts
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardPage },
-  { path: 'users', component: UserListPage },
-  { path: '**', component: NotFoundPage },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./features/home/home').then(m => m.Home)
+  },
+  {
+    path: 'users',
+    loadComponent: () =>
+      import('./features/users/user-list').then(m => m.UserList)
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./shared/not-found/not-found').then(m => m.NotFound)
+  }
 ];
 ```
 
-Provide them:
-
-```ts
-provideRouter(routes)
-```
-
-Root template:
+## Router outlet
 
 ```html
 <router-outlet />
 ```
 
-Navigation:
+## Router links
 
 ```html
 <a routerLink="/users">Users</a>
+<a [routerLink]="['/users', user.id]">Open</a>
 ```
 
-Programmatic:
+## Route parameters
 
 ```ts
-private router = inject(Router);
-
-openUser(id: number) {
-  this.router.navigate(['/users', id]);
+{
+  path: 'users/:id',
+  loadComponent: () => import('./user-detail').then(m => m.UserDetail)
 }
 ```
 
-## SPA idea
-
-The router changes the displayed component without reloading the entire document for each navigation.
-
----
-
-# 34. Route Parameters, Query Parameters, and Route State
-
-## Route parameter
-
-Route:
-
-```ts
-{ path: 'users/:id', component: UserDetailsPage }
-```
-
-URL:
-
-```text
-/users/42
-```
-
-Read:
+Read parameter through `ActivatedRoute`:
 
 ```ts
 private route = inject(ActivatedRoute);
 
-id = this.route.snapshot.paramMap.get('id');
+ngOnInit() {
+  const id = this.route.snapshot.paramMap.get('id');
+}
 ```
 
-For reactive parameter changes, use the route's observable/signal-compatible state rather than assuming the component is always recreated.
+For parameters that can change without destroying the component, use the observable/signal-friendly route state rather than relying only on snapshot.
 
 ## Query parameters
 
 URL:
 
 ```text
-/invoices?status=pending&page=2
+/users?page=2&status=active
 ```
 
-Navigation:
+Useful for filters that should be bookmarkable/shareable.
 
-```ts
-this.router.navigate(['/invoices'], {
-  queryParams: {
-    status: 'pending',
-    page: 2,
-  },
-});
-```
-
-## URL as state
-
-Put shareable navigation/filter state in the URL when appropriate:
-
-```text
-Good candidates:
-search
-page
-sort
-filters
-selected tab
-report period
-```
-
-Benefit: refresh, bookmarking, back/forward, and sharing continue to work.
-
----
-
-# 35. Lazy Loading and Preloading
-
-Lazy loading keeps large features out of the initial JavaScript bundle.
-
-## Lazy standalone component
+## Child routes
 
 ```ts
 {
-  path: 'reports',
-  loadComponent: () =>
-    import('./features/reports/reports.page')
-      .then(m => m.ReportsPage),
+  path: 'settings',
+  loadComponent: () => import('./settings-shell').then(m => m.SettingsShell),
+  children: [
+    {
+      path: 'profile',
+      loadComponent: () => import('./profile').then(m => m.Profile)
+    },
+    {
+      path: 'security',
+      loadComponent: () => import('./security').then(m => m.Security)
+    }
+  ]
 }
 ```
 
-## Lazy route collection
+## Lazy loading
+
+Lazy loading reduces initial JavaScript by loading route code only when needed.
 
 ```ts
-{
-  path: 'admin',
-  loadChildren: () =>
-    import('./features/admin/admin.routes')
-      .then(m => m.ADMIN_ROUTES),
-}
+loadComponent: () => import('./orders').then(m => m.Orders)
 ```
 
-## Scenario
+For route groups you can lazy-load route arrays as well.
 
-A user may never open the Admin module. Do not force every user to download all admin code on initial load.
+## Guards
 
-## Preloading
-
-Preloading loads lazy code after initial startup according to a strategy, improving later navigation while preserving a smaller startup bundle.
-
-Use when:
-
-- features are likely to be visited shortly after startup;
-- network conditions allow it;
-- you want a balance between eager and purely lazy loading.
-
----
-
-# 36. Route Guards
-
-Guards control navigation.
-
-Functional guard:
+Functional guard example:
 
 ```ts
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -2459,1811 +1688,61 @@ export const authGuard: CanActivateFn = () => {
 };
 ```
 
-Route:
+Remember: **client-side guards are not security boundaries**. The backend must enforce authorization.
+
+## Resolvers
+
+Resolvers load data before route activation when that improves UX/architecture.
+
+Use carefully; blocking navigation for every API call can make apps feel slow.
+
+## Route titles
+
+Routes can define title information for browser/document titles.
+
+## Preloading
+
+Preloading can download lazy routes after initial startup, balancing startup performance with later navigation speed.
+
+---
+
+# 24. HTTP and API Integration
+
+Configure HttpClient:
 
 ```ts
-{
-  path: 'admin',
-  canActivate: [authGuard],
-  loadComponent: () => import('./admin.page').then(m => m.AdminPage),
-}
-```
+import { provideHttpClient } from '@angular/common/http';
 
-## Common guard categories
-
-- `CanActivate` — can enter route?
-- `CanActivateChild` — can enter child routes?
-- `CanDeactivate` — can leave page?
-- `CanMatch` — should this route definition match?
-
-## Unsaved form scenario
-
-```ts
-export const unsavedGuard: CanDeactivateFn<EditInvoicePage> = component => {
-  return component.hasUnsavedChanges()
-    ? confirm('Discard unsaved changes?')
-    : true;
+export const appConfig = {
+  providers: [provideHttpClient()]
 };
 ```
 
-## Critical security principle
-
-A client-side guard is **not security by itself**. A user can alter browser code or call APIs directly. The backend must independently enforce authorization.
-
----
-
-# 37. Resolvers
-
-Resolvers load data before activating a route.
+## API service
 
 ```ts
-export const invoiceResolver: ResolveFn<Invoice> = route => {
-  const api = inject(InvoiceApi);
-  const id = Number(route.paramMap.get('id'));
-  return api.getInvoice(id);
-};
-```
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 
-Route:
-
-```ts
-{
-  path: 'invoices/:id',
-  component: InvoicePage,
-  resolve: {
-    invoice: invoiceResolver,
-  },
-}
-```
-
-## Use resolver when
-
-- a page cannot render meaningfully without core data;
-- you want navigation to coordinate required loading;
-- route-level error/navigation logic is desired.
-
-## Do not overuse
-
-If a page can render a shell immediately and progressively load several sections, component/resource-level loading may give better perceived performance.
-
----
-
-# 38. Nested Routes, Multiple Outlets, and Advanced Routing
-
-## Child routes
-
-```ts
-{
-  path: 'products/:id',
-  component: ProductPage,
-  children: [
-    { path: '', redirectTo: 'info', pathMatch: 'full' },
-    { path: 'info', component: ProductInfo },
-    { path: 'reviews', component: ProductReviews },
-  ],
-}
-```
-
-Parent template:
-
-```html
-<h1>Product</h1>
-<nav>...</nav>
-<router-outlet />
-```
-
-## Router events
-
-Useful for:
-
-- analytics;
-- loading indicators;
-- debugging;
-- navigation instrumentation.
-
-Important events include:
-
-```text
-NavigationStart
-RoutesRecognized
-GuardsCheckStart / End
-ResolveStart / End
-NavigationEnd
-NavigationCancel
-NavigationError
-```
-
-## Component input binding from routes
-
-Modern router configuration can bind route parameters/data directly to component inputs, reducing manual `ActivatedRoute` plumbing in suitable cases.
-
-## View transitions
-
-Router integration can use browser View Transitions as a progressive enhancement for route changes. Treat motion as enhancement, not a dependency for application correctness.
-
----
-
-# 39. Forms Overview
-
-Angular has three major form approaches:
-
-| Approach | Best for | State lives in | Type safety |
-|---|---|---|---|
-| Template-driven | simple forms | component + template directives | lower |
-| Reactive Forms | established complex forms | `FormControl`/`FormGroup` tree | strong |
-| Signal Forms | modern signal-first forms | writable signal + form field tree | strong/inferred |
-
-Learn all three because enterprise projects can contain any of them.
-
----
-
-# 40. Template-Driven Forms
-
-Good for small/simple forms.
-
-```ts
-@Component({
-  imports: [FormsModule],
-  template: `
-    <form #form="ngForm" (ngSubmit)="submit()">
-      <input
-        name="email"
-        [(ngModel)]="email"
-        required
-        email
-      />
-
-      <button [disabled]="form.invalid">Submit</button>
-    </form>
-  `,
-})
-export class ContactForm {
-  email = '';
-
-  submit() {
-    console.log(this.email);
-  }
-}
-```
-
-### Good use cases
-
-- search box;
-- small contact form;
-- simple settings form;
-- quick prototype.
-
-For large dynamic enterprise forms, Reactive Forms or Signal Forms are usually easier to structure and test.
-
----
-
-# 41. Reactive Forms
-
-Reactive Forms model form state explicitly in TypeScript.
-
-```ts
-@Component({
-  imports: [ReactiveFormsModule],
-  template: `
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <input formControlName="email" />
-      <input formControlName="password" type="password" />
-      <button [disabled]="form.invalid">Login</button>
-    </form>
-  `,
-})
-export class LoginPage {
-  form = new FormGroup({
-    email: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
-    password: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8)],
-    }),
-  });
-
-  submit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    console.log(this.form.getRawValue());
-  }
-}
-```
-
-## `FormGroup`
-
-Represents a group of controls.
-
-## `FormControl`
-
-Represents one value/control.
-
-## `FormArray`
-
-Represents a dynamic sequence of controls/groups.
-
-## `FormBuilder`
-
-Convenient builder syntax:
-
-```ts
-private fb = inject(FormBuilder);
-
-form = this.fb.nonNullable.group({
-  name: ['', Validators.required],
-  amount: [0, [Validators.required, Validators.min(0)]],
-});
-```
-
-## Value changes
-
-```ts
-this.form.controls.name.valueChanges
-  .pipe(takeUntilDestroyed())
-  .subscribe(name => console.log(name));
-```
-
----
-
-# 42. Signal Forms
-
-Signal Forms are the modern signal-based form system in Angular v22+.
-
-Core idea:
-
-```text
-Writable signal model
-        ↓
-     form(...)
-        ↓
-typed field tree + validation/state
-        ↓
-template control binding
-```
-
-Conceptual example:
-
-```ts
-import { signal } from '@angular/core';
-import { form, required, email } from '@angular/forms/signals';
-
-loginModel = signal({
-  email: '',
-  password: '',
-});
-
-loginForm = form(this.loginModel, path => {
-  required(path.email, { message: 'Email is required' });
-  email(path.email, { message: 'Enter a valid email address' });
-  required(path.password, { message: 'Password is required' });
-});
-```
-
-Template concept:
-
-```html
-<input [formField]="loginForm.email" />
-<input [formField]="loginForm.password" type="password" />
-```
-
-## Advantages
-
-- model shape is the source of truth;
-- types are inferred from the model;
-- integrates naturally with signals;
-- field state is reactive;
-- schema-based validation centralizes rules.
-
-## When to choose
-
-Use Signal Forms for new Angular 22+ signal-first applications when your team is comfortable with the API and its ecosystem.
-
-Use Reactive Forms when:
-
-- maintaining a large existing Reactive Forms codebase;
-- your component library integrates specifically around reactive forms;
-- your team has mature patterns and utilities around `FormGroup`.
-
-Know both.
-
----
-
-# 43. Validation
-
-Validation can be:
-
-- synchronous;
-- asynchronous;
-- field-level;
-- form-level/cross-field;
-- backend validation.
-
-## Reactive Forms validator
-
-```ts
-amount: new FormControl(0, {
-  nonNullable: true,
-  validators: [
-    Validators.required,
-    Validators.min(1),
-    Validators.max(1_000_000),
-  ],
-})
-```
-
-## Custom validator
-
-```ts
-function noWhitespace(control: AbstractControl): ValidationErrors | null {
-  const value = String(control.value ?? '');
-  return value.trim().length === 0 ? { whitespace: true } : null;
-}
-```
-
-## Cross-field validator scenario
-
-Password and confirm password:
-
-```ts
-function passwordsMatch(group: AbstractControl): ValidationErrors | null {
-  const password = group.get('password')?.value;
-  const confirm = group.get('confirmPassword')?.value;
-  return password === confirm ? null : { passwordMismatch: true };
-}
-```
-
-## Async validation
-
-Scenario: check whether username already exists.
-
-Do not call the backend on every raw keystroke without debounce/cancellation.
-
-## Server-side validation is mandatory
-
-Frontend validation improves UX. Backend validation protects data integrity/security.
-
-Never assume:
-
-```text
-Angular validator passed ⇒ request is trustworthy
-```
-
-Attackers can call the API without your Angular application.
-
----
-
-# 44. Dynamic Forms and FormArray
-
-Scenario: invoice line items.
-
-```ts
-private fb = inject(FormBuilder);
-
-form = this.fb.nonNullable.group({
-  invoiceNumber: ['', Validators.required],
-  lines: this.fb.array([] as FormGroup[]),
-});
-
-get lines() {
-  return this.form.controls.lines;
-}
-
-addLine() {
-  this.lines.push(
-    this.fb.nonNullable.group({
-      description: ['', Validators.required],
-      quantity: [1, Validators.min(1)],
-      price: [0, Validators.min(0)],
-    })
-  );
-}
-
-removeLine(index: number) {
-  this.lines.removeAt(index);
-}
-```
-
-Template idea:
-
-```html
-<div formArrayName="lines">
-  @for (line of lines.controls; track line; let i = $index) {
-    <div [formGroupName]="i">
-      <input formControlName="description" />
-      <input formControlName="quantity" type="number" />
-      <input formControlName="price" type="number" />
-      <button type="button" (click)="removeLine(i)">Remove</button>
-    </div>
-  }
-</div>
-```
-
-Dynamic forms are common in:
-
-- invoices;
-- purchase orders;
-- survey builders;
-- user permissions;
-- configurable products;
-- travel itineraries.
-
----
-
-# 45. Custom Form Controls
-
-Create a custom form control when native `<input>`, `<select>`, or `<textarea>` is insufficient.
-
-Examples:
-
-- date picker;
-- rich-text editor;
-- tag selector;
-- searchable dropdown;
-- file picker;
-- rating control.
-
-In Reactive Forms / legacy form integration, understand `ControlValueAccessor` (CVA).
-
-Conceptual responsibilities:
-
-```text
-writeValue(value)        ← form writes into control
-registerOnChange(fn)     ← control reports value changes
-registerOnTouched(fn)    ← control reports touched
-setDisabledState(...)    ← form controls disabled state
-```
-
-Modern Signal Forms also support custom controls through their control interfaces.
-
-### Design rule
-
-A reusable custom form control should behave like a normal native control:
-
-- value in/out;
-- disabled state;
-- touched state;
-- keyboard behavior;
-- accessible label;
-- validation integration.
-
----
-
-# 46. State Management
-
-There is no single state solution for every application.
-
-## Level 1 — local component state
-
-```ts
-isOpen = signal(false);
-```
-
-Use for:
-
-- modal visibility;
-- current tab;
-- local filter;
-- expanded row.
-
-## Level 2 — parent-owned state
-
-Parent holds data and passes it to children with inputs/outputs.
-
-Use when a small component tree shares one feature's state.
-
-## Level 3 — service with signals
-
-```ts
-@Injectable()
-export class InvoiceState {
-  private readonly _invoices = signal<Invoice[]>([]);
-  readonly invoices = this._invoices.asReadonly();
-
-  readonly pending = computed(() =>
-    this._invoices().filter(x => x.status === 'pending')
-  );
-
-  setInvoices(items: Invoice[]) {
-    this._invoices.set(items);
-  }
-}
-```
-
-Provide at feature/route/component scope when the state should live only as long as that feature.
-
-## Level 4 — RxJS state service
-
-Useful when state is stream-heavy or existing architecture is observable-based.
-
-## Level 5 — dedicated store library
-
-A store library can help when the application has:
-
-- many interconnected features;
-- complex state transitions;
-- strict event/action tracing needs;
-- many developers working on shared state;
-- strong testing/debugging requirements.
-
-Examples in the Angular ecosystem include NgRx and signal-oriented store solutions.
-
-### Do not install a global store automatically
-
-For a 5-page CRUD application, a huge store architecture may create more complexity than it removes.
-
-## State ownership decision tree
-
-```text
-Used only by one component?
-  → local signal
-
-Used by parent + children?
-  → parent state + inputs/outputs
-
-Used throughout one feature?
-  → feature-scoped state service
-
-Used across unrelated features?
-  → application service/store
-
-Should survive refresh/share URL?
-  → URL or persisted storage/server
-```
-
----
-
-# 47. Authentication and Authorization
-
-Authentication answers:
-
-> Who is the user?
-
-Authorization answers:
-
-> What is the user allowed to do?
-
-## Typical frontend flow
-
-```text
-Login
-  ↓
-Backend validates credentials
-  ↓
-Session / token established
-  ↓
-Frontend reads auth state
-  ↓
-Interceptor attaches credentials/token if appropriate
-  ↓
-Guards improve navigation UX
-  ↓
-Backend enforces permissions on every protected API
-```
-
-## Auth state service
-
-```ts
 @Injectable({ providedIn: 'root' })
-export class AuthState {
-  private readonly _user = signal<User | null>(null);
-  readonly user = this._user.asReadonly();
-  readonly isLoggedIn = computed(() => this._user() !== null);
-
-  setUser(user: User) {
-    this._user.set(user);
-  }
-
-  clear() {
-    this._user.set(null);
-  }
-}
-```
-
-## Role/permission check
-
-Prefer permissions over hard-coded role checks when requirements are granular:
-
-```ts
-can(permission: Permission): boolean {
-  return this.user()?.permissions.includes(permission) ?? false;
-}
-```
-
-Template:
-
-```html
-@if (auth.can('invoice.approve')) {
-  <button (click)="approve()">Approve</button>
-}
-```
-
-Again, hiding a button is UX, not backend security.
-
----
-
-# 48. Angular Security
-
-Security is a system concern, not one library setting.
-
-## XSS
-
-Angular escapes normal interpolated values.
-
-```html
-<div>{{ userControlledText }}</div>
-```
-
-Do not bypass sanitization casually.
-
-High-risk APIs include intentionally trusting raw HTML/URLs. If you must use them, validate and sanitize at the correct trust boundary.
-
-## Never build HTML from untrusted data unnecessarily
-
-Bad idea:
-
-```text
-backend string → bypass security → innerHTML
-```
-
-Prefer structured data rendered through Angular templates.
-
-## Authentication tokens
-
-Avoid treating `localStorage` as a magical secure vault. Any script executing in your origin can potentially access it.
-
-Depending on backend architecture, secure HttpOnly cookies can reduce token exposure to JavaScript, but CSRF/XSRF and same-site configuration must then be handled correctly.
-
-## CSRF/XSRF
-
-Understand:
-
-- same-origin policy;
-- cookies;
-- SameSite;
-- anti-CSRF tokens;
-- backend framework protections.
-
-Angular's HTTP stack has XSRF support for common cookie/header patterns, but your backend and deployment must be configured consistently.
-
-## CSP
-
-A strong Content Security Policy can reduce impact of script injection.
-
-## Dependency security
-
-Regularly audit dependencies:
-
-```bash
-npm audit
-```
-
-But do not blindly run automated major upgrades without reviewing breaking changes.
-
-## Route guards are not security
-
-Always repeat this rule:
-
-```text
-Frontend authorization = UX
-Backend authorization  = security boundary
-```
-
-## Avoid leaking secrets
-
-Anything bundled into browser JavaScript can be inspected by users.
-
-Never put in Angular environment files:
-
-- database passwords;
-- private API keys;
-- signing secrets;
-- service-account credentials.
-
-Public client identifiers are different from secrets.
-
----
-
-# 49. Browser Storage
-
-Options:
-
-## `localStorage`
-
-Persists until removed.
-
-Good for:
-
-- non-sensitive UI preferences;
-- theme;
-- dismissed hints.
-
-## `sessionStorage`
-
-Persists for a browser tab/session.
-
-## IndexedDB
-
-Better for larger structured offline data.
-
-## Cookies
-
-Can be sent with requests and have security attributes (`HttpOnly`, `Secure`, `SameSite`) when set by the server.
-
-## Never store unnecessarily
-
-Ask:
-
-1. Why do I need persistence?
-2. How long should it live?
-3. Is it sensitive?
-4. How is it invalidated?
-5. What happens if another tab changes it?
-
----
-
-# 50. Change Detection
-
-Change detection is how Angular determines what template output must update.
-
-Modern Angular increasingly relies on explicit reactive notifications such as Signals, component input changes, and framework event handling.
-
-## `OnPush`
-
-In enterprise Angular, you will see:
-
-```ts
-@Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class UserList {}
-```
-
-Historically and conceptually, `OnPush` reduces unnecessary checking by making update triggers more explicit. Signal-based state works naturally with efficient rendering.
-
-## Immutable updates
-
-Prefer:
-
-```ts
-this.users.update(users => [
-  ...users,
-  newUser,
-]);
-```
-
-Instead of silently mutating nested structures that other reactive logic may not detect as expected.
-
-## Expensive template work
-
-Avoid:
-
-```html
-@for (item of getSortedAndFilteredItems(); track item.id) {
-  ...
-}
-```
-
-Prefer derived state:
-
-```ts
-visibleItems = computed(() =>
-  this.items()
-    .filter(/* ... */)
-    .sort(/* ... */)
-);
-```
-
----
-
-# 51. Zoneless Angular
-
-Historically Angular often used Zone.js to notice async activity and trigger checks. Modern Angular supports zoneless operation, relying on explicit framework notifications.
-
-Benefits can include:
-
-- less runtime overhead;
-- smaller dependency footprint;
-- fewer unnecessary change-detection triggers;
-- clearer reactive behavior.
-
-A zoneless-friendly application updates UI through Angular-known mechanisms such as:
-
-- signals;
-- template event listeners;
-- input updates;
-- explicit change detection notifications;
-- async pipe/framework APIs.
-
-## Migration mindset
-
-Do not merely delete Zone.js from a large legacy app and hope everything works.
-
-Audit code that depends on async callbacks mutating fields without notifying Angular.
-
-Example legacy pattern that may require adaptation:
-
-```ts
-setTimeout(() => {
-  this.plainField = 'done';
-}, 1000);
-```
-
-Signal-friendly:
-
-```ts
-status = signal('waiting');
-
-setTimeout(() => {
-  this.status.set('done');
-}, 1000);
-```
-
----
-
-# 52. Performance Optimization
-
-Performance is not "use OnPush everywhere". Measure first.
-
-## Main areas
-
-### 1. Initial JavaScript size
-
-Use:
-
-- lazy routes;
-- `@defer`;
-- tree-shakable providers;
-- careful dependency selection.
-
-### 2. Rendering work
-
-Use:
-
-- stable `track` keys in `@for`;
-- computed derived state;
-- virtual scrolling for huge lists;
-- pagination/server-side filtering when data is huge.
-
-### 3. Network
-
-Use:
-
-- caching;
-- HTTP compression;
-- CDN;
-- request deduplication;
-- parallel independent requests;
-- cancellation for stale requests.
-
-### 4. Images
-
-Use:
-
-- correct dimensions;
-- modern formats;
-- responsive images;
-- lazy loading;
-- Angular image optimization tools where applicable.
-
-### 5. Avoid memory leaks
-
-Clean up:
-
-- subscriptions;
-- timers;
-- DOM listeners;
-- third-party widgets.
-
-## Performance smell
-
-```ts
-get total() {
-  return this.items
-    .filter(...)
-    .map(...)
-    .reduce(...);
-}
-```
-
-called repeatedly by a large template.
-
-Prefer a computed signal or pre-computed observable pipeline.
-
-## Server-side pagination
-
-For 1,000,000 invoices, do not download everything into Angular and then paginate 10 rows locally.
-
-Use API parameters:
-
-```text
-GET /api/invoices?page=3&pageSize=25&status=pending&sort=-createdAt
-```
-
----
-
-# 53. `@defer` and Deferrable Views
-
-`@defer` delays loading code until needed.
-
-```html
-@defer {
-  <app-heavy-chart />
-}
-```
-
-With placeholder:
-
-```html
-@defer (on viewport) {
-  <app-heavy-chart />
-} @placeholder {
-  <div class="chart-skeleton">Loading chart area...</div>
-} @loading {
-  <p>Loading...</p>
-} @error {
-  <p>Unable to load chart.</p>
-}
-```
-
-## Common triggers
-
-Conceptually:
-
-- idle;
-- viewport;
-- interaction;
-- hover;
-- timer;
-- condition.
-
-## Scenario
-
-Dashboard has:
-
-```text
-Header      20 KB
-Summary     30 KB
-Charts     400 KB
-Audit tab  300 KB
-```
-
-If charts are below the fold and audit is rarely opened, defer them.
-
-## Requirement
-
-Dependencies that you want split/deferred must satisfy Angular's deferrable loading rules, commonly working best with standalone dependencies.
-
----
-
-# 54. SSR, SSG, Hybrid Rendering, and Hydration
-
-## CSR
-
-Client-Side Rendering:
-
-```text
-Server sends app shell
-        ↓
-Browser downloads JS
-        ↓
-Angular runs
-        ↓
-UI appears
-```
-
-Good for authenticated internal applications where SEO is irrelevant and the app is highly interactive.
-
-## SSR
-
-Server-Side Rendering renders HTML for a request on the server.
-
-```text
-Request
-  ↓
-Angular server rendering
-  ↓
-HTML returned
-  ↓
-Browser displays HTML
-  ↓
-Angular hydrates interactive app
-```
-
-Useful for:
-
-- SEO;
-- faster content display;
-- public content pages;
-- route-specific server data needs.
-
-## SSG / prerendering
-
-Generate HTML at build time.
-
-Excellent for content that changes infrequently:
-
-- marketing pages;
-- documentation;
-- product information that can be regenerated;
-- help pages.
-
-## Hybrid rendering
-
-Modern Angular can choose different rendering modes by route.
-
-Example strategy:
-
-```text
-/                 → prerender
-/about            → prerender
-/products/:slug   → server render
-/account           → client render
-/admin             → client render
-```
-
-## Hydration
-
-Hydration attaches Angular behavior to server-rendered DOM instead of throwing away and recreating all initial HTML.
-
-Benefits:
-
-- preserves server-rendered DOM;
-- improves user-perceived startup;
-- avoids unnecessary rerendering.
-
-## Incremental hydration
-
-Advanced Angular rendering can hydrate deferred parts of an application later, reducing startup work for large pages.
-
-## Browser-only APIs
-
-SSR code may run where `window`, `document`, or `localStorage` is unavailable.
-
-Avoid direct top-level usage:
-
-```ts
-const theme = localStorage.getItem('theme');
-```
-
-Instead isolate browser behavior and execute only in a browser-compatible context.
-
----
-
-# 55. Service Workers and PWA Concepts
-
-A Progressive Web App can provide:
-
-- offline shell caching;
-- installation;
-- asset caching;
-- update handling;
-- push capabilities when architecture supports it.
-
-Angular's service worker package can be added to applications that benefit from these behaviors.
-
-Before enabling offline caching, define data correctness rules.
-
-For example, an approval system should not show stale critical approval status indefinitely without clear indicators.
-
-Think about:
-
-```text
-What is safe to cache?
-How stale may it become?
-What happens on app update?
-What happens when backend data changes?
-```
-
----
-
-# 56. Animations
-
-Modern Angular supports `animate.enter` and `animate.leave`, which work with CSS classes or animation functions.
-
-Example:
-
-```html
-@if (showPanel()) {
-  <div animate.enter="fade-in" animate.leave="fade-out">
-    Panel content
-  </div>
-}
-```
-
-```css
-.fade-in {
-  animation: fade-in 200ms ease-out;
-}
-
-.fade-out {
-  animation: fade-out 150ms ease-in;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-```
-
-The older `@angular/animations` package is deprecated in modern Angular, so prefer native CSS/new enter-leave APIs for new development.
-
-## Accessibility
-
-Respect reduced-motion preferences:
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-```
-
----
-
-# 57. Accessibility
-
-Accessibility is part of correctness.
-
-## Prefer semantic HTML
-
-Good:
-
-```html
-<button (click)="save()">Save</button>
-```
-
-Bad:
-
-```html
-<div (click)="save()">Save</div>
-```
-
-A real button provides:
-
-- keyboard behavior;
-- focus behavior;
-- semantics;
-- assistive-technology support.
-
-## Labels
-
-```html
-<label for="email">Email</label>
-<input id="email" type="email" />
-```
-
-## ARIA
-
-Use ARIA to supplement semantic HTML, not replace it.
-
-```html
-<button
-  type="button"
-  [attr.aria-expanded]="open()"
-  aria-controls="filters"
->
-  Filters
-</button>
-```
-
-## Keyboard support
-
-Custom widgets need:
-
-- focus management;
-- keyboard navigation;
-- escape behavior where relevant;
-- clear focus indication.
-
-## Dialogs
-
-A correct modal needs more than `position: fixed`:
-
-- focus trap;
-- accessible name;
-- escape handling;
-- restore focus;
-- appropriate dialog semantics.
-
-Prefer a mature accessible component library when possible.
-
----
-
-# 58. Internationalization
-
-Internationalization (i18n) prepares an application for different locales/languages.
-
-Concerns include:
-
-- translated text;
-- dates;
-- numbers;
-- currencies;
-- pluralization;
-- directionality;
-- locale-specific formats.
-
-Do not concatenate sentences from fragments:
-
-Bad:
-
-```html
-{{ count }} + ' invoices found'
-```
-
-Different languages may require different grammar/order.
-
-Use translation-aware messages and locale formatting.
-
-## Currency
-
-```html
-{{ amount | currency:'INR' }}
-```
-
-But remember formatting locale and business currency are separate decisions.
-
----
-
-# 59. Testing Strategy
-
-A healthy application uses multiple test layers.
-
-```text
-Many      unit tests
-Some      component/integration tests
-Fewer     end-to-end tests
-```
-
-## Unit test
-
-Tests a small unit quickly.
-
-Example:
-
-```text
-TaxService.calculateTax()
-```
-
-## Component test
-
-Tests component behavior and rendered DOM.
-
-## Integration test
-
-Tests multiple Angular pieces together.
-
-## E2E test
-
-Tests the application through the browser as a user would.
-
-### What to test
-
-Test behavior that matters:
-
-- calculations;
-- validation;
-- permission rules;
-- navigation;
-- API error states;
-- important UI interactions.
-
-Avoid brittle tests that merely repeat implementation details.
-
----
-
-# 60. Component Testing
-
-Conceptual TestBed example:
-
-```ts
-beforeEach(async () => {
-  await TestBed.configureTestingModule({
-    imports: [UserCard],
-  }).compileComponents();
-});
-```
-
-Create fixture:
-
-```ts
-const fixture = TestBed.createComponent(UserCard);
-const component = fixture.componentInstance;
-fixture.detectChanges();
-```
-
-Query DOM:
-
-```ts
-const element: HTMLElement = fixture.nativeElement;
-expect(element.querySelector('h2')?.textContent).toContain('Asha');
-```
-
-## Test inputs
-
-Set input through the component reference APIs used by your Angular testing version rather than directly bypassing Angular input semantics when you specifically need to test change behavior.
-
-## Test outputs
-
-Listen/subscribe and verify the event emitted when the user performs the action.
-
-## Prefer user-visible behavior
-
-Instead of testing:
-
-```text
-private variable changed from false → true
-```
-
-test:
-
-```text
-clicking Expand displays details
-```
-
----
-
-# 61. Service and HTTP Testing
-
-## Pure service
-
-```ts
-const service = new TaxService();
-expect(service.calculateTax(100, 0.18)).toBe(18);
-```
-
-## Service with DI
-
-Use TestBed and provide dependencies/test doubles.
-
-## HTTP tests
-
-Angular's HTTP testing utilities let you assert:
-
-- URL;
-- HTTP method;
-- body;
-- headers;
-- response handling;
-- errors.
-
-Conceptual flow:
-
-```text
-call service method
-      ↓
-expect one outgoing request
-      ↓
-assert request properties
-      ↓
-flush mock response
-      ↓
-assert result
-```
-
-Never require a real backend for normal unit tests.
-
----
-
-# 62. Router and Form Testing
-
-## Router testing
-
-Test:
-
-- navigation to correct component;
-- guard redirect;
-- route parameter handling;
-- resolver/error behavior.
-
-Modern Angular provides router testing helpers/harnesses that can navigate and inspect the rendered route.
-
-## Form testing
-
-Test:
-
-```text
-initial state
-required validation
-invalid input
-valid input
-cross-field rules
-submit behavior
-server validation display
-```
-
-Signal Forms can often test schema/field logic directly without rendering a whole component, which keeps tests focused and fast.
-
----
-
-# 63. End-to-End Testing
-
-E2E test tools commonly used in modern frontend projects include Playwright and Cypress. Angular does not require you to use only one.
-
-Test a small set of high-value journeys:
-
-```text
-login
-create entity
-edit entity
-approval flow
-critical report
-logout
-```
-
-Avoid building thousands of slow E2E tests for logic that could be tested at a lower level.
-
-## Example scenario
-
-```text
-Given user is Finance Approver
-When user opens pending invoice
-And clicks Approve
-Then status becomes Approved
-And approval is visible after refresh
-```
-
-This verifies the system flow rather than a single function.
-
----
-
-# 64. Configuration and Environments
-
-Frontend builds often need different public configuration:
-
-- API base URL;
-- production flag;
-- analytics ID;
-- feature flags;
-- public identity-provider client ID.
-
-Do **not** store secrets in frontend configuration.
-
-A build-time environment file may look like:
-
-```ts
-export const environment = {
-  production: false,
-  apiUrl: 'https://dev-api.example.com',
-};
-```
-
-Production:
-
-```ts
-export const environment = {
-  production: true,
-  apiUrl: 'https://api.example.com',
-};
-```
-
-For deployments where one build must run in many environments, consider runtime configuration loaded before application bootstrap instead of rebuilding for every environment.
-
----
-
-# 65. Building for Production
-
-Run:
-
-```bash
-ng build --configuration production
-```
-
-The output directory is configured by the Angular builder, often under `dist/`.
-
-Check:
-
-- build succeeds with no unexpected warnings;
-- budgets are reasonable;
-- source maps follow security/operations policy;
-- environment configuration is correct;
-- lazy chunks load;
-- deep links work after deployment;
-- API/CORS settings are correct;
-- CSP and security headers are configured;
-- error monitoring works.
-
-## Bundle budgets
-
-Set budgets so accidental size growth fails/warns in CI rather than silently shipping.
-
-## CI pipeline concept
-
-```text
-Install dependencies
-      ↓
-Lint / format checks
-      ↓
-Unit tests
-      ↓
-Production build
-      ↓
-Security/license checks
-      ↓
-Deploy to environment
-      ↓
-Smoke tests
-```
-
----
-
-# 66. Deployment: Nginx, Apache, IIS, and Static Hosting
-
-A client-side Angular router requires the web server to return the app's `index.html` for application routes that are not real static files.
-
-Otherwise:
-
-```text
-User opens /users/42 directly
-        ↓
-Web server searches for physical /users/42
-        ↓
-404
-```
-
-Instead:
-
-```text
-/users/42
-   ↓
-rewrite to /index.html
-   ↓
-Angular Router handles /users/42
-```
-
-## Nginx concept
-
-```nginx
-location / {
-  try_files $uri $uri/ /index.html;
-}
-```
-
-## Apache concept
-
-Use rewrite rules to serve `index.html` for non-file/non-directory routes.
-
-## IIS concept
-
-Use URL Rewrite with a fallback to `/index.html` for routes that are not physical files/directories.
-
-Conceptual `web.config` rule:
-
-```xml
-<rule name="Angular Routes" stopProcessing="true">
-  <match url=".*" />
-  <conditions logicalGrouping="MatchAll">
-    <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
-    <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
-  </conditions>
-  <action type="Rewrite" url="/index.html" />
-</rule>
-```
-
-If the application is hosted under a subpath such as:
-
-```text
-https://example.com/hr/
-```
-
-configure base paths and rewrite rules accordingly.
-
-## API proxy separation
-
-Common deployment:
-
-```text
-/           → Angular static files
-/api/*      → backend application
-```
-
-Do not accidentally rewrite API requests to Angular's `index.html`.
-
----
-
-# 67. Enterprise Project Architecture
-
-Architecture should make change safer, not merely create folders.
-
-## Suggested layers
-
-```text
-UI / Feature pages
-       ↓
-Feature state / facade
-       ↓
-Domain/application logic
-       ↓
-API / infrastructure services
-       ↓
-Backend
-```
-
-Not every application needs all layers.
-
-## Example invoice feature
-
-```text
-features/invoices/
-├── pages/
-│   ├── invoice-list/
-│   └── invoice-details/
-├── components/
-│   ├── invoice-filter/
-│   ├── invoice-table/
-│   └── approval-panel/
-├── data-access/
-│   └── invoice.api.ts
-├── state/
-│   └── invoice.state.ts
-├── models/
-│   ├── invoice.model.ts
-│   └── invoice.dto.ts
-├── invoice.routes.ts
-└── utils/
-```
-
-## Boundary rule
-
-A `UserCard` should not know:
-
-- API base URL;
-- how authentication tokens work;
-- database field names;
-- how routing for another feature works.
-
-Keep responsibilities local.
-
----
-
-# 68. Feature-Based Folder Structure
-
-Avoid organizing the whole app only by technical type:
-
-```text
-components/
-services/
-models/
-pipes/
-```
-
-At scale, this becomes hard to navigate.
-
-Prefer:
-
-```text
-features/
-  users/
-    pages/
-    components/
-    data-access/
-    state/
-    models/
-  invoices/
-    pages/
-    components/
-    data-access/
-    state/
-    models/
-```
-
-Technical categories can exist **inside a business feature**.
-
-## Co-location
-
-Keep files that change together near each other.
-
-Example:
-
-```text
-invoice-table/
-├── invoice-table.ts
-├── invoice-table.html
-├── invoice-table.css
-└── invoice-table.spec.ts
-```
-
----
-
-# 69. Reusable UI and Smart/Dumb Component Patterns
-
-The old terms "smart/dumb" describe a useful idea, though real applications are more flexible.
-
-## Page/container component
-
-Knows:
-
-- routing;
-- feature state;
-- API orchestration;
-- permissions.
-
-## Presentational component
-
-Knows:
-
-- inputs;
-- outputs;
-- how to render one reusable UI responsibility.
-
-Example:
-
-```text
-InvoiceListPage
-  │
-  ├── data/state/route
-  │
-  └── InvoiceTable
-         ├── input: invoices
-         ├── input: loading
-         └── output: rowSelected
-```
-
-## Do not over-separate
-
-A component used once with 12 inputs and 15 outputs may be worse than keeping that small piece in the page.
-
-Extract components when they improve:
-
-- reuse;
-- readability;
-- testing;
-- isolation;
-- ownership.
-
----
-
-# 70. Practical CRUD Scenario
-
-Build an employee manager.
-
-## Model
-
-```ts
-export interface Employee {
-  id: number;
-  name: string;
-  email: string;
-  department: string;
-  active: boolean;
-}
-```
-
-## API
-
-```ts
-@Injectable({ providedIn: 'root' })
-export class EmployeeApi {
+export class UserApi {
   private http = inject(HttpClient);
-  private baseUrl = '/api/employees';
+  private readonly baseUrl = '/api/users';
 
-  list() {
-    return this.http.get<Employee[]>(this.baseUrl);
+  getAll() {
+    return this.http.get<User[]>(this.baseUrl);
   }
 
-  get(id: number) {
-    return this.http.get<Employee>(`${this.baseUrl}/${id}`);
+  getById(id: number) {
+    return this.http.get<User>(`${this.baseUrl}/${id}`);
   }
 
-  create(payload: Omit<Employee, 'id'>) {
-    return this.http.post<Employee>(this.baseUrl, payload);
+  create(payload: Omit<User, 'id'>) {
+    return this.http.post<User>(this.baseUrl, payload);
   }
 
-  update(id: number, payload: Partial<Employee>) {
-    return this.http.patch<Employee>(`${this.baseUrl}/${id}`, payload);
+  update(id: number, payload: Partial<User>) {
+    return this.http.patch<User>(`${this.baseUrl}/${id}`, payload);
   }
 
   delete(id: number) {
@@ -4272,2955 +1751,2056 @@ export class EmployeeApi {
 }
 ```
 
-## State
+## HttpClient Observables are cold
+
+The request generally starts when the returned Observable is subscribed.
 
 ```ts
-@Injectable()
-export class EmployeeState {
-  private api = inject(EmployeeApi);
+this.api.getAll().subscribe(...);
+```
 
-  readonly employees = signal<Employee[]>([]);
-  readonly loading = signal(false);
-  readonly error = signal<string | null>(null);
+Multiple subscriptions can mean multiple requests unless you intentionally share/cache.
+
+## Functional interceptor
+
+```ts
+import { HttpInterceptorFn } from '@angular/common/http';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = localStorage.getItem('access_token');
+
+  if (!token) {
+    return next(req);
+  }
+
+  return next(req.clone({
+    setHeaders: {
+      Authorization: `Bearer ${token}`
+    }
+  }));
+};
+```
+
+Register:
+
+```ts
+provideHttpClient(
+  withInterceptors([authInterceptor])
+)
+```
+
+## Interceptor uses
+
+- auth headers
+- correlation IDs
+- consistent API error mapping
+- telemetry
+- caching where appropriate
+
+Avoid placing feature-specific business logic into global interceptors.
+
+## `httpResource`
+
+For reactive GET-like data:
+
+```ts
+userId = signal(1);
+user = httpResource(() => `/api/users/${this.userId()}`);
+```
+
+Use normal `HttpClient` for mutations.
+
+## Validate server responses
+
+TypeScript types do not validate runtime JSON.
+
+This is unsafe:
+
+```ts
+this.http.get<User>('/api/user/1');
+```
+
+It tells TypeScript what you *expect*. It does not prove the server returned that shape.
+
+For high-integrity applications, validate important API responses with a runtime schema/validation layer.
+
+---
+
+# 25. RxJS in Angular
+
+RxJS models values that arrive over time as Observables.
+
+## Observable mental model
+
+```text
+source → operators → subscriber
+```
+
+## Essential operators
+
+### `map`
+
+Transform values.
+
+```ts
+users$.pipe(
+  map(users => users.map(u => u.name))
+);
+```
+
+### `filter`
+
+Ignore values that do not match.
+
+### `tap`
+
+Perform non-transforming side effects such as logging.
+
+### `debounceTime`
+
+Useful for search input.
+
+### `distinctUntilChanged`
+
+Ignore repeated equal values.
+
+### `switchMap`
+
+Switch to a new async source and cancel the previous inner subscription.
+
+Perfect for typeahead search.
+
+```ts
+searchTerm$.pipe(
+  debounceTime(300),
+  distinctUntilChanged(),
+  switchMap(term => this.api.search(term))
+);
+```
+
+### `concatMap`
+
+Queue operations in order.
+
+Scenario: save sequential changes where order matters.
+
+### `mergeMap`
+
+Run inner operations concurrently.
+
+Scenario: independent requests that may complete in any order.
+
+### `exhaustMap`
+
+Ignore new triggers while current operation is active.
+
+Scenario: prevent repeated login button clicks from sending concurrent login requests.
+
+### `catchError`
+
+Handle errors within a stream.
+
+### `forkJoin`
+
+Wait for multiple finite Observables to complete and return combined final values.
+
+### `combineLatest`
+
+Combine latest values from long-lived streams.
+
+## Async pipe
+
+```html
+@if (users$ | async; as users) {
+  @for (user of users; track user.id) {
+    <p>{{ user.name }}</p>
+  }
+}
+```
+
+The `async` pipe manages subscription/unsubscription.
+
+## Signals ↔ RxJS interop
+
+Modern Angular provides utilities to bridge signals and Observables. Use them when crossing boundaries instead of manually mirroring state with nested subscriptions/effects.
+
+## Avoid nested subscriptions
+
+Bad:
+
+```ts
+this.route.params.subscribe(params => {
+  this.api.getUser(params['id']).subscribe(user => {
+    this.api.getOrders(user.id).subscribe(orders => {
+      // ...
+    });
+  });
+});
+```
+
+Better: compose with RxJS operators such as `switchMap`.
+
+---
+
+# 26. State Management
+
+State is information your application must remember.
+
+Examples:
+
+- logged-in user
+- selected invoice
+- shopping cart
+- filter values
+- cached API data
+- UI modal state
+
+## State categories
+
+### Local component state
+
+Use component signals.
+
+```ts
+isOpen = signal(false);
+```
+
+### Shared feature state
+
+Use an injectable service/store.
+
+```ts
+@Injectable({ providedIn: 'root' })
+export class CartStore {
+  readonly items = signal<CartItem[]>([]);
+  readonly count = computed(() =>
+    this.items().reduce((sum, item) => sum + item.quantity, 0)
+  );
+}
+```
+
+### Server state
+
+Server-derived data should consider:
+
+- loading
+- error
+- caching
+- invalidation
+- refetching
+- optimistic updates
+
+## Simple signal store pattern
+
+```ts
+@Injectable({ providedIn: 'root' })
+export class UserStore {
+  private api = inject(UserApi);
+
+  private readonly _users = signal<User[]>([]);
+  private readonly _loading = signal(false);
+  private readonly _error = signal<string | null>(null);
+
+  readonly users = this._users.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
 
   load() {
-    this.loading.set(true);
-    this.error.set(null);
+    this._loading.set(true);
+    this._error.set(null);
 
-    this.api.list().pipe(
-      finalize(() => this.loading.set(false)),
-    ).subscribe({
-      next: employees => this.employees.set(employees),
-      error: () => this.error.set('Unable to load employees.'),
+    this.api.getAll().subscribe({
+      next: users => {
+        this._users.set(users);
+        this._loading.set(false);
+      },
+      error: () => {
+        this._error.set('Could not load users');
+        this._loading.set(false);
+      }
     });
   }
 }
 ```
 
-## Page
+For production, improve lifetime/error/cancellation patterns as needed.
 
-```ts
-@Component({
-  providers: [EmployeeState],
-  template: `
-    <h1>Employees</h1>
+## When to consider NgRx or another state library
 
-    @if (state.loading()) {
-      <p>Loading...</p>
-    } @else if (state.error()) {
-      <p>{{ state.error() }}</p>
-    } @else {
-      @for (employee of state.employees(); track employee.id) {
-        <app-employee-card [employee]="employee" />
-      } @empty {
-        <p>No employees.</p>
-      }
-    }
-  `,
-})
-export class EmployeeListPage {
-  readonly state = inject(EmployeeState);
+Consider a dedicated state library when you have:
 
-  constructor() {
-    this.state.load();
-  }
-}
-```
+- complex cross-feature shared state
+- complicated event flows
+- strict auditability/predictability needs
+- many derived selectors
+- advanced effects and entity management
+- team conventions built around store architecture
 
-### What this scenario teaches
-
-```text
-Model
-API service
-DI
-Signals
-loading/error state
-@for
-@empty
-feature-scoped state
-component composition
-```
+Do **not** add a global state library merely because the project is “enterprise.” Complexity should justify complexity.
 
 ---
 
-# 71. Search, Debounce, Filter, Sort, and Pagination Scenario
+# 27. Error Handling
 
-Requirement:
+Errors belong to different layers.
 
-> Search invoices by vendor, filter status, sort by date, and paginate results without sending a request for every keystroke.
+## User validation errors
 
-## Signals for controls
+Example: required email.
+
+Handle in forms/UI.
+
+## Expected domain errors
+
+Example: “Invoice already approved.”
+
+Display a meaningful message and preserve user context.
+
+## HTTP errors
+
+Map technical errors to domain-friendly outcomes.
 
 ```ts
-query = signal('');
-status = signal<InvoiceStatus | 'all'>('all');
-page = signal(1);
-pageSize = signal(25);
-```
-
-Convert search to RxJS for debounce:
-
-```ts
-query$ = toObservable(this.query);
-
-results$ = this.query$.pipe(
-  debounceTime(300),
-  distinctUntilChanged(),
-  switchMap(query => this.api.search({
-    query,
-    status: this.status(),
-    page: this.page(),
-    pageSize: this.pageSize(),
-  }))
+return this.http.get<User[]>('/api/users').pipe(
+  catchError(error => {
+    console.error(error);
+    return throwError(() => new Error('Unable to load users'));
+  })
 );
 ```
 
-For all filters to trigger reactively, combine observable streams or build a signal/resource-based request parameter model.
+## Unexpected application errors
 
-## API request model
+Log centrally and show a fallback UX where appropriate.
+
+## Never expose sensitive backend details
+
+Do not show raw stack traces, SQL text, internal hostnames, or secrets to users.
+
+---
+
+# 28. Authentication and Authorization
+
+Authentication answers:
+
+> Who are you?
+
+Authorization answers:
+
+> What are you allowed to do?
+
+## Typical SPA auth flow
+
+```text
+Login form
+  ↓
+POST /login
+  ↓
+Backend validates credentials
+  ↓
+Token/session established
+  ↓
+Client sends authenticated requests
+  ↓
+Backend enforces permissions
+```
+
+## Auth state service
 
 ```ts
-interface InvoiceSearchRequest {
-  query: string;
-  status: InvoiceStatus | 'all';
-  page: number;
-  pageSize: number;
-  sort?: string;
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private readonly _user = signal<User | null>(null);
+  readonly user = this._user.asReadonly();
+
+  readonly isLoggedIn = computed(() => this._user() !== null);
+  readonly isAdmin = computed(() => this._user()?.role === 'admin');
 }
 ```
 
-## Response model
+## Route guard
+
+Use guards for navigation UX.
+
+Do not rely on guards to protect data. Users can call backend APIs without using your Angular Router.
+
+## Token storage
+
+Security depends on backend/auth architecture. Common options include secure cookies and token-based flows. Avoid blindly copying localStorage JWT patterns into high-risk applications without understanding XSS, CSRF, token expiry, refresh strategy, and revocation.
+
+---
+
+# 29. Change Detection and Zoneless Angular
+
+Change detection is how Angular synchronizes application state with rendered UI.
+
+Historically Angular commonly used Zone.js to know that “something asynchronous happened” and schedule checks.
+
+Modern Angular can run zoneless, and current Angular versions default to zoneless behavior for new/current applications.
+
+## Good zoneless-compatible notification sources
+
+Angular can react when you:
+
+- update a signal read by a template
+- trigger a bound template/host event
+- update an input through Angular
+- use mechanisms such as `AsyncPipe`
+- explicitly mark a view for check when necessary
+
+## Signals make UI updates explicit
 
 ```ts
-interface PageResult<T> {
-  items: T[];
-  page: number;
-  pageSize: number;
-  totalItems: number;
-  totalPages: number;
+count = signal(0);
+
+increment() {
+  this.count.update(v => v + 1);
 }
 ```
 
-## Important behaviors
+Angular knows the template consuming `count()` may need updating.
 
-- when query changes → reset page to 1;
-- cancel old search request;
-- put filters in URL if users should share/bookmark them;
-- show empty state separately from error state;
-- debounce text input but not necessarily status dropdown;
-- use server pagination for large data.
+## `OnPush`
 
----
-
-# 72. File Upload Scenario
-
-HTML:
-
-```html
-<input type="file" (change)="selectFile($event)" />
-<button (click)="upload()" [disabled]="!file() || uploading()">
-  Upload
-</button>
-```
-
-Component:
+`ChangeDetectionStrategy.OnPush` remains an important strategy and is a good discipline for predictable component updates, especially in legacy/transitioning codebases.
 
 ```ts
-file = signal<File | null>(null);
-uploading = signal(false);
-
-selectFile(event: Event) {
-  const input = event.target as HTMLInputElement;
-  this.file.set(input.files?.[0] ?? null);
-}
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `...`
+})
 ```
 
-Service:
-
-```ts
-uploadInvoice(file: File) {
-  const body = new FormData();
-  body.append('file', file);
-
-  return this.http.post<UploadResult>('/api/invoices/upload', body, {
-    reportProgress: true,
-    observe: 'events',
-  });
-}
-```
-
-## Validate on both sides
-
-Frontend can check:
-
-- extension;
-- MIME type;
-- file size.
-
-Backend must independently validate:
-
-- actual file type/content;
-- size;
-- malware/security policy;
-- storage path;
-- authorization.
-
-Never trust a filename extension alone.
-
----
-
-# 73. Dashboard Scenario
-
-Requirements:
-
-- summary cards immediately;
-- heavy charts below the fold;
-- date filter;
-- API failures isolated per widget.
-
-Architecture:
-
-```text
-DashboardPage
-├── DashboardFilters
-├── SummaryCards
-├── RevenueChart        (@defer on viewport)
-├── StatusChart         (@defer on viewport)
-└── RecentActivity
-```
-
-State:
-
-```ts
-period = signal<'week' | 'month' | 'quarter'>('month');
-summary = resource(/* based on period */);
-```
-
-Derived:
-
-```ts
-completionRate = computed(() => {
-  const s = this.summary.value();
-  if (!s || s.total === 0) return 0;
-  return s.completed / s.total;
-});
-```
-
-## Important dashboard lesson
-
-Do not create one API endpoint because "fewer calls is always faster" or many endpoints because "microservices". Design backend/frontend data boundaries around:
-
-- independent loading;
-- caching;
-- authorization;
-- failure isolation;
-- payload size;
-- backend cost.
-
----
-
-# 74. Role-Based Workflow Scenario
-
-Suppose an invoice can be:
-
-```ts
-type InvoiceStatus =
-  | 'draft'
-  | 'submitted'
-  | 'manager_pending'
-  | 'finance_pending'
-  | 'approved'
-  | 'rejected';
-```
-
-Permissions:
-
-```ts
-type Permission =
-  | 'invoice.view'
-  | 'invoice.edit'
-  | 'invoice.submit'
-  | 'invoice.managerApprove'
-  | 'invoice.financeApprove';
-```
-
-UI:
-
-```html
-@if (permissions.can('invoice.managerApprove') && invoice().status === 'manager_pending') {
-  <button (click)="approveAsManager()">Approve</button>
-}
-```
-
-Better still, derive allowed actions:
-
-```ts
-availableActions = computed(() => {
-  const invoice = this.invoice();
-  const result: InvoiceAction[] = [];
-
-  if (invoice.status === 'manager_pending' && this.permissions.can('invoice.managerApprove')) {
-    result.push('approve', 'reject');
-  }
-
-  return result;
-});
-```
-
-## Backend rule
-
-The backend must verify:
-
-```text
-current user permission
-current invoice state
-allowed transition
-business limits
-concurrency/version
-```
-
-The frontend merely presents valid actions.
-
-## State machine thinking
-
-Model workflow transitions explicitly:
-
-```text
-Draft → Submitted → Manager Pending → Finance Pending → Approved
-                    ↘ Rejected
-                                      ↘ Rejected
-```
-
-This is clearer than dozens of unrelated boolean flags.
-
----
-
-# 75. Optimistic UI and Caching Scenario
-
-Optimistic UI updates before server confirmation.
-
-Example: favorite an item.
-
-```ts
-favorite(id: number) {
-  const before = this.items();
-
-  this.items.update(items =>
-    items.map(item =>
-      item.id === id ? { ...item, favorite: true } : item
-    )
-  );
-
-  this.api.favorite(id).subscribe({
-    error: () => {
-      this.items.set(before);
-      this.toast.error('Unable to save favorite.');
-    },
-  });
-}
-```
-
-## Use optimistic UI for
-
-- low-risk reversible actions;
-- favorites;
-- likes;
-- reorder actions;
-- lightweight status changes with clear rollback.
-
-Be cautious for:
-
-- money transfer;
-- irreversible approvals;
-- inventory reservation;
-- legally significant actions.
-
-For those, confirmed server state should dominate.
-
----
-
-# 76. WebSocket / Real-Time Concepts
-
-Real-time applications may receive server events through WebSocket/SSE or another push mechanism.
-
-Examples:
-
-- chat;
-- live notifications;
-- job progress;
-- stock/market display;
-- live approval queue;
-- collaborative editing.
-
-Architecture:
-
-```text
-Backend event
-    ↓
-WebSocket/SSE client service
-    ↓
-RxJS stream
-    ↓
-feature state
-    ↓
-Angular components
-```
-
-Do not put raw socket setup separately in every component.
-
-Service should handle:
-
-- connection;
-- reconnect/backoff;
-- authentication;
-- event decoding;
-- cleanup;
-- heartbeat if needed.
-
-Feature state should decide what an event means to business data.
-
----
-
-# 77. Error Handling Architecture
-
-Errors occur at different layers.
-
-## 1. Validation error
-
-Example:
-
-```text
-Invoice number is required
-```
-
-Display next to field.
-
-## 2. Business-rule error
-
-Example:
-
-```text
-Invoice cannot be approved because GIR does not match.
-```
-
-Display actionable business message.
-
-## 3. Authorization error
-
-```text
-You do not have permission to approve this invoice.
-```
-
-## 4. Not found
-
-```text
-Invoice no longer exists.
-```
-
-## 5. Conflict
-
-Example HTTP 409:
-
-```text
-Another user already changed this record.
-```
-
-Offer refresh/reload behavior.
-
-## 6. Server/unexpected error
-
-```text
-Something went wrong. Reference ID: ABC-123
-```
-
-Log technical detail, show safe user-facing message.
-
-## Error model
-
-Normalize backend errors:
-
-```ts
-interface AppError {
-  type: 'validation' | 'business' | 'auth' | 'network' | 'server';
-  message: string;
-  fieldErrors?: Record<string, string[]>;
-  correlationId?: string;
-}
-```
-
----
-
-# 78. Logging and Observability
-
-Production frontend debugging needs more than `console.log`.
-
-Capture useful telemetry such as:
-
-- uncaught errors;
-- failed navigation;
-- HTTP failure rates;
-- performance timings;
-- user-safe breadcrumb events;
-- correlation/request IDs.
-
-## Do not log sensitive data
-
-Avoid logging:
-
-- passwords;
-- auth tokens;
-- full payment details;
-- sensitive personal data;
-- confidential document contents.
-
-## Correlation IDs
-
-A backend may return/request a correlation ID:
-
-```text
-Browser error report: requestId=abc123
-Backend logs:          requestId=abc123
-```
-
-This makes cross-system troubleshooting much easier.
-
----
-
-# 79. Angular Coding Standards
-
-## Prefer explicit types at boundaries
-
-API response:
-
-```ts
-getUsers(): Observable<UserDto[]> { ... }
-```
-
-## Avoid `any`
-
-Use:
-
-- interfaces;
-- generics;
-- `unknown` + validation.
-
-## Keep functions small
+## Immutability matters
 
 Bad:
 
 ```ts
-submit() {
-  // 200 lines
-}
+this.user().name = 'New Name';
 ```
 
 Better:
 
 ```ts
-submit() {
-  if (!this.validate()) return;
-  const request = this.buildRequest();
-  this.save(request);
-}
+this.user.update(user => ({ ...user, name: 'New Name' }));
 ```
 
-## Name booleans clearly
-
-Good:
-
-```ts
-isLoading
-hasPermission
-canApprove
-shouldShowBanner
-```
-
-## Use domain names
-
-Good:
-
-```ts
-approveInvoice()
-loadVendorDetails()
-calculateNetAmount()
-```
-
-Weak:
-
-```ts
-doAction()
-processData()
-handleStuff()
-```
-
-## Keep templates readable
-
-If a template condition becomes:
-
-```html
-@if (a() && !b() && (c() || d()) && user()?.x?.y === 'Z')
-```
-
-extract a named derived value:
-
-```ts
-canApprove = computed(() => /* business condition */);
-```
-
-## Use readonly signals/dependencies
-
-```ts
-readonly loading = signal(false);
-private readonly api = inject(InvoiceApi);
-```
-
-## Avoid duplicated derived state
-
-Prefer `computed`.
-
-## Keep backend DTO mapping explicit
-
-A backend may expose:
-
-```json
-{
-  "invd_net_amnt": 12500,
-  "invd_vndr_name": "ABC Ltd"
-}
-```
-
-Map it to clean frontend domain names:
-
-```ts
-interface Invoice {
-  netAmount: number;
-  vendorName: string;
-}
-```
-
-This isolates backend naming quirks.
+This creates a new object and communicates the state transition clearly.
 
 ---
 
-# 80. Common Anti-Patterns
+# 30. Performance Optimization
 
-## 1. Subscribing inside subscribing
+Performance work should start with measurement.
+
+## High-value practices
+
+- lazy-load routes
+- use `@defer` for heavy non-critical UI
+- use stable tracking in `@for`
+- avoid expensive template functions
+- use `computed` for derived state
+- split large components
+- avoid unnecessary global state
+- optimize images
+- use SSR/hydration when it meaningfully helps
+- reduce bundle size
+- remove unused dependencies
+- use browser performance tools and Angular DevTools
+
+## `@for` tracking
 
 Bad:
 
+```html
+@for (row of rows(); track $index) {
+```
+
+If rows can reorder/insert/delete, index tracking may cause unnecessary DOM reuse issues.
+
+Better:
+
+```html
+@for (row of rows(); track row.id) {
+```
+
+## Avoid expensive template methods
+
+Bad:
+
+```html
+<p>{{ calculateInvoiceTotal(invoice()) }}</p>
+```
+
+Better:
+
 ```ts
-this.userApi.getUser().subscribe(user => {
-  this.roleApi.getRoles(user.id).subscribe(roles => {
-    // nested
+invoiceTotal = computed(() => calculateInvoiceTotal(this.invoice()));
+```
+
+## Bundle budgets
+
+Configure build budgets to detect accidental bundle growth.
+
+## Image optimization
+
+Use Angular/image optimization guidance and modern web image formats where appropriate.
+
+---
+
+# 31. Deferrable Views
+
+`@defer` delays loading/rendering of a block until a trigger occurs.
+
+```html
+@defer (on viewport) {
+  <app-heavy-chart />
+} @placeholder {
+  <div class="chart-skeleton">Chart placeholder</div>
+} @loading {
+  <p>Loading chart...</p>
+} @error {
+  <p>Could not load chart.</p>
+}
+```
+
+Common triggers include viewport, interaction, idle, timer, and conditions.
+
+## Scenario: Analytics dashboard
+
+Above the fold:
+
+- KPI cards: load immediately
+
+Below the fold:
+
+- complex charts
+- geographic map
+- historical tables
+
+Defer the below-the-fold features.
+
+## Avoid over-deferring
+
+Do not defer tiny UI fragments just because you can. Every boundary creates complexity and loading states.
+
+---
+
+# 32. SSR, SSG, Hydration, and Hybrid Rendering
+
+## CSR — Client-Side Rendering
+
+Browser receives the application and renders UI client-side.
+
+Good for internal apps where SEO/first-content requirements may be less important.
+
+## SSR — Server-Side Rendering
+
+Server renders HTML for a request before sending it to the browser.
+
+Benefits can include:
+
+- faster initial content
+- SEO
+- social previews
+- better perceived load performance
+
+Trade-offs:
+
+- server complexity
+- hydration constraints
+- environment differences
+- caching decisions
+
+## SSG / prerendering
+
+Generate pages ahead of time.
+
+Excellent for content that changes infrequently.
+
+## Hybrid rendering
+
+Different routes can use different rendering strategies.
+
+Example:
+
+```text
+/marketing        → prerender
+/products/:slug   → server render
+/admin            → client render
+```
+
+## Hydration
+
+Hydration reuses server-rendered DOM on the client instead of throwing it away and rebuilding everything.
+
+## Incremental hydration
+
+Incremental hydration can delay hydration of portions of the page until they are needed, working especially well with deferred UI and performance-sensitive SSR applications.
+
+## Browser-only APIs
+
+Code like this can fail during server rendering:
+
+```ts
+window.localStorage.getItem('token');
+```
+
+Use platform-aware architecture and only access browser APIs where the browser is actually available.
+
+---
+
+# 33. Styling, CSS, and Theming
+
+Angular supports regular CSS, SCSS, and other configured style workflows.
+
+## Component-scoped styles
+
+```ts
+@Component({
+  styleUrl: './profile.scss'
+})
+```
+
+Angular's view encapsulation normally scopes styles so component CSS does not casually leak everywhere.
+
+## CSS variables for design tokens
+
+```css
+:root {
+  --brand: #4f46e5;
+  --surface: #ffffff;
+  --text: #111827;
+}
+```
+
+```css
+.button-primary {
+  background: var(--brand);
+}
+```
+
+## Theme architecture
+
+Prefer central tokens for:
+
+- colors
+- spacing
+- radius
+- typography
+- shadows
+- z-index layers
+
+Avoid 40 slightly different hard-coded blues across components.
+
+## Host selector
+
+```css
+:host {
+  display: block;
+}
+```
+
+## Avoid deep style coupling
+
+A parent should not know the private DOM structure of every child component.
+
+---
+
+# 34. Angular Animations and Native CSS Animation Strategy
+
+Animation strategy has evolved in Angular and the web platform.
+
+For many UI transitions, prefer modern CSS transitions/animations because they are simple, performant, and platform-native.
+
+```css
+.panel {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.panel.open {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+Use Angular-specific animation capabilities when you need Angular-aware enter/leave orchestration or richer state-driven transitions.
+
+Always respect `prefers-reduced-motion` for accessibility.
+
+---
+
+# 35. Accessibility
+
+Accessibility is a functional requirement, not visual polish.
+
+## Core practices
+
+- semantic HTML
+- real `<button>` for actions
+- real `<a>` for navigation
+- label form fields
+- keyboard support
+- visible focus states
+- logical heading order
+- sufficient contrast
+- descriptive alt text
+- ARIA only where needed
+- announce meaningful dynamic state
+
+Bad:
+
+```html
+<div (click)="save()">Save</div>
+```
+
+Better:
+
+```html
+<button type="button" (click)="save()">Save</button>
+```
+
+## Angular Aria / CDK
+
+Angular's accessibility-oriented primitives and CDK can help with robust interaction patterns. Still test with keyboard and assistive-technology workflows.
+
+---
+
+# 36. Security
+
+## XSS
+
+Angular automatically escapes normal interpolation.
+
+```html
+<p>{{ untrustedComment }}</p>
+```
+
+Be extremely careful with HTML bypass/sanitizer escape hatches.
+
+## Never trust client-side checks
+
+This is only UX:
+
+```ts
+@if (auth.isAdmin()) {
+  <button>Delete user</button>
+}
+```
+
+Backend must still verify the user is authorized to delete users.
+
+## Secrets do not belong in Angular builds
+
+Anything delivered to the browser can be inspected.
+
+Do not put:
+
+- database passwords
+- private API keys
+- signing secrets
+- service-account secrets
+
+into Angular environment files and assume they are protected.
+
+## CSRF/XSRF
+
+Understand how your authentication transport works. Cookie-based authentication may require CSRF protection strategies.
+
+## CSP
+
+A strong Content Security Policy reduces XSS impact. Coordinate with deployment/backend teams.
+
+## Dependency security
+
+Keep Angular and dependencies updated, review advisories, and remove abandoned packages.
+
+---
+
+# 37. Testing
+
+Modern Angular CLI projects use Vitest by default for unit testing, while older projects may still use Karma/Jasmine.
+
+## What to test
+
+Test behavior and contracts:
+
+- component rendering
+- user interactions
+- form validation
+- services
+- guards
+- HTTP logic
+- routing
+- state transitions
+- pure business functions
+
+## Basic component test
+
+```ts
+import { TestBed } from '@angular/core/testing';
+import { describe, expect, it } from 'vitest';
+import { Counter } from './counter';
+
+describe('Counter', () => {
+  it('increments', async () => {
+    const fixture = TestBed.createComponent(Counter);
+    const component = fixture.componentInstance;
+
+    component.increment();
+    await fixture.whenStable();
+
+    expect(component.count()).toBe(1);
   });
 });
 ```
 
-Use RxJS composition:
+## Service test
 
 ```ts
-this.userApi.getUser().pipe(
-  switchMap(user => this.roleApi.getRoles(user.id))
-).subscribe();
+TestBed.configureTestingModule({});
+const service = TestBed.inject(CalculatorService);
+expect(service.add(2, 3)).toBe(5);
 ```
 
-## 2. Giant components
+## HTTP testing
 
-Split by responsibility.
+Use Angular's HTTP testing utilities so tests do not hit real servers.
 
-## 3. Global store for every checkbox
+Concept:
 
-Keep local state local.
+```text
+Call service
+  ↓
+HttpTestingController captures request
+  ↓
+assert method/url/body
+  ↓
+flush mock response
+  ↓
+assert service output
+```
 
-## 4. Service named `CommonService`
+## Router testing
 
-Split by domain responsibility.
+Test navigation outcomes, guards, route params, and routed rendering where relevant.
 
-## 5. Business logic in template
+## E2E testing
 
-Move to computed state/service.
+Angular does not force one universal E2E framework. Popular teams use tools such as Playwright or Cypress depending on ecosystem decisions.
 
-## 6. Calling API from pipe
+## Testing pyramid
 
-Pipes should not perform server requests.
+A practical balance:
 
-## 7. Trusting route guard as security
+```text
+few end-to-end tests
+more integration/component tests
+many fast unit/pure-function tests
+```
 
-Backend must authorize.
+Do not chase coverage percentage while missing critical behavior.
 
-## 8. Manual subscription without cleanup
+---
 
-Prefer:
+# 38. Angular Material and CDK
 
-- async pipe;
-- `toSignal`;
-- `takeUntilDestroyed()`;
-- framework-managed reactive APIs.
+Angular Material provides ready-made UI components following Material Design principles.
 
-## 9. Mutating input objects
+Install:
 
-Use explicit data ownership.
+```bash
+ng add @angular/material
+```
 
-## 10. Exposing secrets in environment files
+Common components:
 
-Browser bundles are visible to users.
+- buttons
+- form fields
+- dialogs
+- menus
+- tables
+- paginator
+- sorting
+- datepicker
+- sidenav
+- tabs
+- snackbar
 
-## 11. Downloading entire DB table to filter locally
+## CDK
 
-Use server-side pagination/filtering.
+The Component Dev Kit provides lower-level behavior primitives such as:
 
-## 12. `setTimeout` to "fix" change detection
+- overlay
+- portal
+- drag/drop
+- virtual scrolling
+- a11y helpers
+- layout utilities
+- component harnesses
 
-Understand the state/lifecycle problem instead.
+Use CDK when you want behavior without Material's visual design.
 
-## 13. Boolean explosion
+---
+
+# 39. Internationalization
+Internationalization (i18n) prepares an application for multiple languages, locales, number/date formats, plural rules, and text direction. It is more than translating strings: layouts, dates, currency, sorting, and message grammar can all vary by locale.
+
+Plan i18n early for products that will serve multiple regions; retrofitting hard-coded strings and layout assumptions later is expensive.
+
+
+Internationalization (i18n) prepares an application for multiple languages/locales.
+
+Concerns include:
+
+- translated text
+- pluralization
+- date formatting
+- number formatting
+- currency formatting
+- directionality (LTR/RTL)
+
+Use locale-aware formatting rather than manually concatenating date/currency strings.
+
+Example:
+
+```html
+<p>{{ amount | currency:'INR' }}</p>
+<p>{{ createdAt | date:'longDate' }}</p>
+```
+
+For large multilingual products, design translation keys/processes and QA workflows early.
+
+---
+
+# 40. PWA and Service Workers
+
+A Progressive Web App can provide offline-aware behavior, caching, installability, and update flows.
+
+Angular provides service-worker tooling.
+
+```bash
+ng add @angular/pwa
+```
+
+Use cases:
+
+- field apps with unstable connectivity
+- catalog browsing
+- frequently used dashboards
+
+Be careful caching authenticated or rapidly changing data. A stale service-worker cache can create confusing behavior if caching rules are poorly designed.
+
+---
+
+# 41. Web Workers
+A Web Worker runs JavaScript in a background thread separate from the browser's main UI thread. It is useful for CPU-heavy calculations that would otherwise freeze interaction, but workers cannot directly manipulate the DOM and introduce message-passing/serialization overhead.
+
+Do not move ordinary API calls to workers just because they are asynchronous; network I/O already does not require blocking the main thread.
+
+
+Web Workers run JavaScript away from the main UI thread.
+
+Useful for CPU-heavy operations such as:
+
+- large calculations
+- parsing
+- image/data transformations
+- expensive algorithms
+
+Not useful for ordinary API calls—the browser already handles network I/O asynchronously.
+
+Workers cannot directly manipulate your DOM. Communicate using messages/data transfer.
+
+---
+
+# 42. Custom Libraries
+
+Create reusable Angular libraries for shared capabilities across applications.
+
+```bash
+ng generate library company-ui
+```
+
+Potential library contents:
+
+- design-system components
+- auth SDK
+- API client
+- shared validation
+- domain models
+
+## Library design rules
+
+- small public API
+- avoid leaking internals
+- semantic versioning
+- tests
+- documentation/examples
+- avoid app-specific global assumptions
+
+A library should be reusable because it expresses a stable shared contract, not merely because two files happen to look similar today.
+
+---
+
+# 43. Monorepos and Large Workspaces
+A monorepo stores multiple applications and/or libraries in one repository. The benefit is coordinated changes, shared tooling, and visible dependency boundaries; the cost is more build tooling, ownership rules, and CI complexity.
+
+Use a monorepo when several related projects genuinely benefit from shared versioning and code. Do not adopt it merely because the organization is large.
+
+
+Angular CLI supports multi-project workspaces, and external tools such as Nx can add advanced monorepo orchestration.
+
+A large organization may structure:
+
+```text
+apps/
+  admin/
+  customer-portal/
+libs/
+  ui/
+  auth/
+  orders-domain/
+  invoices-data-access/
+```
+
+Benefits:
+
+- shared code
+- atomic changes
+- centralized tooling
+- consistent versions
+
+Risks:
+
+- accidental coupling
+- giant CI pipelines
+- unclear ownership
+- “shared” dumping grounds
+
+Define dependency boundaries.
+
+---
+
+# 44. Environment and Configuration Management
+
+Applications commonly need environment-specific API roots or feature flags.
+
+## Important principle
+
+Frontend configuration is **not secret**.
+
+A value bundled into JavaScript is visible to users.
+
+## Build-time configuration
+
+Useful when deployment produces separate artifacts per environment.
+
+## Runtime configuration
+
+Useful when one build artifact must deploy to multiple environments.
+
+Example architecture:
+
+```text
+/index.html
+/assets/runtime-config.json
+/main-*.js
+```
+
+The app loads non-secret runtime endpoints/settings during startup.
+
+## Feature flags
+
+Use feature flags to control rollout, but the backend must still enforce security-sensitive capabilities.
+
+---
+
+# 45. Build, Deployment, and CI/CD
+
+Production build:
+
+```bash
+ng build
+```
+
+Do not deploy the development server (`ng serve`) as production hosting.
+
+## SPA server rewrite
+
+If the user opens:
+
+```text
+/orders/123
+```
+
+directly, your web server must usually rewrite unknown frontend routes to the Angular `index.html` while still serving real static files normally.
+
+Without rewrite configuration, browser refresh can return 404 even though Angular routing works during client navigation.
+
+## Typical CI pipeline
+
+```text
+Checkout
+  ↓
+Install exact dependencies
+  ↓
+Lint / format checks
+  ↓
+Unit tests
+  ↓
+Build
+  ↓
+Security/dependency checks
+  ↓
+Publish artifact
+  ↓
+Deploy
+  ↓
+Smoke test
+```
+
+## Reproducible installs
+
+In CI, prefer lockfile-respecting installation such as:
+
+```bash
+npm ci
+```
+
+## Cache busting
+
+Angular production builds use content-hashed assets so new deployments can coexist safely with browser caching.
+
+---
+
+# 46. Architecture Patterns
+
+## Smart/container vs presentational components
+
+Useful conceptual split:
+
+### Container/page
+
+- route-aware
+- loads data
+- coordinates state
+- handles business interactions
+
+### Presentational component
+
+- receives data through inputs
+- emits user intent through outputs
+- minimal business knowledge
+
+Do not force every component into a rigid label, but keep responsibilities clear.
+
+## Facade pattern
+
+A feature facade gives components a stable API over state/API complexity.
+
+```ts
+@Injectable()
+export class OrdersFacade {
+  readonly orders = ...;
+  readonly loading = ...;
+
+  load() { ... }
+  approve(id: number) { ... }
+}
+```
+
+Components do not care whether implementation uses signals, RxJS, NgRx, or HTTP directly.
+
+## Repository/data-access pattern
+
+Useful when backend interaction is complex or multiple API sources exist.
+
+```text
+OrderPage
+  ↓
+OrderFacade
+  ↓
+OrderRepository
+  ↓
+HttpClient
+```
+
+## Domain logic
+
+Pure functions are powerful:
+
+```ts
+export function calculateInvoiceTotal(lines: InvoiceLine[]): number {
+  return lines.reduce(
+    (total, line) => total + line.quantity * line.unitPrice,
+    0
+  );
+}
+```
+
+They are easy to test and independent of Angular.
+
+---
+
+# 47. Enterprise Folder Structure
+An enterprise folder structure should communicate **feature ownership and dependency direction**, not just categorize files by extension. Prefer feature-oriented boundaries so developers can find the code for one business capability without searching through global `components/`, `services/`, and `models/` folders.
+
+Treat the examples below as a starting point. The right structure is the simplest one that makes ownership, reuse, testing, and dependency rules clear for your team.
+
+
+Example:
+
+```text
+src/app/
+├─ core/
+│  ├─ auth/
+│  │  ├─ auth.service.ts
+│  │  ├─ auth.guard.ts
+│  │  └─ auth.interceptor.ts
+│  ├─ config/
+│  ├─ error/
+│  └─ layout/
+├─ shared/
+│  ├─ ui/
+│  ├─ directives/
+│  ├─ pipes/
+│  └─ utilities/
+├─ features/
+│  ├─ invoices/
+│  │  ├─ pages/
+│  │  ├─ ui/
+│  │  ├─ data-access/
+│  │  ├─ state/
+│  │  ├─ models/
+│  │  └─ invoices.routes.ts
+│  └─ users/
+└─ app.routes.ts
+```
+
+## Feature boundaries
+
+Inside `invoices/`, keep invoice-specific:
+
+- API calls
+- models
+- components
+- state
+- routing
+
+Do not move everything to `shared` too early.
+
+A good rule:
+
+> Code is shared after it proves it is shared.
+
+---
+
+# 48. Common Angular Anti-Patterns
+
+## 1. Massive components
+
+Symptom: 1,000+ line component with many unrelated responsibilities.
+
+Fix: split UI, state, and data-access responsibilities.
+
+## 2. `any` everywhere
+
+Fix: create domain types and runtime validation where necessary.
+
+## 3. Subscribing inside subscribing
+
+Fix: compose RxJS pipelines.
+
+## 4. Manual derived-state synchronization
 
 Bad:
 
 ```ts
-isDraft
-isPending
-isApproved
-isRejected
+price = signal(10);
+qty = signal(2);
+total = signal(20);
 ```
 
-Prefer:
+Fix:
 
 ```ts
-status: 'draft' | 'pending' | 'approved' | 'rejected'
+total = computed(() => this.price() * this.qty());
 ```
 
-## 14. Duplicate API calls from multiple subscriptions
+## 5. Business logic in templates
 
-Understand cold observables and use shared state/caching when needed.
+Templates should render and dispatch intent, not become mini-programs.
 
-## 15. Ignoring loading/empty/error states
+## 6. Huge global shared service
 
-Every server-driven UI should think in at least these states:
+Split by domain responsibility.
+
+## 7. Storing secrets in environment files
+
+Frontend code is public to the browser.
+
+## 8. Trusting route guards as security
+
+Backend authorization is mandatory.
+
+## 9. Using `localStorage` for every state value
+
+Use it only for data that genuinely needs browser persistence and is appropriate to store there.
+
+## 10. Mutating signal objects/arrays without creating a clear new state
+
+Prefer immutable updates.
+
+## 11. Premature global state library
+
+Start with the simplest state boundary that solves the problem.
+
+## 12. Ignoring loading/error/empty states
+
+Every data screen should consider:
 
 ```text
-initial
 loading
-success with data
-success empty
+success
+empty
 error
-refreshing
+permission denied
 ```
 
 ---
 
-# 81. Legacy Angular: NgModules and Older Syntax
+# 49. Debugging Guide
 
-Modern Angular defaults to standalone architecture, but older enterprise projects frequently use NgModules.
+## First questions
 
-## NgModule
+1. Is the component created?
+2. Is the route correct?
+3. Is the API request sent?
+4. What response/status came back?
+5. Is the state updated?
+6. Is the template reading the correct state?
+7. Is the browser console showing an exception?
 
-```ts
-@NgModule({
-  declarations: [UserListComponent],
-  imports: [CommonModule, FormsModule],
-  providers: [],
-})
-export class UserModule {}
-```
+## Common tools
 
-Key properties:
+- browser console
+- Network tab
+- Elements tab
+- Source maps
+- Angular DevTools
+- `ng version`
+- TypeScript compiler errors
+- unit tests
 
-```text
-declarations → components/directives/pipes owned by module
-imports      → other modules
-exports      → things made available outside
-providers    → DI providers
-bootstrap    → root component in classic AppModule bootstrap
-```
-
-## Classic root module
-
-```ts
-@NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, AppRoutingModule],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
-```
-
-Modern equivalent is usually `bootstrapApplication()` with standalone configuration.
-
-## Legacy structural directives
-
-Older code:
-
-```html
-<div *ngIf="isVisible">...</div>
-<li *ngFor="let user of users; trackBy: trackUser">...</li>
-```
-
-Modern code:
-
-```html
-@if (isVisible) {
-  <div>...</div>
-}
-
-@for (user of users; track user.id) {
-  <li>...</li>
-}
-```
-
-## Decorator inputs/outputs
-
-Older/common enterprise style:
-
-```ts
-@Input() user!: User;
-@Output() selected = new EventEmitter<User>();
-```
-
-Modern API:
-
-```ts
-user = input.required<User>();
-selected = output<User>();
-```
-
-## `ViewChild`
-
-Older style:
-
-```ts
-@ViewChild('input') input!: ElementRef;
-```
-
-Modern signal query APIs are preferred in new code where applicable.
-
-## Constructor injection
-
-Still valid:
-
-```ts
-constructor(private api: UserApi) {}
-```
-
-Modern code often uses:
-
-```ts
-private readonly api = inject(UserApi);
-```
-
-You must understand both styles.
-
----
-
-# 82. Migrating Older Angular Applications
-
-Do not rewrite a stable enterprise app just to make the code look modern.
-
-Use incremental migration.
-
-## Recommended order
-
-```text
-1. Upgrade Angular versions safely
-2. Fix build/test issues
-3. Improve strict TypeScript
-4. Convert leaf features to standalone
-5. Adopt modern control flow
-6. Introduce signals where they simplify state
-7. Convert provider/guard/interceptor patterns when useful
-8. Evaluate zoneless compatibility
-9. Improve lazy loading / @defer
-10. Remove deprecated APIs
-```
-
-## Standalone migration
-
-Angular provides migration tooling to convert suitable components/modules incrementally.
-
-## Do not combine every migration at once
-
-Bad migration branch:
-
-```text
-Angular 16 → 22
-NgModules → standalone
-RxJS state → signals
-all forms rewritten
-all CSS framework replaced
-folder architecture rewritten
-SSR added
-```
-
-When it fails, you will not know which change caused the issue.
-
-Prefer small reviewable steps.
-
----
-
-# 83. Common Angular Errors and Debugging
-
-## `ExpressionChangedAfterItHasBeenCheckedError` / NG0100
-
-Often indicates state changed during/after a check in a way Angular considers inconsistent in development mode.
-
-Common causes:
-
-- child changes parent state during lifecycle;
-- mutation in `ngAfterViewInit`;
-- template method changes state;
-- async/sync sequencing problem.
-
-Do not use `setTimeout(..., 0)` as the automatic solution. Fix the data flow/lifecycle ownership.
-
-## `NullInjectorError`
-
-Meaning:
-
-```text
-Angular cannot resolve a dependency token.
-```
+## “UI not updating”
 
 Check:
 
-- provider registered?
-- correct scope?
-- correct token?
-- library provider function called?
+- signal update actually happened
+- you mutated an object without changing reactive state correctly
+- component expects an input that never changed
+- reactive form state is not notifying a zoneless template in your chosen pattern
+- a third-party callback is outside your intended update mechanism
 
-## Unknown element
+## “Route refresh gives 404”
 
-Possible causes:
+Likely server rewrite configuration, not Angular Router code.
 
-- standalone component not imported;
-- module does not export/import component;
-- selector misspelled.
+## “API works in Postman but fails in browser”
 
-## Unknown pipe/directive
+Investigate:
 
-Import the standalone pipe/directive or corresponding module.
+- CORS
+- cookies/credentials
+- TLS certificate
+- mixed content
+- proxy/base URL
+- authentication headers
 
-## `Cannot read properties of undefined`
+## “Expression changed” / lifecycle timing problems
 
-Usually JavaScript/application data problem, not Angular-specific.
-
-Check:
-
-- async data not loaded yet;
-- optional property missing;
-- wrong API model;
-- incorrect lifecycle assumption.
-
-Use explicit loading state rather than spraying optional chaining everywhere.
-
-## Circular dependency
-
-Example:
-
-```text
-AuthService → UserService → AuthService
-```
-
-Refactor shared responsibility into a lower-level service/token.
-
-## Route refresh returns 404
-
-Web server lacks SPA fallback rewrite to `index.html`.
-
-## CORS error
-
-CORS is primarily a backend/server policy. Do not try to "fix CORS" by adding random headers in Angular.
-
-## `inject()` outside injection context
-
-Move it to:
-
-- class field;
-- provider factory;
-- guard/interceptor;
-- a function executed through a valid injection context.
+Avoid changing bound state in a timing-sensitive lifecycle phase solely to “make the error disappear.” Understand why the state changes after a render/check and redesign the flow.
 
 ---
 
-# 84. Angular DevTools and Debugging Workflow
+# 50. Migration Strategy for Legacy Angular Apps
 
-Use a repeatable debugging process.
+Never jump into a large upgrade by changing every concept at once.
 
-## 1. Reproduce consistently
+## Recommended sequence
 
-Write exact steps.
+1. Commit/branch clean baseline.
+2. Ensure tests/build run.
+3. Read Angular Update Guide.
+4. Upgrade one major version at a time.
+5. Apply migrations.
+6. Fix build/tests.
+7. Commit.
+8. Continue to next major.
+9. After framework upgrade, modernize patterns incrementally.
 
-## 2. Check browser console
+## Modernization stages
 
-Look at first meaningful error, not only the last cascade.
+### Stage 1 — Framework compatibility
 
-## 3. Network tab
+Get supported Angular/Node/TypeScript versions working.
 
-Check:
+### Stage 2 — Standalone
 
-```text
-URL
-method
-status
-request payload
-response body
-headers
-timing
-redirects
-```
+Move from NgModule-centric architecture where beneficial.
 
-## 4. Angular DevTools
+### Stage 3 — Built-in control flow
 
-Inspect component tree, state, and performance-related information supported by the current tool.
+Convert common `*ngIf` / `*ngFor` patterns.
 
-## 5. Add targeted logging
+### Stage 4 — Modern DI
 
-Do not print entire giant objects everywhere.
+Adopt `inject()` where it improves readability/migration compatibility.
 
-Good:
+### Stage 5 — Signal APIs
 
-```ts
-console.debug('Invoice load failed', {
-  invoiceId: id,
-  status: error.status,
-});
-```
+Introduce Signals for component and feature state.
 
-## 6. Isolate layer
+### Stage 6 — Signal inputs/outputs/queries
 
-Ask:
+Modernize component APIs where useful.
 
-```text
-Template problem?
-Component state problem?
-Service problem?
-HTTP/backend problem?
-Router problem?
-CSS/layout problem?
-Build/deployment problem?
-```
+### Stage 7 — Zoneless compatibility
 
-## 7. Reproduce with smallest case
+Remove assumptions that require Zone.js.
 
-Remove unrelated complexity.
+### Stage 8 — Modern testing
+
+Move to the current recommended test tooling when practical.
+
+### Stage 9 — SSR/performance upgrades
+
+Only after correctness is stable.
+
+## Do not combine all migrations in one giant PR
+
+Large “modernize everything” PRs are hard to review and rollback.
 
 ---
 
-# 85. Design Patterns Useful in Angular
+# 51. Real-World Mini Project: Product Admin Portal
 
-## Facade
+This section connects many concepts.
 
-A component talks to one feature facade instead of coordinating many services directly.
+## Requirements
 
-```text
-InvoicePage
-    ↓
-InvoiceFacade
-  ├── InvoiceApi
-  ├── PermissionService
-  └── InvoiceState
-```
+Build an admin portal with:
 
-Useful in complex features; unnecessary for tiny ones.
+- login
+- product list
+- search
+- product create/edit form
+- product details
+- role-based delete button
+- lazy routes
+- API integration
+- loading/error states
+- tests
 
-## Adapter
-
-Convert external API model to internal model.
+## Domain model
 
 ```ts
-function mapInvoice(dto: InvoiceDto): Invoice {
-  return {
-    id: dto.invd_id,
-    vendorName: dto.invd_vndr_name,
-    amount: Number(dto.invd_net_amnt),
-  };
+export interface Product {
+  id: number;
+  sku: string;
+  name: string;
+  price: number;
+  active: boolean;
 }
 ```
 
-## Strategy
+## API service
 
-Choose behavior at runtime.
+```ts
+@Injectable({ providedIn: 'root' })
+export class ProductApi {
+  private http = inject(HttpClient);
+  private baseUrl = '/api/products';
 
-Example:
+  list() {
+    return this.http.get<Product[]>(this.baseUrl);
+  }
 
-```text
-TaxCalculator
-  ├── DomesticTaxStrategy
-  ├── ExportTaxStrategy
-  └── ExemptTaxStrategy
+  get(id: number) {
+    return this.http.get<Product>(`${this.baseUrl}/${id}`);
+  }
+
+  create(payload: Omit<Product, 'id'>) {
+    return this.http.post<Product>(this.baseUrl, payload);
+  }
+
+  update(id: number, payload: Partial<Product>) {
+    return this.http.patch<Product>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  delete(id: number) {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+}
 ```
 
-## Observer
+## Product list state
 
-RxJS observables and Angular reactive primitives embody observer/reactivity concepts.
+```ts
+@Injectable()
+export class ProductListStore {
+  private api = inject(ProductApi);
 
-## State machine
+  private readonly _products = signal<Product[]>([]);
+  private readonly _search = signal('');
+  private readonly _loading = signal(false);
+  private readonly _error = signal<string | null>(null);
 
-Great for workflows:
+  readonly search = this._search.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
 
-```text
-Draft → Submitted → Approved
-                 ↘ Rejected
+  readonly products = computed(() => {
+    const q = this._search().trim().toLowerCase();
+    return this._products().filter(product =>
+      product.name.toLowerCase().includes(q) ||
+      product.sku.toLowerCase().includes(q)
+    );
+  });
+
+  setSearch(value: string) {
+    this._search.set(value);
+  }
+
+  load() {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.api.list().subscribe({
+      next: products => {
+        this._products.set(products);
+        this._loading.set(false);
+      },
+      error: () => {
+        this._error.set('Could not load products');
+        this._loading.set(false);
+      }
+    });
+  }
+}
 ```
 
-## Repository/data-access abstraction
-
-Frontend "repository" or API class can isolate transport details from feature state.
-
-## Dependency inversion
-
-Use tokens/interfaces/abstractions when alternate implementations are valuable, especially for libraries/testability.
-
-## Composition over inheritance
-
-Prefer composing components/services/directives instead of deep component inheritance hierarchies.
-
----
-
-# 86. Angular Interview Questions
-
-## Beginner
-
-### What is Angular?
-A full TypeScript-based web framework with components, templates, routing, DI, forms, HTTP, reactive APIs, build tooling, and more.
-
-### What is a component?
-A class plus template and metadata representing a reusable UI unit.
-
-### What is interpolation?
-A component-to-template binding:
+## List page template
 
 ```html
-{{ value }}
+<input
+  type="search"
+  placeholder="Search products"
+  [value]="store.search()"
+  (input)="store.setSearch($any($event.target).value)"
+>
+
+@if (store.loading()) {
+  <p>Loading products...</p>
+} @else if (store.error(); as error) {
+  <p>{{ error }}</p>
+} @else {
+  @for (product of store.products(); track product.id) {
+    <a [routerLink]="['/products', product.id]">
+      {{ product.sku }} — {{ product.name }}
+    </a>
+  } @empty {
+    <p>No products found.</p>
+  }
+}
 ```
 
-### Property vs event binding?
+## Routes
+
+```ts
+export const productRoutes: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./pages/product-list').then(m => m.ProductList)
+  },
+  {
+    path: 'new',
+    loadComponent: () => import('./pages/product-editor').then(m => m.ProductEditor)
+  },
+  {
+    path: ':id',
+    loadComponent: () => import('./pages/product-detail').then(m => m.ProductDetail)
+  },
+  {
+    path: ':id/edit',
+    loadComponent: () => import('./pages/product-editor').then(m => m.ProductEditor)
+  }
+];
+```
+
+Main route:
+
+```ts
+{
+  path: 'products',
+  canActivate: [authGuard],
+  loadChildren: () =>
+    import('./features/products/product.routes').then(m => m.productRoutes)
+}
+```
+
+## Edit form design
+
+Choose:
+
+- Signal Forms for a modern signal-first app
+- Reactive Forms if your enterprise form infrastructure already relies on it
+
+Validation rules:
+
+- SKU required
+- name required
+- price > 0
+
+## Authorization UX
 
 ```html
-[property]="value"   <!-- component → view -->
-(event)="handler()"  <!-- view → component -->
+@if (auth.isAdmin()) {
+  <button (click)="deleteProduct()">Delete</button>
+}
 ```
 
-### What is two-way binding?
-Synchronizes value in both directions, commonly represented with `[(...)]`.
+Backend must also reject unauthorized delete requests.
 
-### What is a service?
-A reusable injectable class for non-visual responsibilities such as API access, state, or calculations.
+## What this project teaches
 
-### What is DI?
-A mechanism where dependencies are supplied by an injector rather than manually constructed.
-
-## Intermediate
-
-### Signals vs Observables?
-Signals model current reactive state with synchronous reads. Observables model streams of values over time and provide rich async composition. Angular applications often use both.
-
-### `computed()` vs `effect()`?
-`computed` derives state; `effect` performs side effects.
-
-### `switchMap` vs `mergeMap`?
-`switchMap` switches to the newest inner observable and cancels previous subscriptions. `mergeMap` allows concurrent inner observables.
-
-### Why lazy loading?
-Reduce initial JavaScript by loading feature code when needed.
-
-### Guard vs resolver?
-Guard controls whether navigation proceeds; resolver obtains data needed for a route.
-
-### Reactive vs template-driven forms?
-Reactive Forms define a typed form model in TypeScript; template-driven forms rely more on template directives and suit simpler forms.
-
-### What is `OnPush`?
-A change-detection strategy that makes update checks more targeted. Modern signal-driven state works well with efficient rendering.
-
-## Advanced
-
-### Why can a route guard not enforce security?
-Because browser code is controlled by the client; backend APIs must enforce permissions independently.
-
-### What is hierarchical DI?
-Providers may exist at different injector scopes. Resolution walks the injector hierarchy, enabling global and feature/local service lifetimes.
-
-### What is hydration?
-Reuse server-rendered DOM when making an SSR page interactive on the client.
-
-### What is zoneless Angular?
-Angular operation without relying on Zone.js as the broad async-change signal; state changes notify Angular through explicit framework/reactive mechanisms.
-
-### What problem does `linkedSignal()` solve?
-Writable state that is dependent on another reactive source and should reset/recompute meaningfully when that source changes.
-
-### `@defer` vs route lazy loading?
-Route lazy loading splits code by navigation boundaries. `@defer` splits parts inside a template/page and loads them based on triggers.
-
-### How do you prevent duplicate HTTP calls?
-Depends on cause: centralize state, cache results, share streams where appropriate, avoid accidental multiple subscriptions, or model request state with a resource/store.
-
-### How would you structure a large app?
-Use feature boundaries, route-level lazy loading, dedicated data access/state layers where useful, reusable shared UI, core infrastructure, strict types, tests, and clear dependency direction.
+- feature architecture
+- routes
+- DI
+- HTTP
+- Signals
+- forms
+- loading/error states
+- auth UX
+- testable service boundaries
 
 ---
 
-# 87. Practice Projects
+# 52. Interview and Revision Checklist
+Use this checklist to find gaps, not to memorize answers. For every checked item, be able to explain the concept in plain language, write a small example without copying, describe one production failure mode, and compare it with the nearest alternative.
 
-Build in increasing difficulty.
 
-## Project 1 — Todo App
+You should be able to explain these without memorized definitions:
 
-Learn:
+## Core
 
-- components;
-- signals;
-- `@for`;
-- events;
-- localStorage;
-- basic forms.
+- What is Angular?
+- Angular vs AngularJS?
+- What is a component?
+- What is a template?
+- interpolation vs property binding vs event binding?
+- standalone components?
+- built-in control flow?
 
-Features:
+## Reactivity
 
-```text
-add todo
-toggle complete
-delete
-filter
-persist locally
-```
+- signal vs computed vs effect?
+- Signals vs RxJS?
+- when use `switchMap`?
+- why avoid nested subscriptions?
 
-## Project 2 — Employee CRUD
+## Components
 
-Learn:
+- input/output/model?
+- content projection?
+- lifecycle hooks?
+- view/content queries?
 
-- routing;
-- HttpClient;
-- Reactive Forms;
-- validation;
-- services;
-- interceptors.
+## DI
 
-## Project 3 — Product Catalog
+- what is dependency injection?
+- `providedIn: 'root'`?
+- injection token?
+- provider scopes?
 
-Learn:
+## Forms
 
-- search;
-- debounce;
-- pagination;
-- route params;
-- lazy loading;
-- caching.
+- Signal Forms vs Reactive Forms vs Template-driven?
+- sync/async validators?
+- FormGroup/FormArray?
 
-## Project 4 — Admin Portal
+## Router
 
-Learn:
+- lazy loading?
+- route params vs query params?
+- guard vs resolver?
+- why guards are not security?
 
-- authentication;
-- role/permission model;
-- nested routes;
-- reusable table;
-- dialogs;
-- global error handling.
+## HTTP
 
-## Project 5 — Invoice Approval System
+- interceptors?
+- Observable nature of HttpClient?
+- `httpResource` vs HttpClient?
 
-Learn:
+## Performance
 
-- dynamic forms;
-- file upload;
-- business workflows;
-- audit history;
-- multi-level approvals;
-- guards;
-- state machines;
-- optimistic vs confirmed actions;
-- complex error handling.
+- `track` in `@for`?
+- `@defer`?
+- lazy loading?
+- SSR/hydration?
+- zoneless?
 
-## Project 6 — Public Commerce Site
+## Testing
 
-Learn:
+- TestBed?
+- service/component test?
+- HTTP testing?
+- Vitest vs legacy Karma?
 
-- SSR/SSG;
-- hydration;
-- SEO;
-- defer;
-- image optimization;
-- performance budgets.
+## Security
 
-## Project 7 — Real-Time Operations Dashboard
-
-Learn:
-
-- WebSocket/SSE;
-- RxJS;
-- signals;
-- resource cleanup;
-- charts;
-- progressive rendering.
+- XSS?
+- sanitizer bypass risk?
+- frontend secrets?
+- backend authorization?
 
 ---
 
-# 88. 12-Week Learning Roadmap
+# 53. Learning Roadmap
 
-## Week 1 — JavaScript + TypeScript foundation
+## Phase 1 — Beginner
 
-Learn:
+Build 3 small apps using:
 
-- ES modules;
-- arrays/objects;
-- promises;
-- `async/await`;
-- classes;
-- interfaces;
-- unions;
-- generics.
+- components
+- templates
+- binding
+- `@if`, `@for`, `@switch`
+- signals
+- input/output
+- basic forms
 
-Build: TypeScript console CRUD.
+Projects:
 
-## Week 2 — Components and templates
+1. Todo list
+2. Expense calculator
+3. Contact manager
 
-Learn:
-
-- components;
-- standalone imports;
-- interpolation;
-- bindings;
-- events;
-- control flow.
-
-Build: profile/dashboard UI.
-
-## Week 3 — Component communication
+## Phase 2 — Intermediate
 
 Learn:
 
-- input;
-- output;
-- model;
-- content projection;
-- queries;
-- lifecycle.
+- services
+- DI
+- router
+- HTTP
+- reactive/signal forms
+- RxJS basics
+- route guards
+- interceptors
 
-Build: reusable card/modal/table.
+Projects:
 
-## Week 4 — Services and DI
+1. Product CRUD
+2. Employee directory
+3. Blog admin
 
-Learn:
-
-- injectables;
-- `inject()`;
-- providers;
-- scopes;
-- tokens;
-- hierarchical DI.
-
-Build: mock employee service + feature state.
-
-## Week 5 — Signals
+## Phase 3 — Advanced
 
 Learn:
 
-- signal;
-- computed;
-- effect;
-- linkedSignal;
-- resources;
-- state ownership.
+- state architecture
+- complex RxJS
+- signal/RxJS interoperability
+- performance
+- testing
+- custom directives/pipes
+- reusable UI
+- error architecture
 
-Build: shopping cart.
+Project:
 
-## Week 6 — RxJS
+- multi-role enterprise dashboard
 
-Learn:
-
-- observable;
-- subject;
-- map;
-- switchMap;
-- concatMap;
-- mergeMap;
-- exhaustMap;
-- catchError;
-- combineLatest;
-- forkJoin.
-
-Build: live search page.
-
-## Week 7 — HTTP and API architecture
+## Phase 4 — Production
 
 Learn:
 
-- CRUD;
-- DTOs;
-- interceptors;
-- retry;
-- errors;
-- caching.
+- auth security model
+- SSR/hydration
+- accessibility
+- CI/CD
+- logging/monitoring
+- bundle optimization
+- deployment rewrites
+- migration strategy
 
-Build: employee API frontend.
+## Phase 5 — Senior/Architect
 
-## Week 8 — Routing
+Learn to reason about:
 
-Learn:
-
-- params;
-- query params;
-- lazy loading;
-- guards;
-- resolvers;
-- nested routes.
-
-Build: admin portal shell.
-
-## Week 9 — Forms
-
-Learn all three:
-
-- template-driven;
-- Reactive Forms;
-- Signal Forms.
-
-Build: multi-section invoice form.
-
-## Week 10 — Testing + security
-
-Learn:
-
-- component tests;
-- service tests;
-- HTTP tests;
-- router tests;
-- XSS;
-- auth;
-- backend authorization boundary.
-
-## Week 11 — Performance + rendering
-
-Learn:
-
-- lazy loading;
-- `@defer`;
-- change detection;
-- zoneless concepts;
-- SSR;
-- hydration;
-- SSG.
-
-## Week 12 — Enterprise capstone
-
-Build one complete system:
-
-```text
-Authentication
-Dashboard
-CRUD feature
-Search/filter/pagination
-Complex form
-File upload
-Role-based actions
-Error handling
-Tests
-Production build
-Deployment
-```
-
-Then review this handbook again. Concepts will make much more sense after the capstone.
+- boundaries
+- state ownership
+- caching
+- server/client rendering trade-offs
+- library APIs
+- design systems
+- monorepo boundaries
+- migration risk
+- observability
+- performance budgets
+- team conventions
 
 ---
 
-# 89. Angular Cheat Sheet
+# 54. Glossary
+Use this glossary as a quick reminder after learning a concept in context. A one-line definition is not a substitute for understanding how the concept behaves in code, especially for overloaded terms such as *provider*, *signal*, *guard*, *hydration*, and *change detection*.
+
+
+**Component** — A UI building block with behavior, template, and styles.
+
+**Directive** — Behavior attached to an element/component.
+
+**Pipe** — Display-oriented value transformation.
+
+**Signal** — Reactive value tracked by Angular.
+
+**Computed** — Read-only derived signal.
+
+**Effect** — Side effect triggered by reactive dependencies.
+
+**Observable** — RxJS stream of values over time.
+
+**DI** — Dependency Injection; framework-managed dependency creation/resolution.
+
+**Provider** — Recipe for creating/resolving a dependency.
+
+**InjectionToken** — DI key often used for configuration/non-class dependencies.
+
+**Standalone** — Component/directive/pipe architecture that does not require declaring everything in an NgModule.
+
+**NgModule** — Legacy/still-supported grouping mechanism heavily used by older Angular apps.
+
+**Router** — Maps URLs to application views.
+
+**Guard** — Controls route navigation behavior.
+
+**Resolver** — Preloads data for a route before activation.
+
+**Interceptor** — Middleware for HttpClient requests/responses.
+
+**CSR** — Client-side rendering.
+
+**SSR** — Server-side rendering.
+
+**SSG** — Static site generation/prerendering.
+
+**Hydration** — Reusing server-rendered DOM when Angular starts in the browser.
+
+**Incremental Hydration** — Hydrating portions of the app progressively as needed.
+
+**Zoneless** — Angular change-detection scheduling without depending on Zone.js.
+
+**Tree shaking** — Removing unused code from production bundles.
+
+**Lazy loading** — Loading code only when needed.
+
+**Deferrable view** — Template block loaded/rendered based on a trigger using `@defer`.
+
+---
+
+# 55. Official References
+Version-sensitive Angular APIs change quickly. Use these official references as the final authority when upgrading, copying configuration, or deciding whether an API is stable, deprecated, or legacy.
+
+
+Use official Angular sources as the final authority, especially when upgrading versions:
+
+- Angular documentation: https://angular.dev/
+- Angular version compatibility: https://angular.dev/reference/versions
+- Angular release/support policy: https://angular.dev/reference/releases
+- Angular Update Guide: https://angular.dev/update-guide
+- Angular migrations: https://angular.dev/reference/migrations
+- Angular roadmap: https://angular.dev/roadmap
+- Angular GitHub repository/changelog: https://github.com/angular/angular
+- Angular CLI repository: https://github.com/angular/angular-cli
+
+---
+
+# Appendix A — Modern Angular Quick Reference
+This appendix is a recall aid for syntax you already understand. If a line here is unfamiliar, jump back to the full topic before using it in production.
+
 
 ## Component
 
 ```ts
 @Component({
-  selector: 'app-example',
-  imports: [],
-  template: `...`,
+  selector: 'app-user-card',
+  imports: [RouterLink],
+  template: `
+    <a [routerLink]="['/users', user().id]">
+      {{ user().name }}
+    </a>
+  `
 })
-export class Example {}
+export class UserCard {
+  user = input.required<User>();
+}
 ```
 
 ## Signal
 
 ```ts
 count = signal(0);
-count();
-count.set(1);
-count.update(v => v + 1);
-```
-
-## Computed
-
-```ts
-total = computed(() => this.price() * this.qty());
-```
-
-## Effect
-
-```ts
-effect(() => console.log(this.count()));
-```
-
-## Input
-
-```ts
-user = input.required<User>();
+double = computed(() => this.count() * 2);
 ```
 
 ## Output
 
 ```ts
-saved = output<User>();
-this.saved.emit(user);
+selected = output<number>();
+this.selected.emit(id);
 ```
 
-## Two-way component model
-
-```ts
-value = model('');
-```
-
-```html
-<app-editor [(value)]="value" />
-```
-
-## If
-
-```html
-@if (condition) {
-  ...
-} @else {
-  ...
-}
-```
-
-## For
-
-```html
-@for (item of items(); track item.id) {
-  ...
-} @empty {
-  No items
-}
-```
-
-## Switch
-
-```html
-@switch (status()) {
-  @case ('ok') { ... }
-  @default { ... }
-}
-```
-
-## Let
-
-```html
-@let total = price() * quantity();
-```
-
-## Inject
+## Service injection
 
 ```ts
 private api = inject(UserApi);
 ```
 
-## HttpClient
-
-```ts
-this.http.get<User[]>('/api/users');
-```
-
-## Functional interceptor
-
-```ts
-export const interceptor: HttpInterceptorFn = (req, next) => {
-  return next(req);
-};
-```
-
 ## Route
 
 ```ts
-{ path: 'users/:id', component: UserPage }
-```
-
-## Lazy route
-
-```ts
 {
-  path: 'reports',
-  loadComponent: () => import('./reports').then(m => m.ReportsPage),
+  path: 'users',
+  loadComponent: () => import('./users').then(m => m.Users)
 }
 ```
 
-## Guard
+## HTTP
 
 ```ts
-export const authGuard: CanActivateFn = () => true;
+return this.http.get<User[]>('/api/users');
 ```
 
-## Reactive Form
+## Reactive GET state
 
 ```ts
-form = new FormGroup({
-  name: new FormControl('', { nonNullable: true }),
-});
+users = httpResource<User[]>(() => '/api/users');
 ```
 
-## RxJS search
-
-```ts
-search$.pipe(
-  debounceTime(300),
-  distinctUntilChanged(),
-  switchMap(term => api.search(term))
-);
-```
-
-## Subscription cleanup
-
-```ts
-observable$.pipe(
-  takeUntilDestroyed()
-).subscribe();
-```
-
-## Defer
+## Control flow
 
 ```html
-@defer (on viewport) {
-  <app-chart />
-}
-```
-
----
-
-# 90. Glossary
-
-**Angular CLI** — command-line tooling for creating, developing, building, testing, and updating Angular projects.
-
-**Binding** — connection between component state and template/DOM.
-
-**Component** — Angular UI building block containing behavior, template, and metadata.
-
-**Computed Signal** — read-only derived signal calculated from other reactive state.
-
-**CSR** — Client-Side Rendering; the browser renders the application after JavaScript loads.
-
-**Dependency Injection (DI)** — system for supplying dependencies to classes/functions.
-
-**Directive** — behavior attached to an element/component.
-
-**DTO** — Data Transfer Object representing data at an API boundary.
-
-**Effect** — reactive side-effect function that reruns when tracked signals change.
-
-**Guard** — router function controlling navigation.
-
-**Hydration** — making server-rendered Angular DOM interactive while reusing the existing DOM.
-
-**InjectionToken** — typed DI key for values/abstractions that are not naturally class tokens.
-
-**Interceptor** — middleware-like HTTP function that can inspect/modify requests/responses.
-
-**Lazy Loading** — loading feature code only when needed.
-
-**linkedSignal** — writable reactive state linked to another signal-derived source.
-
-**NgModule** — older/legacy Angular organizational and dependency configuration unit still supported and common in existing codebases.
-
-**Observable** — RxJS stream of values over time.
-
-**OnPush** — component change-detection strategy emphasizing targeted update triggers.
-
-**Pipe** — display-oriented value transformation.
-
-**Provider** — DI configuration describing how to create/obtain a dependency.
-
-**Reactive Forms** — form API based on explicit `FormControl`, `FormGroup`, and related objects.
-
-**Resolver** — router data-loading function executed as part of navigation.
-
-**Resource** — signal-oriented abstraction for asynchronous data and its status.
-
-**Route** — mapping from URL pattern to application behavior/component.
-
-**RxJS** — reactive programming library heavily used in Angular for asynchronous streams.
-
-**Service** — injectable class containing reusable non-view logic.
-
-**Signal** — reactive value that Angular can track precisely.
-
-**Signal Forms** — signal-based Angular form system built around a writable model signal and typed form-field tree.
-
-**SPA** — Single-Page Application.
-
-**SSG** — Static Site Generation / prerendering at build time.
-
-**SSR** — Server-Side Rendering per request.
-
-**Standalone Component** — component that directly declares/imports its dependencies without requiring declaration in an NgModule.
-
-**Tree Shaking** — build-time elimination of unused code.
-
-**Zoneless** — running Angular without using Zone.js as the broad async change-notification mechanism.
-
----
-
-# 91. Official References
-
-Use these as the source of truth when APIs evolve:
-
-- Angular documentation: https://angular.dev/
-- Angular version/release schedule: https://angular.dev/reference/releases
-- Version compatibility: https://angular.dev/reference/versions
-- Angular CLI: https://angular.dev/cli
-- Components: https://angular.dev/guide/components
-- Templates: https://angular.dev/guide/templates
-- Signals: https://angular.dev/guide/signals
-- Dependency Injection: https://angular.dev/guide/di
-- Routing: https://angular.dev/guide/routing
-- HTTP: https://angular.dev/guide/http
-- Forms: https://angular.dev/guide/forms
-- Signal Forms: https://angular.dev/guide/forms/signals/overview
-- SSR / Hybrid Rendering: https://angular.dev/guide/ssr
-- Hydration: https://angular.dev/guide/hydration
-- Zoneless Angular: https://angular.dev/guide/zoneless
-- Animations: https://angular.dev/guide/animations
-- Testing: https://angular.dev/guide/testing
-- Update command: https://angular.dev/cli/update
-
----
----
-
-# 92. Advanced Template Primitives: `ng-template`, `ng-container`, and Outlets
-
-These primitives are common in reusable Angular libraries and enterprise UIs.
-
-## `ng-container`
-
-`ng-container` groups Angular template logic without adding an unnecessary DOM element.
-
-```html
-<ng-container>
-  <p>These nodes do not need an extra wrapper div.</p>
-  <button>Action</button>
-</ng-container>
-```
-
-This matters when extra DOM would break CSS Grid, Flexbox, table structure, or semantics.
-
-## `ng-template`
-
-`ng-template` defines template content that is not rendered immediately by itself.
-
-```html
-<ng-template #emptyState>
-  <p>No records found.</p>
-</ng-template>
-```
-
-It can later be rendered by Angular APIs or passed to reusable components.
-
-## Template context
-
-A reusable template can receive context data.
-
-```html
-<ng-template #row let-user>
-  <strong>{{ user.name }}</strong>
-</ng-template>
-```
-
-This pattern is useful in advanced reusable tables where the parent controls how a cell is rendered.
-
-## `NgTemplateOutlet`
-
-Conceptually:
-
-```html
-<ng-container
-  *ngTemplateOutlet="rowTemplate; context: { $implicit: user }"
-/>
-```
-
-Use cases:
-
-- configurable tables;
-- reusable list renderers;
-- custom empty/loading templates;
-- component libraries.
-
-If a normal component/input solution is simpler, use that instead. Template outlets are powerful but increase abstraction.
-
----
-
-# 93. Host Elements, Host Bindings, and Event Handling
-
-Every component/directive is attached to a host element.
-
-```html
-<app-status-badge />
-```
-
-The `<app-status-badge>` element is the host.
-
-Modern Angular encourages defining host behavior in the decorator:
-
-```ts
-@Component({
-  selector: 'app-status-badge',
-  host: {
-    'role': 'status',
-    '[class.approved]': 'status() === "approved"',
-    '[attr.aria-label]': 'label()',
-    '(click)': 'handleClick()',
-  },
-  template: `{{ label() }}`,
-})
-export class StatusBadge {
-  status = input.required<'pending' | 'approved'>();
-  label = computed(() => this.status() === 'approved' ? 'Approved' : 'Pending');
-
-  handleClick() {}
-}
-```
-
-Older code may use:
-
-```ts
-@HostBinding('class.active') active = true;
-@HostListener('click') onClick() {}
-```
-
-Understand both styles when maintaining legacy projects.
-
-## Host directives
-
-Composition can attach directive behavior to components without deep inheritance.
-
-Use case:
-
-```text
-Reusable focus behavior
-Reusable keyboard behavior
-Reusable tooltip behavior
-Reusable accessibility behavior
-```
-
-Prefer composition when several components need the same host behavior.
-
----
-
-# 94. DOM Access, `ElementRef`, and Renderer Safety
-
-Angular should normally control DOM rendering through templates.
-
-Direct DOM access is justified for cases such as:
-
-- focus;
-- measuring dimensions;
-- integrating a non-Angular library;
-- canvas/video APIs;
-- observers such as ResizeObserver/IntersectionObserver.
-
-Example:
-
-```ts
-private element = inject(ElementRef<HTMLElement>);
-```
-
-## Rule
-
-Do not replace ordinary template binding with manual DOM mutation.
-
-Bad:
-
-```ts
-this.element.nativeElement.querySelector('.title').innerHTML = userInput;
-```
-
-Better:
-
-```html
-<h2>{{ title() }}</h2>
-```
-
-## `Renderer2`
-
-Legacy/existing code may use `Renderer2` for DOM operations. Know what it is, but first ask whether normal Angular bindings solve the requirement more clearly.
-
-## SSR compatibility
-
-Directly assuming browser globals exist can break server rendering:
-
-```ts
-window.addEventListener(...)
-document.querySelector(...)
-localStorage.getItem(...)
-```
-
-Isolate browser-specific code and ensure it executes only in an appropriate browser context.
-
----
-
-# 95. Advanced Dependency Injection Patterns
-
-## Route-scoped state
-
-A route can provide a service so its lifetime follows that route subtree.
-
-Conceptually:
-
-```ts
-{
-  path: 'invoice/:id',
-  providers: [InvoiceEditorState],
-  loadComponent: () => import('./invoice-editor').then(m => m.InvoiceEditor),
-}
-```
-
-This is useful when each route visit needs a fresh feature state instance.
-
-## Multi providers
-
-Multi providers allow several implementations under one token.
-
-Use cases:
-
-- plugin registrations;
-- validation rules;
-- menu contributions;
-- feature hooks.
-
-Concept:
-
-```ts
-{ provide: APP_ACTIONS, useClass: ExportAction, multi: true }
-{ provide: APP_ACTIONS, useClass: PrintAction, multi: true }
-```
-
-Injection returns all registered values.
-
-## `useExisting`
-
-Alias one token to an existing instance rather than creating another one.
-
-## Factory provider
-
-Use when creation depends on configuration/another service.
-
-## Injection scope decision
-
-Ask:
-
-```text
-Should every consumer share one instance?
-  → root/application scope
-
-Should one feature navigation share it?
-  → route/feature scope
-
-Should each component instance have isolated state?
-  → component scope
-```
-
-Incorrect scope can create subtle bugs such as data leaking between tabs/components or state resetting unexpectedly.
-
----
-
-# 96. Advanced Signals Patterns
-
-## Read-only public state
-
-Keep write access private:
-
-```ts
-private readonly _items = signal<Item[]>([]);
-readonly items = this._items.asReadonly();
-```
-
-Consumers can read but cannot directly write.
-
-## Derived selectors
-
-```ts
-readonly pendingItems = computed(() =>
-  this.items().filter(item => item.status === 'pending')
-);
-```
-
-## Avoid signal copying
-
-Bad:
-
-```ts
-source = signal(10);
-copy = signal(this.source());
-```
-
-`copy` does not automatically remain synchronized.
-
-If it is derived:
-
-```ts
-copy = computed(() => this.source());
-```
-
-If it is intentionally writable but linked to source changes, consider `linkedSignal()`.
-
-## Signal object mutation
-
-Avoid:
-
-```ts
-this.user().name = 'Asha';
-```
-
-Prefer:
-
-```ts
-this.user.update(user => ({ ...user, name: 'Asha' }));
-```
-
-## Equality
-
-Reactive primitives may support equality semantics so equal values do not trigger unnecessary downstream work. Use custom equality only when you understand the cost; deep comparison can itself become expensive.
-
-## Effects are not event buses
-
-If you find effects coordinating many state changes in a loop, rethink the architecture.
-
-Prefer:
-
-```text
-user event → command method → update state
-state → computed derived values
-state → UI
-```
-
-Effects are best at the boundary with non-reactive systems.
-
----
-
-# 97. RxJS Operator Decision Guide
-
-When mapping an event to an async request:
-
-## `switchMap`
-
-**Keep newest; cancel previous subscription.**
-
-Use for:
-
-- search suggestions;
-- route-param-driven fetch;
-- filter changes;
-- latest selection.
-
-```text
-A starts
-B starts → A canceled
-C starts → B canceled
-```
-
-## `concatMap`
-
-**Queue in order.**
-
-Use for:
-
-- sequential writes;
-- ordered upload queue;
-- operations where order matters.
-
-```text
-A finishes → B starts → B finishes → C starts
-```
-
-## `mergeMap`
-
-**Run concurrently.**
-
-Use for independent parallel work.
-
-```text
-A ──────►
-B ───►
-C ─────────►
-```
-
-## `exhaustMap`
-
-**Ignore new triggers while busy.**
-
-Use for:
-
-- login submit;
-- payment submit;
-- approval button double-click prevention.
-
-```text
-A starts
-B ignored
-C ignored
-A finishes
-D can start
-```
-
-## `debounceTime`
-
-Wait until events stop for a period.
-
-Great for typing; usually poor for a button that should react immediately.
-
-## `distinctUntilChanged`
-
-Skip consecutive duplicates.
-
-## `shareReplay`
-
-Can share/cache observable results, but understand:
-
-- ref counting;
-- errors;
-- completion;
-- invalidation;
-- memory lifetime.
-
-Do not apply it to every HTTP call by habit.
-
----
-
-# 98. Advanced HTTP Patterns
-
-## Headers
-
-```ts
-this.http.get('/api/report', {
-  headers: {
-    'X-Correlation-ID': correlationId,
-  },
-});
-```
-
-Cross-cutting headers usually belong in an interceptor.
-
-## Observe full response
-
-```ts
-this.http.get<User[]>('/api/users', {
-  observe: 'response',
-}).subscribe(response => {
-  console.log(response.status);
-  console.log(response.headers.get('X-Total-Count'));
-  console.log(response.body);
-});
-```
-
-## File download
-
-```ts
-this.http.get('/api/reports/123/pdf', {
-  responseType: 'blob',
-});
-```
-
-Treat filenames/content-disposition headers carefully and avoid trusting unsafe paths.
-
-## Upload progress
-
-Use `observe: 'events'` and `reportProgress: true` when your backend/runtime can report useful progress.
-
-## Idempotency
-
-For critical commands that may be retried, backend APIs can support idempotency keys. This is a server/API design concern but the frontend may generate/send a request identifier.
-
-Example:
-
-```text
-POST payment
-network timeout
-frontend unsure whether request succeeded
-```
-
-Blind retry may duplicate a payment. Proper API idempotency avoids this class of failure.
-
-## Concurrency / stale updates
-
-For editing shared records, use versioning/ETags or equivalent server concurrency rules.
-
-```text
-User A opens version 5
-User B edits → version 6
-User A saves stale version 5
-Backend returns conflict
-```
-
-Frontend should show a clear conflict/reload/merge flow.
-
----
-
-# 99. Advanced Router Patterns
-
-## Route data
-
-Static route metadata:
-
-```ts
-{
-  path: 'reports',
-  component: ReportsPage,
-  data: {
-    title: 'Reports',
-    permission: 'reports.view',
-  },
-}
-```
-
-Useful for:
-
-- page titles;
-- breadcrumbs;
-- permissions metadata;
-- analytics identifiers.
-
-## `CanMatch` for alternate route implementations
-
-A route can be conditionally matched based on feature flags, permissions, or environment.
-
-Use carefully: avoid creating routing behavior users cannot understand.
-
-## Preloading strategy
-
-A custom strategy can preload routes based on route metadata.
-
-Example idea:
-
-```text
-Dashboard → preload
-Admin → do not preload
-Reports → preload on good network
-```
-
-## Route reuse
-
-Angular can customize route reuse. Only introduce custom reuse strategies when re-creating a page is genuinely expensive or UX requires preserving state. Custom caching of entire route components can create memory and stale-state complexity.
-
-## Navigation error handling
-
-Plan for:
-
-- lazy chunk load failure after deployment;
-- resolver errors;
-- auth expiration;
-- invalid route parameters.
-
----
-
-# 100. Advanced Forms Patterns
-
-## Disabled values
-
-In Reactive Forms, disabled controls behave differently from enabled controls in `.value`. Use `getRawValue()` when you intentionally need all values.
-
-## `updateOn`
-
-Reactive controls can validate/update on different triggers such as change, blur, or submit.
-
-Example:
-
-```ts
-new FormControl('', {
-  validators: [Validators.required],
-  updateOn: 'blur',
-});
-```
-
-Useful for expensive validation that should not run on every keystroke.
-
-## Backend field errors
-
-Backend:
-
-```json
-{
-  "fieldErrors": {
-    "invoiceNumber": ["Invoice number already exists"]
+@if (users.hasValue()) {
+  @for (user of users.value(); track user.id) {
+    <p>{{ user.name }}</p>
+  } @empty {
+    <p>No users.</p>
   }
 }
 ```
 
-Frontend should map this to the correct form field and display it near that field when possible.
-
-## Form DTO mapping
-
-Do not submit a form object blindly when the API model differs.
-
-```ts
-const formValue = this.form.getRawValue();
-
-const request: CreateInvoiceRequest = {
-  invoiceNo: formValue.invoiceNumber.trim(),
-  vendorId: formValue.vendor.id,
-  amount: Number(formValue.amount),
-};
-```
-
-This creates a clear API boundary.
-
-## Form state before navigation
-
-For long forms, decide whether drafts are:
-
-- local only;
-- saved automatically to backend;
-- saved manually;
-- restored after refresh.
-
-Do not leave this as an accidental behavior.
-
----
-
-# 101. Angular Material, CDK, and Component Libraries
-
-For enterprise apps, a component system can dramatically improve consistency.
-
-A mature library may provide:
-
-- buttons;
-- dialogs;
-- tables;
-- menus;
-- form controls;
-- date pickers;
-- accessibility primitives;
-- overlays;
-- theming.
-
-Angular Material is an Angular-native component library. The Angular CDK provides lower-level behavior primitives useful even when you build your own visual design.
-
-Useful CDK concepts include areas such as:
-
-- accessibility;
-- overlay;
-- drag/drop;
-- virtual scrolling;
-- clipboard;
-- layout/observers.
-
-## Virtual scroll scenario
-
-If 50,000 rows must appear in a scrollable list, rendering all 50,000 DOM nodes is expensive.
-
-Virtual scrolling renders only the visible window plus buffer.
-
-However, for database-backed business tables, server-side pagination may still be the more appropriate solution.
-
-## Component-library rule
-
-Choose one consistent design system instead of mixing five libraries with conflicting CSS and accessibility behavior.
-
----
-
-# 102. Image and Asset Performance
-
-Large images can dominate page performance.
-
-Checklist:
-
-- use the correct dimensions;
-- compress assets;
-- avoid shipping a 4000×3000 image into a 200×150 card;
-- use modern formats where supported;
-- lazy-load below-the-fold imagery;
-- reserve layout space to reduce layout shift;
-- use responsive source sizes.
-
-Angular provides image optimization features such as `NgOptimizedImage` for suitable applications.
-
-Conceptual usage:
+## Deferred block
 
 ```html
-<img
-  ngSrc="/assets/hero.webp"
-  width="1200"
-  height="600"
-  priority
-  alt="Product dashboard"
-/>
-```
-
-Use `priority` only for truly important above-the-fold imagery, not every image.
-
----
-
-# 103. Custom Elements / Web Components
-
-Angular components can be packaged for usage as custom elements in scenarios where a component must be embedded into another application outside normal Angular composition.
-
-Potential use cases:
-
-- widget embedded in a legacy server-rendered application;
-- gradual migration from another frontend stack;
-- organization-wide embedded UI widget.
-
-Trade-offs:
-
-- bundle/runtime duplication;
-- CSS isolation/theming;
-- event contracts;
-- browser support requirements;
-- versioning between host and widget.
-
-If the host is already Angular, normal Angular libraries/components are usually simpler than custom elements.
-
----
-
-# 104. Creating Reusable Angular Libraries
-
-A library is useful when multiple applications genuinely share code.
-
-Possible library contents:
-
-- design system;
-- authentication integration;
-- common domain models;
-- reusable directives/pipes;
-- shared data-access SDK.
-
-Create a library in an Angular workspace with the CLI tooling available for the installed version.
-
-Library design principles:
-
-1. keep public API small;
-2. avoid leaking internal files;
-3. make services tree-shakable;
-4. avoid application-specific assumptions;
-5. provide configuration through typed provider functions/tokens;
-6. document breaking changes;
-7. test against supported Angular versions;
-8. avoid hidden global side effects.
-
-## Public API
-
-Consumers should import from an intentional package entry point:
-
-```ts
-import { MyButton, provideMyLibrary } from '@company/ui';
-```
-
-not deep internal paths:
-
-```ts
-import { InternalThing } from '@company/ui/src/lib/private/internal';
-```
-
----
-
-# 105. Multi-Project Workspaces and Monorepo Thinking
-
-Large organizations may keep multiple applications/libraries in one repository or workspace.
-
-Example:
-
-```text
-repo/
-├── apps/
-│   ├── employee-portal/
-│   └── finance-portal/
-├── libs/
-│   ├── ui/
-│   ├── auth/
-│   └── finance-domain/
-└── tooling/
-```
-
-Benefits:
-
-- atomic changes across app/library boundaries;
-- shared tooling;
-- consistent lint/test configuration;
-- easier code reuse when boundaries are enforced.
-
-Risks:
-
-- everything imports everything;
-- slow CI;
-- unclear ownership;
-- giant shared library becoming a dumping ground.
-
-Use explicit dependency boundaries and ownership rules.
-
----
-
-# 106. Linting, Formatting, and Quality Gates
-
-Automate style and correctness checks.
-
-Common tooling includes:
-
-- TypeScript strict mode;
-- ESLint ecosystem;
-- Prettier or another formatter;
-- unit tests;
-- build budgets;
-- dependency scanning;
-- CI checks.
-
-## TypeScript strictness
-
-Strict typing catches many frontend bugs before runtime.
-
-Avoid disabling type checks globally because one API has poor types. Fix the boundary instead.
-
-## Code quality gate example
-
-```text
-Pull Request
-   ↓
-format check
-   ↓
-lint
-   ↓
-unit tests
-   ↓
-production build
-   ↓
-optional E2E / security checks
-   ↓
-review + merge
-```
-
-The goal is not maximum rules. The goal is predictable quality with low developer friction.
-
----
-
-# 107. CI/CD and Release Strategy
-
-A frontend release is more than copying `dist/`.
-
-## Pipeline
-
-```text
-checkout
-  ↓
-install locked dependencies
-  ↓
-type/lint checks
-  ↓
-unit tests
-  ↓
-production build
-  ↓
-artifact signing/scanning if required
-  ↓
-deploy
-  ↓
-smoke test
-```
-
-## Lock dependencies
-
-Use a lockfile and CI install mode appropriate for npm so CI receives reproducible package versions.
-
-## Cache carefully
-
-Cache dependency downloads/build intermediates, but never allow stale caches to hide dependency/configuration changes.
-
-## Versioning
-
-For internal enterprise apps, still keep release identifiers so an issue report can answer:
-
-```text
-Which frontend build was the user running?
-Which backend version handled the request?
-```
-
-Expose a non-sensitive build version in an About screen or diagnostics endpoint if useful.
-
-## Rollback
-
-Know how to roll back a broken static build quickly.
-
-For SPAs, hashed assets plus HTML caching rules need coordinated deployment so `index.html` never references deleted chunks.
-
----
-
-# 108. Application Startup and Bootstrap
-
-Modern standalone bootstrap:
-
-```ts
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
-
-bootstrapApplication(App, appConfig)
-  .catch(err => console.error(err));
-```
-
-Application config:
-
-```ts
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient(),
-  ],
-};
-```
-
-## Startup configuration
-
-Sometimes the app must load configuration before normal operation.
-
-Examples:
-
-- tenant information;
-- API endpoint selected at deployment;
-- feature flags;
-- identity provider metadata.
-
-Distinguish:
-
-```text
-Build-time configuration
-Runtime public configuration
-User/session data
-Secrets (never browser-owned)
-```
-
-Avoid turning startup into a chain of 20 blocking network calls. Load only what is essential before first render.
-
----
-
-# 109. Reusable Table Design Scenario
-
-Enterprise Angular apps frequently need data tables. A reusable table should not become a universal 200-input monster.
-
-Split responsibilities:
-
-```text
-Data fetching / pagination → page/state
-Column rendering           → table config/templates
-Sorting request            → output/query state
-Selection                   → table + page contract
-Business actions            → feature component
-```
-
-Possible API:
-
-```ts
-interface TableColumn<T> {
-  key: keyof T;
-  label: string;
-  sortable?: boolean;
+@defer (on viewport) {
+  <app-chart />
+} @placeholder {
+  <app-chart-skeleton />
 }
 ```
 
-Usage concept:
+---
 
-```html
-<app-data-table
-  [rows]="invoices()"
-  [columns]="columns"
-  [loading]="loading()"
-  (sortChanged)="changeSort($event)"
-  (rowSelected)="openInvoice($event)"
-/>
-```
+# Appendix B — Legacy Angular Translation Table
+This table helps you recognize older code and map it to modern Angular concepts. “Modern equivalent” does not mean “perform a blind rewrite”; migrate when the change improves maintainability, compatibility, or a planned upgrade.
 
-Do not put domain-specific rules such as "Finance Controller can approve invoice" inside a generic table component.
 
-Keep that in the invoice feature.
+| Older pattern | Modern direction |
+|---|---|
+| NgModule-first architecture | Standalone-first architecture |
+| `*ngIf` | `@if` |
+| `*ngFor` | `@for` |
+| `@Input()` | `input()` / `input.required()` where appropriate |
+| `@Output() + EventEmitter` | `output()` where appropriate |
+| constructor-only DI | `inject()` is a modern ergonomic option |
+| manual derived state | `computed()` |
+| many local Subjects | consider Signals for local synchronous state |
+| eagerly loaded feature routes | lazy routes/components |
+| Zone.js assumptions | zoneless-compatible reactivity |
+| Karma/Jasmine default | Vitest default in current CLI |
+
+Do not mechanically replace every old pattern. Understand the reason for the new pattern first.
 
 ---
 
-# 110. Angular Code Review Checklist
+# Appendix C — Production Readiness Checklist
+Run this checklist before release and during periodic production reviews. A checked box should be backed by evidence—tests, configuration, monitoring, measurements, or documented operational behavior—not by assumption.
 
-Use this before merging significant Angular code.
 
-## Architecture
+## Correctness
 
-- [ ] Is the code in the correct feature/layer?
-- [ ] Is state owned at the narrowest sensible scope?
-- [ ] Are API/data-access details isolated from presentation where useful?
-- [ ] Is a new abstraction actually needed?
-
-## Components
-
-- [ ] Is each component's responsibility understandable?
-- [ ] Are inputs read-only from the child's perspective?
-- [ ] Are outputs named as domain events?
-- [ ] Is the template readable?
-- [ ] Are loading, empty, error, and success states handled?
-
-## Signals
-
-- [ ] Is derived state implemented with `computed()`?
-- [ ] Are effects limited to real side effects?
-- [ ] Are signal writes centralized where state ownership matters?
-- [ ] Is object/array state updated intentionally?
-
-## RxJS
-
-- [ ] Is the correct flattening operator used?
-- [ ] Are subscriptions cleaned up?
-- [ ] Could async pipe / `toSignal` remove manual subscriptions?
-- [ ] Are errors handled at the right layer?
-- [ ] Are duplicate requests possible?
-
-## HTTP
-
-- [ ] Are request/response types explicit?
-- [ ] Are query parameters encoded through HttpClient APIs?
-- [ ] Are cancellation and race conditions handled?
-- [ ] Is retry safe for the operation?
-- [ ] Are backend validation errors surfaced appropriately?
-
-## Forms
-
-- [ ] Are types correct?
-- [ ] Is validation duplicated unnecessarily?
-- [ ] Are cross-field rules in the correct place?
-- [ ] Is backend validation still authoritative?
-- [ ] Is unsaved/draft behavior defined?
-
-## Routing
-
-- [ ] Should the feature be lazy loaded?
-- [ ] Is shareable state represented in the URL?
-- [ ] Are guards used only as frontend navigation controls?
-- [ ] Does direct route refresh work in deployed environments?
+- [ ] Strict TypeScript enabled
+- [ ] No unexplained `any`
+- [ ] API errors handled
+- [ ] loading/empty/error states designed
+- [ ] forms validate both client and server expectations
 
 ## Security
 
-- [ ] No secrets are shipped to the browser.
-- [ ] No unsafe sanitization bypass without review.
-- [ ] Backend enforces authorization.
-- [ ] Sensitive data is not logged.
-- [ ] Uploads are validated by the backend.
-
-## Accessibility
-
-- [ ] Semantic HTML is used.
-- [ ] Forms have labels.
-- [ ] Keyboard navigation works.
-- [ ] Focus behavior is correct.
-- [ ] ARIA is used only when needed and correctly.
+- [ ] backend enforces authorization
+- [ ] no secrets in frontend bundle
+- [ ] no unsafe sanitizer bypass without review
+- [ ] auth token/cookie strategy reviewed
+- [ ] security headers configured at deployment layer
 
 ## Performance
 
-- [ ] Large features are lazy/deferred when useful.
-- [ ] Lists use stable tracking keys.
-- [ ] Huge data is not loaded unnecessarily.
-- [ ] Expensive template calculations are avoided.
-- [ ] Images/assets are appropriately sized.
+- [ ] large routes lazy-loaded
+- [ ] stable `track` keys used in loops
+- [ ] heavy below-fold UI considered for `@defer`
+- [ ] images optimized
+- [ ] bundle budgets reviewed
+- [ ] expensive template computations removed
+
+## Accessibility
+
+- [ ] semantic controls
+- [ ] keyboard flow tested
+- [ ] labels present
+- [ ] focus visible
+- [ ] color contrast checked
+- [ ] reduced-motion considered
 
 ## Testing
 
-- [ ] Critical business behavior has tests.
-- [ ] Tests assert behavior rather than private implementation details.
-- [ ] API error paths are tested.
-- [ ] Permission/workflow edge cases are tested.
+- [ ] core business logic unit-tested
+- [ ] critical components tested
+- [ ] HTTP behavior mocked/tested
+- [ ] critical routes/guards tested
+- [ ] high-value E2E flows covered
 
-## Maintainability
+## Operations
 
-- [ ] Names describe domain intent.
-- [ ] No unexplained magic constants.
-- [ ] No giant `CommonService` additions.
-- [ ] No unnecessary `any`.
-- [ ] Comments explain **why**, not obvious **what**.
-
----
-
-# 111. Final A-to-Z Scenario Map
-
-When you need a feature, use this map to choose Angular concepts.
-
-| Requirement | Angular concepts to consider |
-|---|---|
-| Show/hide UI | Signal + `@if` |
-| Render list | `@for` + stable `track` |
-| Parent passes data | `input()` |
-| Child sends event | `output()` |
-| Custom two-way control | `model()` / form control API |
-| Derived total | `computed()` |
-| Browser side effect | `effect()` carefully |
-| Shared feature state | Scoped injectable + signals/store |
-| Async stream | RxJS |
-| Latest search request | `switchMap` |
-| Prevent double submit | `exhaustMap` + disabled UI |
-| Ordered async writes | `concatMap` |
-| Parallel independent work | `mergeMap` / `forkJoin` depending completion needs |
-| Backend request | `HttpClient` |
-| Auth header | HTTP interceptor |
-| Page navigation | Router |
-| Protect navigation UX | Guard |
-| Preload page data | Resolver/resource/component loading |
-| Large feature | lazy route |
-| Heavy below-fold widget | `@defer` |
-| Simple form | template-driven or Signal Form |
-| Complex existing form | Reactive Forms |
-| New signal-first typed form | Signal Forms |
-| Repeating controls | `FormArray` / signal-form collection model |
-| Custom picker | custom form control |
-| Public SEO page | SSR/SSG/hybrid rendering |
-| Server-rendered interactivity | hydration |
-| Huge visual list | virtual scroll and/or server pagination |
-| Reusable modal/card shell | content projection |
-| Runtime template rendering | `ng-template` / outlet |
-| Runtime component type | `NgComponentOutlet` / dynamic component API |
-| Shared DOM behavior | directive |
-| Display formatting | pipe |
-| Environment configuration | providers/runtime config/build config |
-| Multiple app reuse | Angular library |
-| Production diagnosis | error monitoring + correlation IDs |
-| Secure permission | backend authorization; frontend permissions only for UX |
+- [ ] production build used
+- [ ] SPA rewrites configured
+- [ ] environment configuration correct
+- [ ] logs/monitoring available
+- [ ] source maps/security policy intentionally configured
+- [ ] rollback process known
 
 ---
 
-## Final Reminder
+# Final Learning Advice
 
-When learning Angular, avoid measuring progress by how many decorators or APIs you remember. Measure it by whether you can take a requirement, identify the correct state owner, build a clear component boundary, model async work safely, enforce security at the backend boundary, test the important behavior, and keep the application understandable six months later.
+Angular mastery does not mean knowing every decorator, operator, or CLI flag from memory. It means being able to answer four questions for a feature:
 
----
+1. **Where should this state live?**
+2. **How should data flow between UI, services, and backend?**
+3. **Which reactive tool makes that flow simplest and safest?**
+4. **How will this feature remain testable, secure, accessible, and maintainable after the project grows?**
 
-# 112. Final Mastery Checklist
-
-A developer who can confidently explain and implement the following is in a strong position for real Angular work:
-
-## Foundation
-
-- [ ] HTML, CSS, JavaScript, TypeScript
-- [ ] Angular CLI
-- [ ] project structure
-- [ ] standalone components
-
-## UI
-
-- [ ] templates
-- [ ] interpolation/property/event/two-way binding
-- [ ] `@if`, `@for`, `@switch`, `@let`
-- [ ] inputs, outputs, `model()`
-- [ ] directives
-- [ ] pipes
-- [ ] content projection
-- [ ] queries
-- [ ] lifecycle
-- [ ] accessibility
-
-## Data and Reactivity
-
-- [ ] Signals
-- [ ] `computed`
-- [ ] `effect`
-- [ ] `linkedSignal`
-- [ ] resources / reactive async data
-- [ ] RxJS
-- [ ] signal/RxJS interop
-
-## Application Architecture
-
-- [ ] services
-- [ ] dependency injection
-- [ ] provider scopes
-- [ ] feature state
-- [ ] shared/global state decisions
-- [ ] feature-based folders
-- [ ] reusable components
-
-## Backend Integration
-
-- [ ] HttpClient
-- [ ] DTO typing
-- [ ] interceptors
-- [ ] error handling
-- [ ] caching
-- [ ] cancellation
-- [ ] pagination
-- [ ] file uploads
-
-## Navigation
-
-- [ ] routes
-- [ ] parameters
-- [ ] query parameters
-- [ ] lazy loading
-- [ ] guards
-- [ ] resolvers
-- [ ] nested routes
-- [ ] router events
-
-## Forms
-
-- [ ] template-driven forms
-- [ ] Reactive Forms
-- [ ] Signal Forms
-- [ ] validation
-- [ ] async validation
-- [ ] cross-field validation
-- [ ] dynamic forms
-- [ ] custom controls
-
-## Production Engineering
-
-- [ ] security boundaries
-- [ ] authentication/authorization
-- [ ] change detection
-- [ ] zoneless concepts
-- [ ] `@defer`
-- [ ] SSR/SSG/hydration
-- [ ] testing
-- [ ] performance
-- [ ] logging/observability
-- [ ] build and deployment
-- [ ] legacy NgModule maintenance
-- [ ] safe Angular upgrades
-
----
-
-## Closing Principle
-
-Angular mastery is not knowing the largest number of APIs. It is being able to choose a simple, maintainable design for a real requirement.
-
-When you receive a requirement such as:
-
-> “Build an invoice approval screen with search, pagination, role-based actions, validation, attachment upload, audit history, and server errors.”
-
-You should be able to map it mentally:
-
-```text
-Route
-  ↓
-Page component
-  ↓
-Feature state / resource
-  ↓
-API service
-  ↓
-Backend
-
-Page
- ├── Filter component
- ├── Table component
- ├── Form component
- ├── Attachment component
- └── Approval actions
-
-State
- ├── invoices
- ├── selected invoice
- ├── filter/query/page
- ├── loading/error
- └── permissions
-
-Cross-cutting
- ├── interceptor/auth
- ├── router guard (UX)
- ├── backend authorization (security)
- ├── tests
- ├── logging
- └── performance
-```
-
-That ability—to turn business requirements into clear component, state, data, and security boundaries—is what makes an Angular developer effective.
+If you can consistently make good decisions about those four questions, the APIs become details you can look up when needed.

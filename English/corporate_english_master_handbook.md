@@ -57,6 +57,19 @@
 47. [Self-Evaluation Checklist](#47-self-evaluation-checklist)
 48. [Final Learning Strategy](#48-final-learning-strategy)
 
+## Bonus Sections
+
+- [Bonus Section A — 100 High-Value Corporate Phrases](#bonus-section-a--100-high-value-corporate-phrases)
+- [Bonus Section B — 50 Common Corporate Verbs](#bonus-section-b--50-common-corporate-verbs)
+- [Bonus Section C — Advanced Executive Communication](#bonus-section-c--advanced-executive-communication)
+- [Bonus Section D — How to Sound More Natural](#bonus-section-d--how-to-sound-more-natural)
+- [Bonus Section E — Shadowing Practice Script](#bonus-section-e--shadowing-practice-script)
+- [Bonus Section F — Professional Vocabulary Upgrade](#bonus-section-f--professional-vocabulary-upgrade)
+- [Bonus Section G — Five Levels of Politeness](#bonus-section-g--five-levels-of-politeness)
+- [Bonus Section H — Corporate English Formula Bank](#bonus-section-h--corporate-english-formula-bank)
+- [Bonus Section I — Learning Resources You Can Create for Yourself](#bonus-section-i--learning-resources-you-can-create-for-yourself)
+- [Bonus Section J — Final Daily Routine](#bonus-section-j--final-daily-routine)
+
 ---
 
 # 1. What Is Corporate English?
@@ -97,6 +110,38 @@ It is about being:
 
 The second version is better because it is polite, clear, and includes a deadline.
 
+
+## What Corporate English Is—and Is Not
+
+Corporate English is **purpose-driven professional communication**. The goal is not to sound unusually formal; the goal is to help another person understand the situation and know what to do next.
+
+A useful way to think about it is:
+
+> **Clear meaning + appropriate tone + useful context + next action**
+
+Corporate English changes with the audience and channel. A short Teams message to a close colleague can be less formal than an email to a client, but both should still be respectful and specific.
+
+### Corporate English vs general English
+
+| General English | Corporate English |
+|---|---|
+| Focuses on everyday communication | Focuses on workplace outcomes |
+| Can be casual or expressive | Usually prioritizes clarity and action |
+| Context may be shared informally | Important context should be stated explicitly |
+| Deadlines may be implied | Deadlines and owners are often stated clearly |
+
+### Practical test
+
+Before sending a workplace message, ask:
+
+1. Will the reader understand **why** I am contacting them?
+2. Is the required action clear?
+3. Is the timing clear?
+4. Does the tone fit the relationship?
+5. Could any wording sound blaming, vague, or unnecessarily demanding?
+
+If the answer to these questions is clear, the message is usually effective even if the vocabulary is simple.
+
 ---
 
 # 2. How to Use This Handbook
@@ -124,6 +169,33 @@ Use the sentence in real workplace conversations, emails, or meetings.
 A useful learning formula is:
 
 > **Learn → Repeat → Use → Review**
+
+
+## A Practical Study Method
+
+Use this handbook as both a learning course and a reference. When you study a section, do not stop after reading the examples.
+
+For each useful sentence pattern:
+
+1. **Copy the pattern** once so you notice its structure.
+2. **Change the situation** and write your own version.
+3. **Say it aloud** so it becomes easier to use in meetings.
+4. **Use it in a realistic scenario** such as an email, chat message, call, or status update.
+5. **Review the result** and check whether the message was clear, polite, and specific.
+
+### Example
+
+Pattern:
+
+> Could you please share [item] by [deadline]?
+
+Your versions:
+
+> Could you please share the UAT report by 4:00 PM?
+
+> Could you please share the approved purchase order by tomorrow morning?
+
+The important part is not memorizing the exact sentence. It is learning how the pattern works so you can adapt it naturally.
 
 ---
 
@@ -156,6 +228,30 @@ The improved version gives:
 - Owner
 - Priority
 - Expected response time
+
+
+## The Five-Part Message Check
+
+Before sending an important message, check these five elements:
+
+| Element | Question |
+|---|---|
+| Purpose | Why am I sending this? |
+| Context | What does the reader need to know? |
+| Impact | Why does it matter? |
+| Action | What should happen next? |
+| Timing | When is the response or action needed? |
+
+Not every message needs all five parts. A simple thank-you message may need only one sentence. A production incident or escalation normally needs much more context.
+
+### Channel choice also matters
+
+- **Chat:** best for quick coordination, short questions, and immediate discussion.
+- **Email:** better for decisions, approvals, formal requests, summaries, and information that should be easy to find later.
+- **Meeting/call:** useful when the topic is complex, sensitive, or likely to require back-and-forth discussion.
+- **Document/ticket:** useful when details, evidence, history, or ownership must be recorded.
+
+Do not use a long meeting when a two-line message is enough, and do not use a vague chat message for a decision that should be formally recorded.
 
 ---
 
@@ -428,6 +524,60 @@ Use passive voice when:
 - The actor is unknown.
 - You want neutral wording.
 
+
+## 4.13 Quick Grammar Decision Guide
+
+The same workplace idea can change meaning depending on the tense or modal used.
+
+### Present simple vs present continuous
+
+> I **work** on the billing module.
+
+This describes a regular responsibility.
+
+> I **am working** on the billing module today.
+
+This describes a current or temporary activity.
+
+### Simple past vs present perfect
+
+> I **sent** the report yesterday.
+
+Use the simple past because the completed time, `yesterday`, is stated.
+
+> I **have sent** the report.
+
+Use the present perfect when the completed action matters now and no finished past time is stated.
+
+### `can`, `could`, and `would` in requests
+
+> Can you review this?
+
+Normal and direct.
+
+> Could you review this?
+
+Usually sounds a little more polite or less forceful.
+
+> Would you be able to review this by 3:00 PM?
+
+Useful when asking about willingness or availability.
+
+The difference is often one of tone, not grammar correctness.
+
+## Common Grammar Mistakes in Workplace Messages
+
+| Mistake | Better | Why |
+|---|---|---|
+| He don't know. | He doesn't know. | Third-person singular uses `doesn't`. |
+| I didn't received it. | I didn't receive it. | After `did`, use the base verb. |
+| I am working here since 2022. | I have been working here since 2022. | The action started in the past and continues now. |
+| We discussed about the issue. | We discussed the issue. | `discuss` does not take `about` in this structure. |
+| Please explain me the process. | Please explain the process to me. | `explain` normally takes the thing first, then `to + person`. |
+| I have sent it yesterday. | I sent it yesterday. | A finished past time normally takes the simple past. |
+
+Grammar should support clarity. Do not make a message unnecessarily complicated just to use an advanced structure.
+
 ---
 
 # 5. Professional Vocabulary
@@ -526,6 +676,53 @@ Better:
 
 > Please share this by 4:00 PM today.
 
+
+## 5.2 Terms Learners Commonly Confuse
+
+### Risk vs issue
+
+A **risk** is something that *might* happen.
+
+> There is a risk that the vendor approval may be delayed.
+
+An **issue** is a problem that *has already happened*.
+
+> The vendor approval is delayed, so this is now an issue.
+
+### Dependency vs blocker
+
+A **dependency** is something your work relies on.
+
+> UAT sign-off is a dependency for production deployment.
+
+A **blocker** is a dependency or problem that is currently preventing progress.
+
+> UAT sign-off has not been received, so the deployment is blocked.
+
+### ETA vs deadline
+
+An **ETA** is an estimate of when something is expected to finish or arrive.
+
+> The current ETA for the fix is 4:00 PM.
+
+A **deadline** is the latest acceptable completion time.
+
+> The deadline for regulatory submission is 5:00 PM Friday.
+
+An ETA may change as new information becomes available. A deadline is usually a requirement.
+
+### Action item vs deliverable
+
+An **action item** is a task someone must perform.
+
+> Priya will validate the report.
+
+A **deliverable** is an output that must be produced.
+
+> The validated report is the deliverable.
+
+Use these terms precisely because they influence ownership, planning, and expectations.
+
 ---
 
 # 6. Sentence Building for the Workplace
@@ -545,6 +742,43 @@ Another pattern:
 Example:
 
 > The API is currently unavailable, which is blocking invoice processing. Could you please check the service and share an update?
+
+
+## How to Build a Strong Workplace Sentence
+
+Start with the minimum information the reader needs, then add only what improves understanding.
+
+### Pattern 1 — Context + request + deadline
+
+> Since the audit starts tomorrow, could you please share the approved access list by 4:00 PM today?
+
+- **Context:** the audit starts tomorrow.
+- **Request:** share the approved access list.
+- **Deadline:** 4:00 PM today.
+
+### Pattern 2 — Problem + impact + action
+
+> The payment API is unavailable, so users cannot submit invoices. The support team is investigating the service.
+
+- **Problem:** the API is unavailable.
+- **Impact:** users cannot submit invoices.
+- **Action:** the support team is investigating.
+
+### Pattern 3 — Decision + reason + next step
+
+> We will postpone the release because two critical defects remain open. Testing will resume after the fixes are validated.
+
+### Keep one sentence focused
+
+Weak:
+
+> The server is down and we checked with infrastructure and there may be a firewall issue and users are waiting and we need help urgently.
+
+Better:
+
+> The production server is unavailable, and users cannot access the application. Infrastructure is checking a possible firewall issue. Please treat this as high priority and share the next update by 11:00 AM.
+
+Breaking complex information into two or three short sentences usually improves clarity.
 
 ---
 
@@ -569,6 +803,31 @@ Choose the level based on:
 - Communication channel
 - Urgency
 - Company culture
+
+
+## Choosing the Right Level of Formality
+
+Formality is a scale rather than a simple choice between "formal" and "informal."
+
+| Situation | Suitable style |
+|---|---|
+| Quick message to a teammate | Friendly and concise |
+| Request to another team | Polite and specific |
+| Client communication | Professional and carefully structured |
+| Senior-management escalation | Formal, factual, concise |
+| Legal, policy, or audit communication | Precise and controlled |
+
+### Do not become overly formal
+
+This can sound unnatural:
+
+> Kindly be informed that the undersigned requests you to do the needful at the earliest.
+
+Clearer:
+
+> Please review the attached request and confirm approval by 3:00 PM.
+
+Professional communication is not improved by unnecessary complexity. Prefer familiar words when they express the meaning accurately.
 
 ---
 
@@ -596,6 +855,38 @@ The same information can sound:
 ### Collaborative
 
 > It looks like the issue is still open. Please let me know if you need any input from our side to move this forward.
+
+
+## How to Control Tone
+
+Tone is influenced by more than polite words. It also depends on sentence structure, punctuation, certainty, and whether the message focuses on the person or the problem.
+
+### Compare
+
+Blaming:
+
+> You failed to send the data.
+
+Problem-focused:
+
+> The data has not yet been received.
+
+Collaborative:
+
+> We have not yet received the data. Could you please share it by 2:00 PM so that testing can continue?
+
+### A simple tone check
+
+Before sending a sensitive message:
+
+1. Remove blame unless responsibility genuinely needs to be recorded.
+2. State observable facts.
+3. Explain business impact.
+4. Ask for a specific action.
+5. Use a deadline only when it is useful.
+6. Avoid excessive exclamation marks, capital letters, or repeated "urgent" labels.
+
+A calm tone does not mean hiding a serious problem. You can be firm and still be respectful.
 
 ---
 
@@ -651,6 +942,33 @@ Use:
 
 > I may not be able to complete this today, but I can deliver it by tomorrow afternoon.
 
+
+## Diplomatic Language Patterns
+
+Diplomatic language is useful when you need to protect the working relationship without hiding the real message.
+
+### Soften a correction
+
+> There appears to be a mismatch between the invoice total and the approved amount.
+
+This focuses on the difference rather than accusing a person.
+
+### State a limitation
+
+> We can support the change, but not within today's release window.
+
+This is clearer than giving a vague "maybe."
+
+### Challenge an assumption
+
+> Could we verify that assumption before finalizing the timeline?
+
+### Make a firm request politely
+
+> Please complete the approval by 3:00 PM today so that the deployment can proceed as scheduled.
+
+Politeness should not make the message unclear. Avoid adding so many softening words that the required action disappears.
+
 ---
 
 # 10. Speaking Confidently at Work
@@ -672,6 +990,41 @@ A useful structure is:
 Example:
 
 > I recommend postponing the deployment. The testing is not yet complete, and we found two critical issues this morning. For example, invoice posting is failing for one vendor category. I suggest we complete testing today and deploy tomorrow.
+
+
+## Building Confidence in Real Conversations
+
+Confidence improves when you reduce the amount of language you must invent in the moment.
+
+### Prepare reusable structures
+
+For updates:
+
+> Current status → blocker → next step → expected time
+
+For opinions:
+
+> Recommendation → reason → evidence → next step
+
+For unexpected questions:
+
+> Acknowledge → answer what you know → state what you need to verify
+
+Example:
+
+> Based on the current logs, the issue appears to be related to authentication. I need to verify the identity-provider response before confirming the root cause. I can share a confirmed update after that check.
+
+### If you lose your words
+
+Use a natural recovery phrase:
+
+> Let me rephrase that.
+
+> What I mean is...
+
+> Let me think for a moment.
+
+Pausing briefly is better than speaking quickly and producing a confusing answer.
 
 ---
 
@@ -715,6 +1068,31 @@ Using them occasionally is normal.
 
 Using them in every sentence makes communication less confident.
 
+
+## Intelligibility Matters More Than Accent
+
+The goal of professional pronunciation is to be easy to understand. You do not need to imitate a particular national accent.
+
+Focus on:
+
+- **Word stress:** saying the stressed syllable clearly.
+- **Sentence stress:** emphasizing important content words.
+- **Pausing:** grouping ideas into short units.
+- **Final sounds:** making endings such as plural `-s` and past `-ed` clear when they carry meaning.
+- **Pace:** slowing down when giving numbers, names, technical terms, or instructions.
+
+### Chunking example
+
+Instead of speaking the whole sentence without pauses:
+
+> The production deployment is scheduled for Friday after business approval.
+
+Say it in meaning groups:
+
+> The production deployment / is scheduled for Friday / after business approval.
+
+This usually sounds clearer and gives the listener more time to process the message.
+
 ---
 
 # 12. Professional Introductions
@@ -730,6 +1108,29 @@ Using them in every sentence makes communication less confident.
 ## 12.3 Introducing a Colleague
 
 > I'd like to introduce Priya, who manages the infrastructure team and will help us with the server migration activities.
+
+
+## A Simple Introduction Formula
+
+A professional introduction usually needs only four parts:
+
+> **Name → role/team → responsibility → reason for joining**
+
+Example:
+
+> Hi, I'm Alex from the Digital Applications team. I support the invoice automation platform, mainly on application development and production issues. I'm joining today's call to help with the deployment discussion.
+
+You can shorten or expand this depending on the setting.
+
+### Internal meeting
+
+> Hi, I'm Alex from Application Support. I handle the invoice platform.
+
+### Client workshop
+
+> Good morning. I'm Alex from the Digital Applications team. I am responsible for the invoice automation platform and will be supporting the technical discussion today.
+
+Avoid giving your complete career history unless the situation requires it.
 
 ---
 
@@ -759,6 +1160,29 @@ Examples:
 > Have you worked with this team before?
 
 Avoid sensitive topics unless you know the person well.
+
+
+## How to Start and End Small Talk
+
+Small talk works best when it is brief, natural, and easy for the other person to answer.
+
+### Open with an observation or simple question
+
+> How has your week been so far?
+
+> Was the journey here comfortable?
+
+### Continue with a light follow-up
+
+> That sounds good. Was it your first time visiting the city?
+
+### Exit naturally
+
+> Good speaking with you. I should get back to the meeting room.
+
+> Thanks for the chat. I'll let you get back to your work.
+
+Avoid turning small talk into an interview by asking many personal questions one after another. In international workplaces, respect privacy and do not assume that topics such as age, salary, religion, politics, health, or family status are comfortable subjects.
 
 ---
 
@@ -905,6 +1329,58 @@ Friendly professional:
 
 > Thank you,
 
+
+## 14.9 Action-Oriented Email Structure
+
+A reader should be able to scan an email and quickly answer:
+
+- What is this about?
+- What do I need to do?
+- By when?
+- What supporting information is available?
+
+For important requests, place the action near the top rather than hiding it in a long background paragraph.
+
+### Example
+
+**Subject:** UAT Sign-Off Required by 4:00 PM — Invoice Automation
+
+> Hi Priya,  
+>
+> UAT validation for the invoice automation release is complete.  
+>
+> **Action required:** Please review the attached results and confirm sign-off by **4:00 PM today** so that we can proceed with tonight's deployment.  
+>
+> Two minor observations are documented in the attachment; neither blocks the release.  
+>
+> Please let me know if you would like to discuss any point before approval.  
+>
+> Regards,  
+> Alex
+
+## 14.10 CC, BCC, and Reply All
+
+- **To:** people expected to act or directly participate.
+- **CC:** people who should be informed but do not normally need to act.
+- **BCC:** hides recipients from one another. Use only when there is a legitimate communication or privacy reason.
+- **Reply All:** use when everyone on the thread genuinely needs the response.
+
+Do not copy senior people only to create pressure. That can damage trust and make routine communication look like escalation.
+
+## 14.11 Attachments and Links
+
+If you mention an attachment, verify it before sending.
+
+Clear:
+
+> Please find the UAT summary attached.
+
+For a shared link:
+
+> The updated deployment plan is available at the link below. Please review section 3 before the meeting.
+
+When version confusion is possible, include a date or version number in the file name or message.
+
 ---
 
 # 15. Chat, Teams, and Slack Communication
@@ -943,6 +1419,43 @@ Use:
 
 This saves time.
 
+
+## Chat Etiquette That Saves Time
+
+Chat is fast, but it is still a work record in many organizations.
+
+### Write the full first message
+
+Instead of sending:
+
+> Hi
+
+and waiting, send:
+
+> Hi Rahul, could you please confirm whether production access has been approved for tonight's deployment?
+
+### Use threads or replies when available
+
+Keeping related messages together makes the conversation easier to follow.
+
+### Use mentions carefully
+
+Mention `@Name` when you need that person's attention. Avoid mentioning an entire group for a routine question.
+
+### State urgency with a reason
+
+Weak:
+
+> URGENT!!!
+
+Better:
+
+> This is blocking the 4:00 PM deployment. Could you please check it by 3:00 PM?
+
+### Move complex discussions to a call when needed
+
+If ten short messages are creating confusion, a five-minute call may be more efficient. After the call, summarize any decision or action item in writing.
+
 ---
 
 # 16. Phone and Video Call English
@@ -968,6 +1481,30 @@ Useful expressions:
 ### Ending
 
 > Thank you for your time. I will send a summary by email.
+
+
+## A Simple Call Structure
+
+Use this sequence for most professional calls:
+
+1. **Identify yourself.**
+2. **Check availability.**
+3. **State the purpose.**
+4. **Discuss and clarify.**
+5. **Confirm the decision or action.**
+6. **Close with the next step.**
+
+Example:
+
+> Hi Priya, this is Alex from Application Support. Is this a good time for a quick discussion? I am calling about the production access request. We need confirmation before tonight's deployment. If approval is received by 4:00 PM, we can proceed as planned. Could you confirm who is currently reviewing it?
+
+### When audio is unclear
+
+> Your voice is breaking up. Could you please repeat the last sentence?
+
+> There seems to be some delay on the line. Let me repeat what I understood.
+
+Never pretend you understood an important instruction when you did not.
 
 ---
 
@@ -1043,6 +1580,31 @@ Meetings require specific language for different situations.
 
 > Thank you, everyone. I will share the meeting notes shortly.
 
+
+## 17.10 Confirming Decisions and Action Items
+
+A meeting is not complete until participants understand what was decided and who owns the next steps.
+
+Use:
+
+> Just to confirm, we have agreed to deploy on Friday after UAT sign-off.
+
+> Rahul will complete testing by Thursday 3:00 PM, and Priya will provide business approval by 5:00 PM.
+
+A useful action-item format is:
+
+> **Action — Owner — Due date — Status**
+
+Example:
+
+| Action | Owner | Due | Status |
+|---|---|---|---|
+| Complete regression testing | Rahul | Thu 3:00 PM | In progress |
+| Provide UAT sign-off | Priya | Thu 5:00 PM | Pending |
+| Prepare deployment package | Alex | Fri 10:00 AM | Not started |
+
+Specific ownership prevents the vague meeting ending: "Someone will take care of it."
+
 ---
 
 # 18. Presentation English
@@ -1090,6 +1652,37 @@ A good presentation usually contains:
 
 > I don't have the exact number with me right now, but I can verify it and share it after the meeting.
 
+
+## Presentation Signposting
+
+Signposting tells the audience where you are in the presentation.
+
+### Opening
+
+> I will cover three points: the current situation, the proposed solution, and the implementation timeline.
+
+### Moving between sections
+
+> We have looked at the current problem. Let's now move to the proposed solution.
+
+### Highlighting a key point
+
+> The most important point here is the reduction in manual processing time.
+
+### Summarizing
+
+> To summarize, the solution reduces manual effort, keeps the existing approval process, and can be introduced in two phases.
+
+### Handling a question you cannot answer
+
+Do not guess.
+
+> I don't have the confirmed figure with me. I will verify it and share the number after the meeting.
+
+If a question requires a long side discussion:
+
+> That is an important point, but it may take us beyond today's agenda. Could we discuss it separately after the session?
+
 ---
 
 # 19. Status Updates and Progress Reporting
@@ -1115,6 +1708,43 @@ Verbal version:
 
 > Development and unit testing are complete. UAT is currently in progress, and we are waiting for business sign-off. There are no technical blockers at the moment. Once approval is received, we will proceed with production deployment.
 
+
+## Make Status Updates Measurable
+
+Avoid status words without evidence.
+
+Weak:
+
+> Testing is almost done.
+
+Better:
+
+> 42 of 45 test cases have passed. Three remain open, including one high-priority failure in invoice posting.
+
+### Include dates when they matter
+
+Instead of:
+
+> Deployment is planned soon.
+
+Use:
+
+> Production deployment is planned for 14 August, subject to UAT sign-off.
+
+### Separate status from forecast
+
+- **Status** describes what is true now.
+- **Forecast/ETA** describes what you expect to happen.
+- **Risk** describes what might prevent the forecast.
+
+Example:
+
+> **Status:** Development is complete.  
+> **ETA:** UAT is expected to finish by 4:00 PM Thursday.  
+> **Risk:** Approval may be delayed if the business reviewer is unavailable.
+
+This prevents estimates from being mistaken for confirmed facts.
+
 ---
 
 # 20. Explaining Technical Issues
@@ -1136,6 +1766,32 @@ Technical:
 Business-friendly:
 
 > The system encountered an internal processing error while reading the submitted data.
+
+
+## Symptom, Cause, Workaround, and Fix
+
+These terms are related but different:
+
+- **Symptom:** what users or monitoring can observe.
+- **Cause/root cause:** the underlying reason the problem happened.
+- **Workaround:** a temporary way to reduce impact without removing the cause.
+- **Fix:** a change intended to remove the defect or cause.
+
+Example:
+
+> **Symptom:** Users receive an error when uploading PDF invoices.  
+> **Impact:** New invoices cannot enter the workflow.  
+> **Suspected cause:** The file-processing service is rejecting one PDF format.  
+> **Workaround:** Users can submit the affected invoices through the support queue.  
+> **Fix:** The parser is being updated and will be retested before release.
+
+Do not call something the "root cause" until it has been verified. During investigation, use wording such as:
+
+> Initial analysis suggests...
+
+> The current hypothesis is...
+
+> We are still validating the cause.
 
 ---
 
@@ -1165,6 +1821,27 @@ Use:
 
 > I may have missed the earlier communication. Could you please share the details again?
 
+
+## Four Useful Question Types
+
+### Clarification
+
+> Could you clarify what "completed" means in this requirement?
+
+### Confirmation
+
+> Just to confirm, should the report include inactive users as well?
+
+### Evidence
+
+> Could you share the error message or a screenshot of the failed transaction?
+
+### Decision
+
+> Which option would you like us to proceed with: the existing workflow or the revised approval flow?
+
+A good question reduces ambiguity. Ask one clear question at a time when possible, especially in chat or email.
+
 ---
 
 # 22. Giving Instructions
@@ -1186,6 +1863,35 @@ Example:
 > 4. Click Approve.
 > 5. Confirm that the status changes to "Approved."
 
+
+## How to Write Instructions People Can Follow
+
+Each step should contain one clear action and, where useful, a way to verify success.
+
+Weak:
+
+> Configure everything and check it.
+
+Better:
+
+> 1. Open **Settings**.
+> 2. Select **Notifications**.
+> 3. Enable **Email alerts**.
+> 4. Click **Save**.
+> 5. Refresh the page and confirm that **Email alerts: Enabled** is displayed.
+
+### Include prerequisites
+
+Before the steps, state anything the user must already have:
+
+> **Prerequisite:** You must have administrator access to change this setting.
+
+### Include expected results
+
+> **Expected result:** The request status changes from `Pending` to `Approved`.
+
+This makes instructions testable instead of leaving the user unsure whether the action worked.
+
 ---
 
 # 23. Requesting Help and Support
@@ -1201,6 +1907,19 @@ Useful phrases:
 > We need your assistance to complete the deployment.
 
 > Please let me know if you need any information from my side.
+
+
+## A Complete Support Request
+
+A strong request for help includes:
+
+> **Problem + evidence + impact + what you already checked + help required**
+
+Example:
+
+> We are unable to connect to the production API from the application server. The connection has failed since 10:20 AM, and invoice posting is currently blocked. We verified that the application service is running and that DNS resolves correctly. Could the network team please check whether the firewall rule is active and share an update by 11:00 AM?
+
+This gives the support team enough information to begin useful investigation without repeatedly asking for basic details.
 
 ---
 
@@ -1220,6 +1939,21 @@ Avoid:
 
 > Why are you not replying?
 
+
+## Follow-Up vs Escalation
+
+A **follow-up** asks for progress on an existing request.
+
+> Could you please share the current status of the access request?
+
+An **escalation** raises visibility because delay, risk, or impact now requires additional support.
+
+> The access request remains pending and is now blocking tonight's deployment. We need your support to complete the approval by 4:00 PM.
+
+Do not escalate only because someone did not reply immediately. Consider the agreed SLA, urgency, business impact, and normal working hours.
+
+When following up repeatedly, add new information—such as impact or deadline—rather than sending the same message again.
+
 ---
 
 # 25. Reminders
@@ -1235,6 +1969,25 @@ Alternative:
 For a deadline:
 
 > Kindly share your confirmation by 4:00 PM today so that we can proceed with the scheduled deployment.
+
+
+## A Good Reminder Contains Context
+
+A reminder is more useful when the recipient can understand it without searching through old messages.
+
+Weak:
+
+> Reminder.
+
+Better:
+
+> A quick reminder that UAT sign-off for the invoice release is due by 4:00 PM today. We need the approval before the production deployment can begin.
+
+For recurring responsibilities, include the period:
+
+> This is a reminder to submit the July timesheet by 5:00 PM today.
+
+A reminder should make the action easy to identify, not merely announce that something is pending.
 
 ---
 
@@ -1254,6 +2007,27 @@ Example:
 Avoid over-apologizing.
 
 You do not need to say "sorry" in every message.
+
+
+## Apology vs Explanation
+
+An apology should acknowledge the impact without becoming a long defense.
+
+Useful pattern:
+
+> **Acknowledge → brief reason → corrective action → next step**
+
+Example:
+
+> Apologies for the incorrect attachment in my previous email. I have attached the correct UAT report here and verified the version before resending it.
+
+Avoid:
+
+> Sorry for the inconvenience caused because I was very busy and many things happened...
+
+Long explanations can sound defensive.
+
+For serious incidents, do not speculate about legal responsibility or make commitments you are not authorized to make. State verified facts, corrective actions, and the next communication point.
 
 ---
 
@@ -1276,6 +2050,31 @@ Example:
 ## 27.3 Receiving Feedback
 
 > Thank you for the feedback. I understand the point and will incorporate it in the next report.
+
+
+## Make Feedback Specific and Actionable
+
+Feedback is more useful when the person can identify exactly what to repeat or change.
+
+### Positive feedback
+
+Weak:
+
+> Good job.
+
+Better:
+
+> Your status update was clear because you separated completed work, blockers, and next steps. Please continue using that structure.
+
+### Constructive feedback
+
+Use:
+
+> **Observed behavior → impact → requested change**
+
+> The deployment note did not include the rollback steps. That makes the production change harder to recover safely if validation fails. Please include the rollback command and verification step in the next version.
+
+Avoid feedback about personality when the real issue is a specific behavior.
 
 ---
 
@@ -1307,6 +2106,19 @@ Use:
 
 > This was also discussed in the previous meeting, but I can summarize the agreed approach again.
 
+
+## A Conflict-Resolution Structure
+
+When disagreement becomes tense, use:
+
+> **Shared goal → fact → concern → option → agreement**
+
+Example:
+
+> We both want to release without increasing production risk. Two critical test cases are still failing, so I am concerned about deploying tonight. One option is to fix and retest them today, then deploy tomorrow morning. Would that work for the business team?
+
+This structure keeps the discussion focused on the work rather than on who "wins" the argument.
+
 ---
 
 # 29. Escalation Communication
@@ -1327,6 +2139,23 @@ Example:
 
 Do not use escalation as a threat.
 
+
+## Escalation Ladder
+
+Escalation should increase only as the business impact increases.
+
+1. Follow up with the current owner.
+2. Clarify impact and deadline.
+3. Ask whether another owner can help.
+4. Involve the appropriate manager or governance channel if the risk remains unresolved.
+5. Continue to document status and decisions.
+
+### Strong escalation wording
+
+> The request has been pending since 11 August. Without approval by 3:00 PM today, the scheduled production deployment cannot proceed. We need support to confirm the approver and completion time.
+
+This is firm because the consequence is clear, not because the tone is aggressive.
+
 ---
 
 # 30. Negotiation English
@@ -1344,6 +2173,33 @@ Useful phrases:
 > Could we explore an alternative approach?
 
 > That timeline may be difficult for us. Would Monday be acceptable?
+
+
+## Core Negotiation Ideas
+
+Negotiation is not simply asking for a lower price or later deadline. It is the process of finding a workable agreement when the parties have different needs.
+
+### Separate positions from constraints
+
+Position:
+
+> We need this by Friday.
+
+Constraint:
+
+> The client demonstration is Monday morning, so we need one full business day for validation.
+
+Understanding the constraint creates more options.
+
+### Offer trade-offs
+
+> We can deliver the reporting feature by Friday if the dashboard enhancement moves to the next release.
+
+### Confirm the agreement
+
+> To confirm, phase one will be delivered Friday, and phase two will be completed by Wednesday next week.
+
+Do not leave a negotiation with only a verbal feeling of agreement. Record scope, owner, date, and any condition that affects the commitment.
 
 ---
 
@@ -1367,6 +2223,36 @@ Better:
 ## Handling a complaint
 
 > Thank you for bringing this to our attention. We understand the impact this has caused. The team is investigating the issue on priority, and we will share the next update by 2:00 PM.
+
+
+## Handling Client Problems Without Internal Blame
+
+A client normally needs four things:
+
+1. Recognition of the problem.
+2. Clear impact or current status.
+3. Action being taken.
+4. A reliable next update.
+
+Example:
+
+> We have confirmed that some invoice uploads are failing. The team is investigating the affected file type and has introduced a temporary manual route so processing can continue. We will share the next confirmed update by 2:00 PM.
+
+Avoid exposing unnecessary internal disagreement:
+
+> Network says application caused it, but application says network caused it.
+
+Until the cause is verified, use neutral language and focus on resolution.
+
+### Never promise an unverified ETA
+
+Instead of:
+
+> It will definitely be fixed in one hour.
+
+Use:
+
+> We are targeting a fix within one hour, subject to validation. We will confirm the status by 2:00 PM.
 
 ---
 
@@ -1396,6 +2282,33 @@ Managers often need language for:
 ### Decision
 
 > Based on the current risk, we will postpone the deployment until testing is complete.
+
+
+## Delegation Should Define the Outcome
+
+A delegation message should make four things clear:
+
+> **Outcome → owner → deadline → support/authority**
+
+Example:
+
+> Priya, please own the regression-testing activity and share the final pass/fail summary by Thursday 3:00 PM. Coordinate directly with the development team for any defect clarification, and let me know today if access or test data will block the timeline.
+
+This is stronger than:
+
+> Priya, handle testing.
+
+### Management language should create clarity
+
+Use:
+
+> The priority today is restoring production service. Non-critical enhancement work can resume after the incident is stable.
+
+Avoid vague urgency:
+
+> Everything is urgent.
+
+If everything is called urgent, the team has no real priority.
 
 ---
 
@@ -1444,6 +2357,22 @@ A formal request to modify scope or requirements.
 A person, system, budget, or capability needed for work.
 
 > We need one additional developer for the integration activity.
+
+
+## Terms That Are Easy to Confuse
+
+| Term | Meaning | Example |
+|---|---|---|
+| Scope | Work formally included | "The mobile app is outside the current scope." |
+| Milestone | Important checkpoint | "UAT sign-off is the next milestone." |
+| Risk | Possible future problem | "Reviewer availability is a risk." |
+| Issue | Problem already occurring | "The reviewer is unavailable today; this is now an issue." |
+| Dependency | Something required for progress | "Deployment depends on security approval." |
+| Blocker | Something currently stopping progress | "Missing credentials are blocking testing." |
+| Assumption | Planning belief not yet confirmed | "We assume test data will be available Monday." |
+| Change request | Controlled request to alter agreed scope, cost, or timeline | "The new approval level requires a change request." |
+
+A good project update labels these correctly because the response to a risk is different from the response to an active issue.
 
 ---
 
@@ -1527,6 +2456,84 @@ A person, system, budget, or capability needed for work.
 - Productivity
 - Compliance
 
+
+## 34.6 Key Terms Explained by Function
+
+The lists above are useful for recognition. The tables below add the meaning needed to use the terms correctly.
+
+### IT
+
+| Term | Practical meaning | Example |
+|---|---|---|
+| Deployment | Putting a build or change into an environment | "Production deployment is scheduled for Friday." |
+| Release | A packaged set of changes made available to users | "Release 2.4 contains the invoice fixes." |
+| Patch | A targeted update, often for a defect or security problem | "The vendor supplied a security patch." |
+| Incident | An unplanned interruption or degradation of service | "A login incident is affecting all users." |
+| Root cause | Verified underlying reason an incident occurred | "The root cause was an expired certificate." |
+| Workaround | Temporary method that reduces impact without fully fixing the cause | "Manual upload is the current workaround." |
+| Downtime | Period when a service is unavailable | "Expected downtime is 15 minutes." |
+| Production | Live environment used by real users | "Do not test experimental changes directly in production." |
+| UAT | User Acceptance Testing performed to confirm business needs are met | "Business users are completing UAT." |
+| Integration | Connection between systems or components | "The payment integration sends approved invoices to ERP." |
+| Authentication | Verifying who a user or system is | "SSO handles user authentication." |
+| Authorization | Deciding what an authenticated user may do | "Authorization limits approval access to managers." |
+| API | Interface that allows software systems to exchange requests and responses | "The application calls the vendor API." |
+| Backup | Stored copy used for recovery | "A database backup is created nightly." |
+| Rollback | Returning to a previous stable version or state | "The rollback plan restores the earlier build." |
+| Monitoring | Observing system health, performance, or events | "Monitoring alerted the team to high error rates." |
+
+### Finance
+
+| Term | Practical meaning | Example |
+|---|---|---|
+| Invoice | Request for payment for supplied goods or services | "The vendor submitted the invoice." |
+| Purchase Order (PO) | Formal order authorizing a purchase under agreed terms | "The invoice references PO 45000123." |
+| Reconciliation | Comparing records to find and resolve differences | "Finance completed bank reconciliation." |
+| Accrual | Recognition of an expense or income before cash settlement when accounting rules require it | "The month-end accrual records the received service." |
+| Budget | Approved or planned amount available for spending | "The project remains within budget." |
+| Forecast | Estimate of future financial results | "The team revised the quarterly forecast." |
+| Variance | Difference between planned and actual values | "Travel spend shows a 12% unfavorable variance." |
+| Cost center | Organizational unit used to collect and track costs | "Charge the expense to the IT cost center." |
+| General ledger | Main accounting record containing categorized financial entries | "The posting updates the general ledger." |
+| Debit note | Document used to record or request a debit adjustment depending on the business process | "Finance issued a debit note for the overcharge." |
+| Credit note | Document that reduces or reverses an amount previously invoiced | "The vendor issued a credit note for the returned items." |
+
+### HR
+
+| Term | Practical meaning | Example |
+|---|---|---|
+| Onboarding | Process of joining and enabling a new employee | "IT access is part of onboarding." |
+| Offboarding | Process of completing an employee's exit | "Offboarding includes access removal." |
+| Payroll | Process of calculating and paying employee compensation | "Payroll closes on the 25th." |
+| Appraisal | Formal assessment of performance, often periodic | "Annual appraisal discussions begin next month." |
+| Notice period | Required period between resignation/termination notice and the final working date | "Her notice period is 60 days." |
+| Compensation | Salary and other financial rewards | "The offer includes fixed and variable compensation." |
+
+### Sales
+
+| Term | Practical meaning | Example |
+|---|---|---|
+| Lead | Person or organization that may become a customer | "The campaign generated 80 leads." |
+| Prospect | Lead that has been qualified as a realistic potential customer | "Sales scheduled a demo for the prospect." |
+| Opportunity | Potential deal actively being pursued | "The opportunity is currently in negotiation." |
+| Pipeline | Set of active sales opportunities across stages | "The manager reviewed the quarterly pipeline." |
+| Conversion | Movement from one stage to a desired outcome, such as lead to customer | "Lead-to-customer conversion improved." |
+| Proposal | Document describing the offered solution, scope, and commercial terms | "The proposal was shared Tuesday." |
+| Quotation | Formal price offer for specified goods or services | "Please send the revised quotation." |
+
+### Operations
+
+| Term | Practical meaning | Example |
+|---|---|---|
+| Turnaround time (TAT) | Time from start/request to completion | "The normal TAT is two business days." |
+| Capacity | Amount of work a process or team can handle | "Current capacity is 500 requests per day." |
+| Throughput | Amount of work actually completed in a period | "Daily throughput increased to 430 requests." |
+| SLA | Agreed service level, often including response or resolution targets | "The ticket is still within the SLA." |
+| Bottleneck | Point that limits overall flow or capacity | "Manual approval is the main bottleneck." |
+| Compliance | Conformance with applicable policies, rules, laws, or standards | "The process requires compliance review." |
+
+Terminology can vary by organization. When a term has a company-specific meaning, define that meaning in the project or process documentation.
+
 ---
 
 # 35. Numbers, Dates, Time, and Data
@@ -1585,6 +2592,59 @@ Avoid ambiguous dates like:
 
 This could mean 8 September or August 9 depending on country.
 
+
+## Communicating Numbers Clearly
+
+Numbers become risky when the format can be interpreted in more than one way.
+
+### Large numbers
+
+Indian system:
+
+> ₹12,50,000 = twelve lakh fifty thousand rupees
+
+International system:
+
+> 1,250,000 = one million two hundred fifty thousand
+
+When communicating globally, consider writing both the number and currency code where needed:
+
+> INR 1,250,000
+
+### Decimals
+
+> 3.75 = three point seven five
+
+For measurements or money, make the unit explicit:
+
+> 3.75 hours
+
+> USD 3.75
+
+### Rounding and approximation
+
+Use words that show whether the number is exact.
+
+> approximately 2,500 users
+
+> about 18%
+
+> exactly 147 failed transactions
+
+Do not present a rounded estimate as an exact figure.
+
+## Data Statements Need a Comparison
+
+Weak:
+
+> Performance improved by 20%.
+
+Better:
+
+> Average processing time decreased by 20%, from 10 minutes in June to 8 minutes in July.
+
+The better version identifies the metric, direction, baseline, and comparison period.
+
 ---
 
 # 36. Writing Reports and Documents
@@ -1614,6 +2674,45 @@ Avoid:
 - Repetition
 - Emotional language
 - Unnecessary technical jargon
+
+
+## Common Business Document Types
+
+### Status report
+
+Explains current progress, open risks, blockers, and next steps.
+
+### Decision note
+
+Records the options considered, decision taken, reason, owner, and effective date.
+
+### Incident report
+
+Records what happened, impact, timeline, response, confirmed cause, corrective actions, and preventive actions where applicable.
+
+### Procedure/SOP
+
+Explains how to perform a repeatable process safely and consistently.
+
+### Executive summary
+
+Gives senior readers the most important conclusion, impact, and required decision without forcing them to read the entire document first.
+
+## Separate Facts From Interpretation
+
+Fact:
+
+> Error rate increased from 1.2% to 4.8% after the release.
+
+Interpretation:
+
+> The release may have introduced a regression.
+
+Recommendation:
+
+> Roll back the change and compare logs from the two versions.
+
+Labeling these correctly prevents an assumption from being presented as a confirmed fact.
 
 ---
 
@@ -1653,6 +2752,30 @@ Do not give a fake weakness.
 Better:
 
 > Earlier, I sometimes spent too much time trying to perfect technical details. I have improved this by prioritizing business impact and delivery timelines.
+
+
+## Make Interview Examples Verifiable
+
+Strong interview answers use specific actions and outcomes without inventing numbers.
+
+If you know the result:
+
+> I automated the validation step, which reduced manual review time by approximately 30%.
+
+If you do not know the exact number:
+
+> I automated the validation step, which reduced the amount of manual review required by the operations team.
+
+Do not create impressive metrics that you cannot explain.
+
+### STAR in plain language
+
+- **Situation:** What was happening?
+- **Task:** What were you responsible for?
+- **Action:** What did you personally do?
+- **Result:** What changed because of the action?
+
+Spend most of the answer on **Action** and **Result**. This helps the interviewer understand your contribution rather than only the project background.
 
 ---
 
@@ -1695,6 +2818,31 @@ Use:
 or
 
 > Please get back to me.
+
+
+## Avoid Cultural Stereotypes
+
+Cross-cultural communication means adapting to different communication preferences, not assuming that every person from a country behaves in the same way.
+
+Useful habits:
+
+- Confirm deadlines with a date, time, and time zone when teams are distributed.
+- Avoid slang, local jokes, and unexplained abbreviations.
+- Summarize important decisions in writing after calls.
+- Give people space to ask clarifying questions.
+- Check whether a phrase that is normal in your region is understood globally.
+
+### Time-zone example
+
+Ambiguous:
+
+> Let's meet tomorrow at 10.
+
+Clear:
+
+> Let's meet on 15 August at 10:00 AM IST (4:30 AM UTC).
+
+For recurring global work, use the organization's preferred time-zone convention.
 
 ---
 
@@ -1746,6 +2894,24 @@ Meaning: Easy improvements.
 
 Do not overuse corporate jargon.
 
+
+## Idioms Are Optional, Not Required
+
+Idioms can make speech sound natural inside a team that knows them, but they can also confuse people who use English as an additional language.
+
+Plain alternative examples:
+
+| Idiom | Plain alternative |
+|---|---|
+| touch base | have a short discussion |
+| circle back | return to this topic |
+| take this offline | discuss this separately |
+| deep dive | analyze in detail |
+| low-hanging fruit | easiest improvements |
+| move the needle | create meaningful progress |
+
+When accuracy matters—such as policies, technical instructions, audit evidence, or incident communication—prefer literal language over idioms.
+
 ---
 
 # 40. Common Mistakes and Better Alternatives
@@ -1772,6 +2938,23 @@ Do not overuse corporate jargon.
 | Informations | Information |
 | Advices | Advice |
 | Feedbacks | Feedback |
+
+
+## Why These Corrections Matter
+
+Many common workplace mistakes come from translating directly from another language or from regional office usage.
+
+A few important patterns:
+
+- `information`, `advice`, and `feedback` are normally uncountable in standard English when used in their general sense.
+- After `did/didn't`, use the base verb: `didn't receive`, not `didn't received`.
+- Use `since` for a starting point and `for` for a duration.
+- `discuss` takes a direct object: `discuss the issue`.
+- In global business English, `revert` usually means **return to a previous state**, not simply **reply**. Use `reply`, `respond`, or `get back to me` when that is the intended meaning.
+
+### Do not replace every local expression mechanically
+
+Some expressions may be completely normal inside a particular organization or region. The question is whether the intended audience will understand them. For international communication, prefer the clearest globally understood wording.
 
 ---
 
@@ -2032,6 +3215,32 @@ This section gives real workplace scenarios.
 > Regards,  
 > [Name]
 
+
+## How to Use the Templates
+
+Templates are starting points, not messages to copy without thinking.
+
+Before sending a template:
+
+1. Replace every placeholder such as `[Name]` or `[date]`.
+2. Remove fields that do not apply.
+3. Add the business context the recipient needs.
+4. Verify the owner and deadline.
+5. Check attachments and links.
+6. Read the message once for tone.
+
+### Example of adapting a template
+
+Generic:
+
+> Could you please share an update on [topic/request]?
+
+Adapted:
+
+> Could you please share the current status of firewall request FW-1842? The rule is required for tomorrow's production deployment.
+
+The adapted message is more useful because it identifies the exact request and explains why the update matters.
+
 ---
 
 # 43. Daily Practice Exercises
@@ -2095,6 +3304,24 @@ Every day, write one email for one of these scenarios:
 - Thank-you
 - Approval
 - Meeting summary
+
+
+## Self-Review Checklist for Practice
+
+After each exercise, score your answer using these questions:
+
+- Is the purpose obvious?
+- Did I give enough context?
+- Is the required action clear?
+- Did I state a deadline only when needed?
+- Is the tone respectful?
+- Could I remove unnecessary words?
+- Did I use a specific noun instead of vague words such as `thing`, `stuff`, or `same`?
+- If I used a number, date, or status, is it precise?
+
+### Speaking exercise
+
+After writing the answer, speak it aloud once without reading. Then say it again using shorter, simpler sentences. This helps convert written knowledge into usable workplace speech.
 
 ---
 
@@ -2252,6 +3479,32 @@ Goal:
 
 > Communicate confidently with colleagues, clients, and senior management.
 
+
+## Make the 90-Day Roadmap Measurable
+
+At the end of each month, produce one piece of evidence.
+
+### End of Month 1
+
+- Write a clear request email.
+- Write a status update.
+- Correct ten of your recurring grammar mistakes.
+
+### End of Month 2
+
+- Record a three-minute project update without reading a script.
+- Handle five common meeting functions: update, question, clarification, disagreement, and summary.
+- Give one short presentation with clear transitions.
+
+### End of Month 3
+
+- Handle a negotiation or timeline discussion.
+- Write a factual escalation.
+- Give constructive feedback.
+- Explain one complex issue to both a technical and a non-technical audience.
+
+Progress is easier to see when you compare real samples rather than relying only on how confident you feel.
+
 ---
 
 # 46. Corporate English Cheat Sheet
@@ -2296,6 +3549,25 @@ Goal:
 
 > To summarize, we have agreed on the following action items.
 
+
+## Use the Cheat Sheet as Patterns, Not Scripts
+
+Replace the placeholders and adjust tone to the situation.
+
+For example:
+
+Pattern:
+
+> The activity is currently in progress and is expected to be completed by [time].
+
+Specific version:
+
+> Regression testing is currently in progress and is expected to be completed by 4:00 PM today.
+
+If the completion time is uncertain, do not present it as a promise:
+
+> Regression testing is in progress. The current target is 4:00 PM, and we will confirm the ETA after the remaining critical test cases are completed.
+
 ---
 
 # 47. Self-Evaluation Checklist
@@ -2318,6 +3590,21 @@ Rate yourself from 1 to 5.
 | Leadership communication | /5 |
 
 Review your score every month.
+
+
+## Rating Guide
+
+Use the same standard each month so that the score is meaningful.
+
+| Rating | Practical meaning |
+|---|---|
+| 1 | I usually cannot perform this task without help. |
+| 2 | I can perform it with preparation or a template. |
+| 3 | I can usually perform it independently in familiar situations. |
+| 4 | I can perform it clearly and confidently in most work situations. |
+| 5 | I can adapt the skill to difficult, high-stakes, or unfamiliar situations and help others improve. |
+
+For each score, save one example—an email, recording, meeting note, or presentation. Evidence makes self-evaluation more objective.
 
 ---
 
@@ -2402,7 +3689,7 @@ A simple sentence that everyone understands is better than a complicated sentenc
 53. We will take this forward.
 54. We will coordinate with...
 55. We will check internally.
-56. We will revert with details.
+56. We will get back to you with details.
 57. Could we discuss this briefly?
 58. Could we schedule a quick call?
 59. Would you be available at...

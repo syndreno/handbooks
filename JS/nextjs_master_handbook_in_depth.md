@@ -1,8 +1,11 @@
 # Next.js Master Learning Handbook
 
+> **Review note:** This improved edition preserves the original App Router-first structure and examples, while strengthening sections that were mainly code/checklists with beginner mental models, decision rules, production failure modes, and “when not to use it” guidance.
+
+
 > **A beginner-to-production reference for modern Next.js (App Router first)**
 
-> **Current-version note (verified August 2026):** This edition is aligned with the **Next.js 16.3.x** documentation generation. The current installation documentation lists **Node.js 20.9+** as the minimum. Version-sensitive syntax should always be checked against the official docs during upgrades.
+> **Current-version note (verified 14 August 2026):** This edition is aligned with the **Next.js 16.3.x** documentation generation. The current installation documentation lists **Node.js 20.9+** as the minimum. Version-sensitive syntax should always be checked against the official docs during upgrades.
 >
 > Version context: **Next.js 16.3.x generation (August 2026)**. The core ideas in this handbook are intentionally explained from first principles, while version-sensitive features are called out where appropriate.
 
@@ -696,6 +699,13 @@ app/blog/[slug]/page.tsx
 
 # 11. Catch-All and Optional Catch-All Routes
 
+A normal dynamic segment such as `[slug]` captures exactly one path segment. A **catch-all** segment captures one or more remaining segments, while an **optional catch-all** also allows the route with no remaining segment.
+
+Use these routes when the URL depth itself is data, such as documentation paths, nested CMS pages, or category trees. Do **not** choose a catch-all just to avoid designing clear routes; broad routes can make ownership, validation, and debugging harder.
+
+For a route such as `/docs/react/hooks`, `[...slug]` produces segment data conceptually like `['react', 'hooks']`. Validate the resulting segments before using them to query a CMS or filesystem.
+
+
 ## Catch-all
 
 ```text
@@ -710,7 +720,7 @@ Matches:
 /docs/react/hooks/use-state
 ```
 
-The value is an array-like route path.
+The value is an array of captured path segments (`string[]`).
 
 ## Optional catch-all
 
@@ -2179,6 +2189,23 @@ Large applications often use a schema validator.
 
 # 39. Metadata and SEO
 
+Think of metadata as **page description for browsers, search engines, and social platforms**, not as a replacement for good page content. Metadata should be derived from the same authoritative data that renders the page so titles, descriptions, canonical URLs, and structured data do not disagree.
+
+A useful production workflow is:
+
+```text
+load authoritative page data
+        ↓
+render semantic content
+        ↓
+generate matching metadata
+        ↓
+verify canonical/indexing/social behavior
+```
+
+Do not expose secrets or authorization-sensitive values through metadata. Metadata is user-visible/public output.
+
+
 Metadata affects:
 
 - page title
@@ -2841,6 +2868,20 @@ Return only what the consumer needs.
 ---
 
 # 53. Validation
+
+Validation is the boundary between **untrusted input** and application data you are willing to act on. TypeScript types do not validate browser form data, JSON, URL parameters, cookies, headers, or third-party API responses at runtime.
+
+For each boundary, distinguish:
+
+```text
+Parsing        → can this raw value be read?
+Validation     → does it match required rules?
+Normalization  → should it be trimmed/canonicalized?
+Authorization  → may this caller perform the operation?
+```
+
+Keep those concerns explicit. A schema can validate shape, but it does not prove the caller owns a record or is allowed to change it.
+
 
 Use runtime validation at external boundaries.
 
@@ -3714,6 +3755,11 @@ The server should load authoritative pricing itself.
 
 # 71. Dashboard Scenario
 
+A dashboard is a useful Next.js architecture exercise because it mixes **private server data, shareable URL state, interactive controls, slow independent widgets, and often large tables**. The key is not to turn the entire dashboard into one Client Component.
+
+Start server-first, then add client boundaries only where browser interaction is required. Give slow independent cards separate Suspense boundaries so one report does not delay unrelated content. Treat filters that users may bookmark or share as URL state rather than hidden component state.
+
+
 Dashboard route:
 
 ```text
@@ -3759,6 +3805,11 @@ Use:
 ---
 
 # 72. Blog/CMS Scenario
+
+A blog/CMS is usually read-heavy and write-light, which makes freshness and invalidation more important than client-side state. Decide explicitly whether each content type may be stale for seconds/minutes or must update immediately after publishing.
+
+Do not invalidate “everything” after every edit when a smaller path/tag boundary is sufficient. Conversely, do not cache preview/draft or permission-sensitive content as if it were public published content.
+
 
 Routes:
 
@@ -3901,6 +3952,18 @@ Never trust the filename alone to decide file type.
 ---
 
 # 75. Real-Time Features
+
+“Real time” is a requirement, not a technology choice. First decide **how fresh the UI actually needs to be**, how many concurrent users exist, whether updates are one-way or bidirectional, and whether missed events must be recoverable.
+
+```text
+Occasional freshness          → polling may be enough
+Server → browser stream       → SSE can fit
+Bidirectional low-latency     → WebSockets may fit
+Durable business processing   → queue/event infrastructure is still needed
+```
+
+A WebSocket connection is not a durable job queue, and a UI notification is not proof that a business transaction completed.
+
 
 Real-time use cases:
 
@@ -4170,6 +4233,11 @@ without searching the entire repository.
 ---
 
 # 81. Reusable Utility Patterns
+
+A reusable utility should encode a **small, stable rule** that is independent of a specific page. If a helper starts needing authentication, database access, route context, and several feature flags, it is probably domain/application logic rather than a generic utility.
+
+Good utilities are easy to test with input → output examples. Prefer feature-local helpers until there is genuine reuse; premature “shared” folders often become dependency dumping grounds.
+
 
 ## `cn` class utility
 
@@ -4628,6 +4696,11 @@ Then document architectural decisions.
 
 # 86. Production Checklist
 
+Use this checklist as a **release gate**, not as a one-time reading exercise. For an important application, attach evidence to high-risk items: test results, performance measurements, security review notes, migration plans, rollback steps, and monitoring dashboards.
+
+A checked box should mean “verified in the production-like environment,” not merely “we intended to do this.” Re-run the checklist after major framework upgrades, authentication changes, infrastructure changes, and new external integrations.
+
+
 ## Architecture
 
 - [ ] App Router boundaries make sense.
@@ -5070,6 +5143,11 @@ As of the August 2026 context used for this handbook, the modern documentation i
 ---
 
 # PART II — IN-DEPTH NEXT.JS ENGINEERING
+
+This part moves from API familiarity to engineering judgment. The goal is to understand **boundaries**: server vs browser, cached vs request-specific, trusted vs untrusted, synchronous request work vs durable background work, and framework concerns vs domain concerns.
+
+When reading these chapters, keep asking: *Who owns this data? Where does this code execute? What can fail? What is cached? What security decision is being made?*
+
 
 The first part taught the framework feature-by-feature. This part explains how those pieces fit together in production. Read it when you want to move from “I know the syntax” to “I understand the architecture.”
 
@@ -5609,6 +5687,11 @@ Optimization is not automatically “prefetch everything.”
 
 # 102. Rendering Vocabulary
 
+Rendering terms are easy to mix up because several can participate in the same page. Separate **where React work happens**, **when HTML is produced**, and **what runs in the browser afterward**. A Server Component is a React component model; SSR/SSG describe rendering timing; hydration attaches browser behavior to client-rendered React boundaries.
+
+Do not use these terms interchangeably when debugging performance or hydration problems.
+
+
 Do not use these terms interchangeably.
 
 ## Server rendering
@@ -6044,6 +6127,21 @@ For a table, a row skeleton usually communicates more than a generic centered sp
 
 # 116. Server Actions as Security Boundaries
 
+A Server Action is convenient to call from your own React UI, but convenience does not make it trusted. Treat every action like an internet-reachable mutation boundary: authenticate the caller, authorize the exact resource/action, validate raw input, enforce business invariants, and return only safe error information.
+
+```text
+form/browser input
+      ↓ untrusted
+Server Action
+      ↓ authenticate + validate + authorize
+application/domain operation
+      ↓
+database / external system
+```
+
+Hidden fields, disabled controls, and TypeScript types are not security controls.
+
+
 Production action example:
 
 ```ts
@@ -6418,6 +6516,11 @@ Use a mature auth library/provider unless you have a strong reason to build sess
 
 # 127. Authentication vs Authorization
 
+These two checks answer different questions and usually happen at different layers. **Authentication** establishes an identity/session. **Authorization** evaluates whether that identity may perform a particular action on a particular resource.
+
+Authorization should be repeated at the protected operation or data boundary, not only in navigation/UI. Hiding an admin link improves UX; it does not stop a crafted request.
+
+
 Authentication:
 
 > Who are you?
@@ -6522,6 +6625,11 @@ For security-sensitive apps, a DAL is one of the highest-value architecture patt
 ---
 
 # 130. DTOs and Minimal Data
+
+A DTO (Data Transfer Object) is an explicit shape crossing a boundary. Its job is not merely “another interface”; it prevents internal database models from accidentally becoming public contracts.
+
+Create DTOs around consumer needs. This reduces leakage risk, payload size, accidental coupling to schema changes, and serialization surprises. Map deliberately rather than spreading an entire ORM row into a response.
+
 
 Database row:
 
@@ -6788,6 +6896,20 @@ unsupported package behavior
 
 # 139. Bundle Analysis
 
+Bundle analysis answers **why browser JavaScript is large**, not just how large it is. Start by identifying which route/chunk pays the cost and whether the dependency really needs to cross a Client Component boundary.
+
+Typical remedies differ:
+
+```text
+Server-capable code in client bundle → move boundary/server-side
+Rare heavy UI                    → dynamic import
+Huge general library             → narrower import/alternative
+Duplicate packages               → dependency/lockfile investigation
+```
+
+Re-measure after each change; bundle size is only one performance signal.
+
+
 Large client bundles may come from:
 
 ```text
@@ -7038,6 +7160,11 @@ SEO architecture must decide which URLs represent canonical content.
 ---
 
 # 147. JSON-LD
+
+JSON-LD is machine-readable structured data embedded in a page. It should **describe content users can actually see**, using the appropriate schema vocabulary. Treat values from a CMS or user-generated content as untrusted when serializing them into HTML/script contexts.
+
+Structured data can improve machine understanding, but it does not guarantee a rich search result and should never contain fabricated ratings, availability, or other claims.
+
 
 Structured data can describe entities such as:
 
@@ -7307,6 +7434,11 @@ Next.js provides integration/UI, not the search engine itself.
 
 # 156. File Upload Architecture
 
+File uploads have two distinct planes: **control** (who may upload, what metadata is expected) and **data transfer** (moving bytes). For large files, sending bytes directly to object storage with a short-lived authorized upload mechanism often scales better than proxying the entire file through the Next.js server.
+
+Store an upload as *pending/untrusted* until server-side checks and any required scanning/processing complete. Design cleanup for abandoned or failed uploads as well.
+
+
 For large files:
 
 ```text
@@ -7337,6 +7469,11 @@ Benefits:
 ---
 
 # 157. File Upload Security
+
+File security is a chain of controls, not one MIME check. Validate authorization and limits **before** issuing upload permission, verify metadata/content server-side afterward, isolate untrusted files, and control how downloads are served.
+
+Do not execute uploaded content, do not trust client-supplied paths, and do not assume a random filename alone makes a private file private.
+
 
 Never validate only the extension.
 
@@ -7383,6 +7520,11 @@ Application permission remains the security boundary.
 ---
 
 # 159. Real-Time Architecture
+
+Once multiple application instances exist, an in-memory connection list or event emitter is local to only one process. Real-time architecture therefore becomes a **coordination and delivery** problem: how events reach the instance holding each connection, what happens on reconnect, and whether the client can recover missed state.
+
+For business-critical events, keep the database/queue as the durable source of truth and treat real-time delivery as a UI update channel.
+
 
 One server:
 
@@ -7566,6 +7708,11 @@ A disabled button cannot solve server race conditions.
 
 # 165. Error Taxonomy
 
+Classifying errors gives you consistent HTTP responses, UI messages, logging severity, and retry behavior. Expected domain failures should not look identical to programmer bugs or infrastructure outages.
+
+A useful error object often carries a stable code for machines plus a safe message for users. Keep sensitive internal details in server logs, not in browser responses.
+
+
 Classify failures.
 
 ```text
@@ -7646,6 +7793,11 @@ Then one identifier can trace the full request path.
 
 # 169. Structured Logging
 
+Structured logs are events with named fields, which makes them searchable and aggregatable without parsing human prose. Use stable event names and correlation/request IDs so one transaction can be followed across Route Handlers, services, jobs, and external calls.
+
+Log enough context to diagnose behavior, but minimize personal/sensitive data. Redaction should be deliberate and tested.
+
+
 Bad:
 
 ```ts
@@ -7718,6 +7870,11 @@ Without this, you may optimize React when the database is actually slow.
 
 # 171. Accessibility for Forms
 
+Accessible forms connect every control to a meaningful label, explain constraints, expose validation errors programmatically, and preserve keyboard/focus behavior. Placeholder text is not a label.
+
+When submission fails, make it possible for keyboard and screen-reader users to discover the error, understand which fields need attention, and correct them without losing entered data.
+
+
 A good field has:
 
 ```text
@@ -7765,6 +7922,11 @@ Use a tested accessible dialog primitive/library unless you have a strong reason
 ---
 
 # 173. Testing Strategy
+
+Choose test level by **risk and boundary**, not by trying to maximize one test count. Pure calculation/permission rules are cheap to unit-test; data/auth integration deserves integration tests; a few critical user journeys deserve browser-level E2E coverage.
+
+A good test suite protects behavior during refactoring. Avoid tests that fail merely because an internal helper was renamed or markup was rearranged without changing user-visible behavior.
+
 
 Practical pyramid:
 
@@ -7897,6 +8059,11 @@ Consistency is more important than arguing that one package manager is universal
 
 # 178. Dependency Selection
 
+A dependency trades implementation effort today for maintenance and supply-chain responsibility later. Evaluate not only popularity but also API stability, release cadence, licensing, runtime placement, transitive dependencies, bundle/server cost, and whether the functionality is security-sensitive.
+
+For small stable behavior, a few lines of well-tested local code can be safer than a large dependency. For complex standards such as authentication/cryptography, prefer mature audited implementations over hand-written substitutes.
+
+
 Before installing a package ask:
 
 ```text
@@ -7984,6 +8151,11 @@ Do not automatically convert every database field through the browser's timezone
 
 # 182. Internationalization Architecture
 
+Internationalization affects more than translated strings: routing, locale negotiation, dates/numbers/currency, pluralization, metadata, content, caching, and sometimes right-to-left layout. Decide where locale comes from and make that decision consistent across server rendering and navigation.
+
+Do not build cache keys that accidentally serve one locale's content to another. Store business values in locale-neutral forms and format them for display at the edge/UI.
+
+
 Separate:
 
 ```text
@@ -8029,6 +8201,11 @@ Also remove old flags once rollout is complete.
 
 # 184. Draft Mode
 
+Draft/preview mode exists so authorized editors can see unpublished content without changing the public caching model for normal visitors. Treat preview enablement as a privileged capability: authenticate/verify the preview request and avoid leaking draft data into shared public caches.
+
+Test both “editor preview” and anonymous public behavior; they intentionally have different freshness and access requirements.
+
+
 CMS preview requirement:
 
 ```text
@@ -8053,6 +8230,11 @@ Protect preview enablement with a secret/token and correct authorization.
 ---
 
 # 185. MDX
+
+MDX mixes Markdown content with React components. It is powerful for trusted developer/editor content, but executable component capability changes the security model compared with rendering plain Markdown.
+
+Do not treat arbitrary untrusted MDX as harmless text. Define which components/content sources are trusted and keep the compilation/rendering path explicit.
+
 
 MDX combines Markdown with component usage.
 
@@ -8080,6 +8262,11 @@ Do not execute arbitrary untrusted user-submitted MDX.
 ---
 
 # 186. Monorepos
+
+A monorepo can improve shared tooling and atomic changes across applications/packages, but it also introduces dependency-boundary, build-cache, versioning, and environment-safety concerns. A shared package should clearly declare whether it is server-only, browser-safe, or framework-agnostic.
+
+Do not create a monorepo merely to share a few types. Choose it when the coordination benefits outweigh repository/tooling complexity.
+
 
 Example:
 
@@ -8209,6 +8396,11 @@ This prevents silent overwriting of another user's changes.
 
 # 191. E-Commerce Cache Design
 
+E-commerce data has mixed freshness requirements. Product descriptions may tolerate caching; inventory, customer-specific prices, carts, and checkout authorization often require tighter/request-specific handling.
+
+Document cache policy per data class. Never let a public cache key omit dimensions that materially change the result, such as tenant, currency, authenticated pricing group, or locale.
+
+
 Classify independently:
 
 ```text
@@ -8227,6 +8419,11 @@ Do not label the entire application “static” or “dynamic.”
 ---
 
 # 192. Dashboard Cache Design
+
+Dashboards often combine public/reference data with highly personalized or permission-sensitive metrics. Cache each source according to ownership and freshness rather than wrapping the entire dashboard in one cache decision.
+
+A useful rule: if two users can legitimately receive different answers for the same nominal URL, verify that every cache layer understands the identity/tenant dimension—or keep that data request-scoped.
+
 
 Dashboard may contain:
 
@@ -8406,6 +8603,11 @@ Do not send millions of raw rows to the browser just so it can calculate monthly
 ---
 
 # 199. Export Architecture
+
+Exports can become expensive because they combine large reads, formatting, memory/CPU work, and file delivery. Small exports may fit one request; large or slow exports are better modeled as a job with progress/status and object-storage output.
+
+Do not bypass normal row-level authorization just because the output is a CSV/XLSX. Apply the same tenant/permission filters as the interactive screen.
+
 
 Small export:
 
@@ -8705,6 +8907,11 @@ This enables safer rollouts and rollbacks.
 
 # 211. Rollback Planning
 
+A deploy is only safely reversible when **application code, database schema, cache format, jobs, and external contracts** remain compatible with the rollback path. Plan rollback before release, not after an incident starts.
+
+Prefer backward-compatible database migrations and staged changes when possible. Verify that old application instances can coexist with the new schema during rollout.
+
+
 Before deployment ask:
 
 ```text
@@ -8764,6 +8971,19 @@ Without a budget, performance tends to degrade gradually.
 ---
 
 # 214. Performance Investigation
+
+Performance work should follow evidence:
+
+```text
+observe user symptom
+→ reproduce/measure
+→ identify server, network, render, or interaction bottleneck
+→ change one cause
+→ re-measure
+```
+
+Do not start by adding caching, memoization, or dynamic imports everywhere. Those tools can add complexity while leaving the real database/query/network bottleneck untouched.
+
 
 Do not randomly add caching or memoization.
 
@@ -9049,6 +9269,11 @@ You do not need to move an existing authoritative backend into Next.js just to u
 
 # 225. Next.js With Microservices
 
+Next.js does not remove distributed-systems concerns. When it calls several services, you still need timeouts, authorization propagation, tracing/correlation, partial-failure behavior, contract versioning, and sometimes aggregation through a BFF layer.
+
+Avoid making a page synchronously depend on many services when the user experience cannot tolerate one slow dependency. Parallelize independent calls and design graceful degradation where appropriate.
+
+
 Example:
 
 ```text
@@ -9071,6 +9296,11 @@ Do not duplicate core domain business rules from every microservice inside the B
 ---
 
 # 226. REST Integration
+
+Treat an external REST API as a runtime boundary. Validate/normalize responses you do not control, use explicit timeouts/cancellation, map transport errors to domain/application errors, and keep credentials on the server when they are secret.
+
+Do not scatter raw `fetch` calls with subtly different error handling throughout the UI. A small server-side client/adapter can centralize the contract.
+
 
 Server example:
 
@@ -9261,6 +9491,11 @@ Shared generic primitives stay separate.
 
 # 233. Avoid the `utils.ts` Dumping Ground
 
+A generic `utils.ts` often begins convenient and ends as a high-coupling file containing unrelated dates, auth, formatting, database, and business helpers. Name modules by responsibility (`money.ts`, `invoice-status.ts`, `url.ts`) and keep domain-specific helpers with their feature.
+
+If a “utility” needs many domain objects or infrastructure dependencies, that is a signal it belongs in an application/domain service instead.
+
+
 Bad:
 
 ```text
@@ -9315,6 +9550,11 @@ Framework-independent business logic is easier to test.
 ---
 
 # 235. Avoid Fat Components
+
+A fat component owns too many responsibilities at once: data loading, permission logic, validation, orchestration, formatting, and visual rendering. This makes the component difficult to test and reuse.
+
+Split by responsibility, not by arbitrary line count. Keep UI composition close to the component while extracting stable domain/data operations into server-side feature modules or services.
+
 
 Bad page handles:
 
@@ -9618,6 +9858,11 @@ For large files, direct object-storage upload is often safer than increasing req
 
 # 250. HTTP Methods
 
+HTTP methods communicate **intent and safety/idempotency expectations** to clients, proxies, caches, crawlers, and operators. Use them consistently with the semantics of the endpoint, not only because a browser form happens to make one method convenient.
+
+`GET` should not mutate state. Repeated `PUT`/`DELETE` requests are generally designed to be idempotent at the protocol-semantic level; business implementations still need careful concurrency/idempotency handling.
+
+
 General intent:
 
 ```text
@@ -9664,6 +9909,11 @@ Choose a consistent API convention and document it.
 
 # 252. API Error Contract
 
+An error contract is an API, too. Give clients a stable machine-readable `code`, a safe human-facing message, and only the field-level/context information they are allowed to see. Do not make clients parse arbitrary English strings to decide behavior.
+
+Keep internal stack traces, SQL details, and secret upstream messages out of external responses.
+
+
 Consistent example:
 
 ```json
@@ -9703,6 +9953,11 @@ Using Next.js does not remove API documentation responsibilities.
 ---
 
 # 254. API Authentication Choices
+
+Select authentication based on **who the caller is and where credentials can be safely stored**. Browser sessions, service-to-service credentials, public API tokens, and signed webhooks solve different trust relationships.
+
+Authentication only establishes identity. Every protected API still needs authorization for the specific operation/resource.
+
 
 Possible mechanisms:
 
@@ -9863,6 +10118,11 @@ Follow your database provider's recommended Next.js/serverless setup.
 
 # 261. Cache Stampede
 
+A cache stampede is a concurrency failure around expiry. It matters when recomputation is expensive and many callers can miss at once. Mitigation should match the cache technology and consistency needs; locking everything can itself become a bottleneck.
+
+Also plan behavior when the backing dependency is down: serving bounded stale data may be safer for some read paths than forcing every request to recompute and fail.
+
+
 Popular cache expires.
 
 Then:
@@ -9967,6 +10227,11 @@ redeploy
 ---
 
 # 266. Upgrade Strategy
+
+Before upgrading, capture a working baseline: tests, production build, key performance metrics, and known deprecations. Then upgrade with the official migration guidance/codemods and review framework behaviors that can change semantics—especially routing, caching, request APIs, runtime requirements, and build tooling.
+
+For large systems, prefer incremental rollout with observability and a rollback path over one unverified “big bang” deployment.
+
 
 Major version migration:
 
@@ -10153,6 +10418,11 @@ and update the row blindly.
 
 # 274. Approval Workflow Scenario
 
+Approval workflows are state machines with authorization and audit requirements. The browser may suggest the desired action, but the server must derive the allowed transition from authoritative state and the current user.
+
+Use a transaction when several database changes must succeed together, and consider idempotency/concurrency so duplicate clicks or parallel approvals cannot corrupt the workflow.
+
+
 Client sends:
 
 ```text
@@ -10177,6 +10447,11 @@ This prevents DevTools manipulation of the workflow.
 ---
 
 # 275. Audit Trail Scenario
+
+An audit trail records **who changed what, from which state to which state, when, and under which request/context**. For compliance-sensitive workflows, design audit writes as part of the business transaction rather than an optional UI log.
+
+Audit records should be append-oriented and access-controlled. Decide retention and sensitive-data rules explicitly.
+
 
 For an approval record:
 
@@ -10250,6 +10525,11 @@ This keeps legacy quirks out of UI components.
 ---
 
 # 278. Recommended Feature Architecture
+
+Use this tree as a responsibility map, not a rule that every feature must contain every folder. Start small and introduce a layer when it protects a real boundary—domain rules, permissions, validation, data access, or integration code.
+
+The strongest rule is dependency direction: route/UI code may compose feature capabilities; domain/application rules should not need to know Next.js rendering details.
+
 
 ```text
 src/
@@ -10406,6 +10686,11 @@ The HTTP boundary translates web concerns. Domain logic can live elsewhere.
 
 # 282. Master “Where Does This Code Go?” Decision Tree
 
+Use this decision tree after asking two questions first: **where must the code execute?** and **what trust/data boundary does it cross?** Placement should make security, caching, and dependencies obvious to future maintainers.
+
+When two options both work, prefer the one with the smaller browser bundle and the clearest server-side enforcement of data/business rules.
+
+
 ```text
 Need to display server data?
 → Server Component
@@ -10447,6 +10732,11 @@ Need large private files?
 ---
 
 # 283. Master Performance Decision Tree
+
+Performance symptoms often look similar while having different causes. Separate server latency (TTFB/data), transfer cost, rendering/hydration cost, and interaction responsiveness before choosing an optimization.
+
+Record a baseline measurement so you can prove whether a change helped rather than relying on perceived speed.
+
 
 If page is slow:
 
@@ -10542,6 +10832,11 @@ can it enter browser bundle/log/public file?
 
 # 285. Master Debugging Decision Tree
 
+Debugging is fastest when you identify the failing boundary instead of changing code at random. Reproduce the smallest failing path, inspect server/browser logs and Network data, and compare development vs production behavior when relevant.
+
+For any suspected authorization, cross-tenant data, or secret leak, stop treating the issue as an ordinary UI bug and handle it as a security incident.
+
+
 ## Page does not load
 
 ```text
@@ -10615,6 +10910,11 @@ Do not make the whole app client-rendered as the first fix.
 
 # 287. Common Error: Hydration Failed
 
+A hydration mismatch means the browser's first client render does not agree with the server-rendered HTML React is trying to attach to. Find the **first deterministic difference** rather than suppressing the warning globally.
+
+Common causes include browser-only values during initial render, time/random values, invalid HTML nesting, locale differences, and extensions/scripts mutating markup.
+
+
 Investigate:
 
 ```text
@@ -10633,6 +10933,11 @@ Server and initial client render must agree for hydrated markup.
 
 # 288. Common Error: Too Many DB Connections
 
+This is commonly an architecture/runtime mismatch rather than a “Next.js bug.” Check how your database client/pool is created, how many app instances/functions exist, connection limits, transaction duration, and whether a proxy/pooler is appropriate for the deployment model.
+
+Do not solve exhaustion by blindly raising the database limit; that can move the bottleneck into database memory/CPU.
+
+
 Check:
 
 ```text
@@ -10649,6 +10954,11 @@ Use the database vendor/ORM's recommended Next.js pattern.
 ---
 
 # 289. Common Error: Works Locally, Fails in Docker
+
+Compare environments systematically: Node version, working directory, copied files, environment variables, native dependencies, filesystem case sensitivity, build-time vs runtime variables, network hostnames, and exposed ports.
+
+Build and run the production image in CI before release so container-only failures appear before deployment.
+
 
 Check:
 
@@ -10711,6 +11021,11 @@ In production, avoid leaking sensitive upstream error bodies to users or logs.
 ---
 
 # 292. Abort and Stale Requests
+
+Cancellation is both a resource and correctness concern for client-side requests. When an older search/filter request becomes irrelevant, abort it where supported and ensure stale responses cannot overwrite newer state.
+
+Cancellation does not automatically undo work that already reached the server; mutation endpoints still need correct idempotency/concurrency behavior.
+
 
 Search race:
 
@@ -10993,6 +11308,11 @@ Future developers then understand the reason, not only the code.
 ---
 
 # 305. Production Runbook
+
+A runbook turns tribal knowledge into executable incident procedure. Write commands/locations precisely enough that another engineer can diagnose and recover the service under pressure, including verification after each recovery step.
+
+Review the runbook through drills. A rollback instruction that has never been tested is only a theory.
+
 
 Document:
 

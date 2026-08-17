@@ -276,6 +276,39 @@ Try not to build new applications around:
 
 Legacy systems may contain these patterns. Clean them incrementally rather than rewriting blindly.
 
+## 4.2 Understand support status, not only version numbers
+
+As of August 2026, PHP 8.2, 8.3, 8.4, and 8.5 are supported branches. PHP 8.2 and 8.3 are in security-fixes-only support, while PHP 8.4 and 8.5 are still in active support at this point in time.
+
+For a new project, do not choose a runtime only because it is technically “supported.” Consider:
+
+- how long the branch remains supported;
+- framework and package compatibility;
+- operating-system/container availability;
+- deployment platform certification;
+- upgrade effort.
+
+Check the actual runtime with:
+
+```bash
+php -v
+```
+
+Keep the project requirement explicit in `composer.json`, for example:
+
+```json
+{
+    "require": {
+        "php": ">=8.4 <8.6"
+    }
+}
+```
+
+That constraint is only an example; choose the range your application genuinely tests and supports.
+
+Official lifecycle reference: <https://www.php.net/supported-versions.php>
+
+
 ---
 
 # 5. Formatting and Coding Standards
@@ -1229,6 +1262,38 @@ Weak reason:
 
 Do not create abstractions with no purpose.
 
+## What the interface communicates
+
+This contract:
+
+```php
+public function charge(Money $amount, PaymentToken $token): PaymentResult;
+```
+
+tells the caller:
+
+- **inputs** — a money value and payment token;
+- **output** — a `PaymentResult`;
+- **capability** — charging a payment method;
+- **what it intentionally hides** — HTTP clients, vendor SDKs, credentials, retries, and provider-specific response formats.
+
+An interface is most valuable at a boundary where implementations may change or where the high-level policy should not depend on vendor details.
+
+## Do not create “mirror interfaces” automatically
+
+An interface with exactly one implementation can still be justified, but “one interface per class” creates navigation cost without necessarily reducing coupling.
+
+Prefer:
+
+```text
+important boundary -> interface
+simple internal helper -> concrete class
+value object -> concrete type
+```
+
+Use tests as a design signal, not as a reason to abstract every class. PHP test tools can often instantiate real internal collaborators directly; substitute only the dependencies whose behavior the test genuinely needs to control.
+
+
 ---
 
 # 17. SOLID Principles
@@ -1468,6 +1533,13 @@ Bad thought:
 
 Build extension points when real requirements justify them.
 
+
+Do not build extension points for requirements that do not exist yet.
+
+If the system only sends email today, a simple `EmailNotifier` may be enough. A plugin registry, factory hierarchy, and five unused notifier implementations create maintenance cost before they create value.
+
+YAGNI does **not** mean ignoring known requirements. It means delaying speculative design until there is evidence for it.
+
 ## 18.4 Rule of Three
 
 If logic is duplicated once, observe it.
@@ -1475,6 +1547,17 @@ If logic is duplicated once, observe it.
 If the same concept appears a third time, abstraction may now be justified.
 
 Not a law—just a useful heuristic.
+
+Two similar pieces of code may be coincidence. By the third repetition, the shared concept is often clearer.
+
+Use the rule as a prompt, not a law:
+
+1. duplicate once if the concepts may diverge;
+2. observe what truly stays the same;
+3. extract the shared business rule when its boundary is understood.
+
+A wrong abstraction can be more expensive than a small amount of duplication.
+
 
 ---
 
@@ -1512,6 +1595,34 @@ PasswordHasher
 TaxCalculator
 ImageResizer
 ```
+
+## Recognizing coupling
+
+Coupling is not only “class A imports class B.” It also appears as:
+
+- knowledge of another module's database schema;
+- shared mutable globals;
+- duplicated status strings;
+- callers depending on internal array keys;
+- one change requiring edits across unrelated files;
+- domain code depending directly on framework request/response objects.
+
+Some coupling is necessary. The goal is to make **important coupling explicit and stable**.
+
+## Recognizing cohesion
+
+A cohesive class has data and behavior that change for related reasons.
+
+Ask:
+
+```text
+If one requirement changes, do most members of this class care?
+```
+
+If a class changes because of password policy, tax rules, image processing, email templates, and database migrations, it probably combines unrelated responsibilities.
+
+High cohesion and controlled coupling make refactoring safer because fewer concepts need to be understood at the same time.
+
 
 ---
 
@@ -1680,6 +1791,39 @@ $country = $customer->address()?->country();
 ```
 
 But if the business requires an address, silently accepting null may hide a broken invariant.
+
+## 22.4 `find...` and `get...` can communicate different contracts
+
+A useful team convention is:
+
+```php
+public function findById(int $id): ?User;
+public function getById(int $id): User;
+```
+
+`findById()` treats absence as a normal result. `getById()` promises a user or throws a meaningful exception.
+
+The exact naming convention is a team decision, but the behavior should be consistent.
+
+## 22.5 Do not use null for several unrelated states
+
+Avoid one nullable value meaning all of these:
+
+```text
+not found
+not loaded yet
+not authorized
+validation failed
+database failed
+field intentionally empty
+```
+
+These states have different business meaning. Use exceptions, result objects, enums, separate fields, or dedicated value objects when the distinction matters.
+
+## 22.6 Nullable input and optional input are not always the same
+
+In update APIs, “the field was omitted” can mean “leave it unchanged,” while `null` can mean “clear it.” Preserve that distinction at the boundary when the business operation needs it.
+
 
 ---
 
@@ -1876,6 +2020,37 @@ if ($_GET['secret'] === '12345') {
 ```
 
 Use proper authentication and authorization.
+
+## Validation, sanitization, and encoding are different
+
+These terms are often confused.
+
+**Validation** asks whether input is acceptable for the business rule.
+
+```text
+quantity must be an integer from 1 to 100
+```
+
+**Normalization** converts equivalent acceptable input into one consistent form.
+
+```text
+trim surrounding whitespace from an email address
+```
+
+**Output encoding/escaping** makes data safe for a specific output context such as HTML.
+
+Do not “sanitize everything” with one generic function. HTML, SQL, URLs, shell commands, JSON, and file paths have different safety rules.
+
+## Security checks belong near protected operations
+
+Authentication identifies the caller. Authorization decides whether that caller may perform a specific action.
+
+A UI hiding a Delete button is not authorization. The server-side operation must enforce permission before the protected state change.
+
+## Fail safely
+
+Security-related errors should be useful to operators without exposing secrets, SQL text, tokens, password hashes, stack traces, or internal paths to untrusted clients.
+
 
 ---
 
@@ -2338,6 +2513,30 @@ Use dependency checks in CI.
 }
 ```
 
+## What the commands return
+
+These tools are most useful when their exit status can gate CI.
+
+```text
+exit code 0     -> check succeeded
+non-zero        -> violations, test failures, audit findings, or tool failure
+```
+
+The exact output depends on configuration and tool version.
+
+### PHPStan adoption
+
+Start at a level the codebase can pass, then increase strictness deliberately. PHPStan currently defines levels `0` through `10`, with higher levels adding stricter checks. A baseline can help introduce analysis to legacy code, but do not use a baseline as a permanent hiding place for new problems.
+
+### PHP CS Fixer check mode
+
+`php-cs-fixer check` is a non-modifying check equivalent to a dry-run of the fixer. Use the check command in CI and the fixing command during development when automatic changes are desired.
+
+### `composer audit`
+
+`composer audit` checks installed/locked dependencies against Composer's configured security-advisory sources. Treat an audit finding as something to investigate; remediation may require upgrading, replacing, constraining, or temporarily documenting a dependency risk.
+
+
 ---
 
 # 34. Refactoring
@@ -2532,6 +2731,17 @@ when dependencies and responsibilities become hidden.
 
 Avoid functions that unexpectedly modify input arrays by reference.
 
+
+A function is difficult to reason about when its name suggests a calculation but it silently changes external state.
+
+Bad shape:
+
+```php
+$total = $invoice->calculateTotal(); // also saves to DB
+```
+
+Separate calculation from persistence unless mutation is a clear, documented part of the operation.
+
 ## 36.4 Error suppression
 
 Avoid:
@@ -2541,6 +2751,11 @@ Avoid:
 ```
 
 Handle failure explicitly.
+
+
+The `@` operator suppresses diagnostics from an expression and can hide failures that should be handled.
+
+Prefer an API that exposes failure explicitly, then check or catch that failure according to the contract. If suppression is unavoidable around a legacy/third-party edge, isolate it and immediately inspect the operation result rather than allowing silent failure to spread.
 
 ## 36.5 Mixing HTML, SQL, and business logic
 
@@ -2571,6 +2786,11 @@ Catching broad failures at top-level boundaries is reasonable.
 
 Catching `Throwable` deep in every method often hides programming errors.
 
+
+`Throwable` includes both `Exception` and `Error`. Catching it at every layer can accidentally convert programming/runtime errors into misleading business failures.
+
+Catch the narrowest failures you can actually handle. A top-level process or HTTP boundary may catch `Throwable` to log and produce a safe final response, but it should not pretend every failure is recoverable.
+
 ## 36.7 Returning magic arrays
 
 Avoid:
@@ -2588,6 +2808,11 @@ Prefer stable DTOs or response objects.
 ## 36.8 Massive base classes
 
 Avoid one `BaseController` containing 80 helpers used by unrelated modules.
+
+A large base class creates hidden coupling because subclasses inherit behavior and state they may not need.
+
+Prefer small composition-friendly collaborators. Use inheritance when subclasses truly satisfy the parent contract and the shared lifecycle is stable, not merely to reuse a few helper methods.
+
 
 ---
 
@@ -2947,6 +3172,21 @@ Avoid jobs that assume:
 
 > “This will run exactly once.”
 
+
+A retry can repeat side effects. Before enabling retries, decide whether the job is idempotent.
+
+Risky operations include:
+
+```text
+charge card
+send email
+create external ticket
+increment balance
+publish message
+```
+
+Use idempotency keys, unique constraints, processed-message records, or transaction/outbox patterns where appropriate. Also distinguish transient failures worth retrying from permanent validation failures that will fail forever.
+
 ## 41.3 Locking
 
 When two workers can modify the same state, consider:
@@ -3013,6 +3253,19 @@ Prefer explicit domain methods and normalized timezone handling.
 Do not assume all IDs are safe as integers forever.
 
 For cross-system identifiers, UUIDs, invoice numbers, SGIDs, employee codes, etc., use types that match the real domain.
+
+An identifier is not automatically “just an integer.”
+
+Important IDs may require:
+
+- validation of format/range;
+- tenant or ownership checks;
+- prevention of accidental mixing between entity types;
+- safe serialization;
+- avoidance of exposing predictable internal IDs when that creates a security/privacy problem.
+
+Value objects can help when identifier rules are important enough to deserve a type.
+
 
 ---
 
@@ -4923,6 +5176,21 @@ Use official documentation as the source of truth for version-sensitive behavior
 
 - PHP_CodeSniffer: <https://github.com/PHPCSStandards/PHP_CodeSniffer>
 - PHP CS Fixer: <https://github.com/PHP-CS-Fixer/PHP-CS-Fixer>
+
+## How to use references while learning
+
+Documentation should be checked whenever behavior is version-sensitive.
+
+A practical lookup order is:
+
+1. PHP manual / language migration guide for language behavior.
+2. PHP supported-versions page for lifecycle decisions.
+3. PHP-FIG for interoperability/style standards.
+4. Composer documentation for dependency/autoload behavior.
+5. The exact tool's documentation for CLI options and configuration.
+
+Blog posts and tutorials are useful for explanation, but the official project documentation should win when command syntax, support status, or version behavior differs.
+
 
 ---
 

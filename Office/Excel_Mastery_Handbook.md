@@ -54,6 +54,23 @@
 45. [Function Cheat Sheet](#45-function-cheat-sheet)
 46. [Final Mastery Checklist](#46-final-mastery-checklist)
 
+
+### Additional Advanced Chapters
+
+47. [Financial Functions](#47-financial-functions)
+48. [Statistical and Analytical Functions](#48-statistical-and-analytical-functions)
+49. [Reference, Information, and Utility Functions](#49-reference-information-and-utility-functions)
+50. [Printing, Page Layout, and Report Delivery](#50-printing-page-layout-and-report-delivery)
+51. [View, Navigation, Grouping, and Large-Sheet Productivity](#51-view-navigation-grouping-and-large-sheet-productivity)
+52. [Notes, Comments, Links, and Documentation](#52-notes-comments-links-and-documentation)
+53. [Sparklines, Icons, and In-Cell Visualization](#53-sparklines-icons-and-in-cell-visualization)
+54. [Advanced Workbook Architecture](#54-advanced-workbook-architecture)
+55. [Formula Design Patterns Worth Memorizing](#55-formula-design-patterns-worth-memorizing)
+56. [Auditing and Control Framework for Business Excel](#56-auditing-and-control-framework-for-business-excel)
+57. [Expert-Level Questions to Ask Before Building](#57-expert-level-questions-to-ask-before-building)
+
+The final practice sections and mastery map are intentionally kept outside the numbered chapter sequence.
+
 ---
 
 # 1. How to Use This Handbook
@@ -293,6 +310,48 @@ Conceptually:
 ```
 
 External links should be used carefully because moved or renamed files can break them.
+
+## How Excel Reads a Reference
+
+A reference tells Excel **where to get a value from**. The reference itself is not the value.
+
+If `B2` contains `500`, then:
+
+```excel
+=B2
+```
+
+returns:
+
+```text
+500
+```
+
+This distinction matters because formulas usually work with **references to cells**, not copied values.
+
+### Reference operators
+
+| Pattern | Meaning | Example |
+|---|---|---|
+| `:` | Continuous range | `A2:A20` |
+| `,` | Separate references supplied to a function | `SUM(A1:A5,C1:C5)` |
+| `!` | Separates sheet name from cell/range | `Sales!B2` |
+| `#` | Refers to an entire spilled dynamic-array result | `G2#` |
+
+### Entire-column references: useful but not always ideal
+
+A formula such as:
+
+```excel
+=COUNTIF(A:A,"Open")
+```
+
+is convenient and usually fine in small workbooks. In large calculation-heavy models, thousands of formulas that repeatedly scan entire columns can increase recalculation work. Prefer Excel Tables or realistically bounded ranges when performance matters.
+
+### Common beginner mistake: selecting only one column before sorting
+
+A reference can point to one column, but a **record** usually spans several columns. If you sort only the Amount column while Customer and Invoice columns are not included, records can become misaligned. When working with datasets, select the whole table or let Excel detect the current region.
+
 
 ---
 
@@ -626,6 +685,84 @@ TRUE
 FALSE
 ```
 
+## Formula Anatomy
+
+A formula can contain:
+
+```text
+= function(arguments) operator reference
+```
+
+Example:
+
+```excel
+=ROUND(B2*C2,2)
+```
+
+Breakdown:
+
+| Part | Meaning |
+|---|---|
+| `=` | Tells Excel this is a formula |
+| `ROUND` | Function being called |
+| `B2*C2` | First argument: calculation to round |
+| `2` | Second argument: number of decimal places |
+| Result | One calculated value returned to the cell |
+
+A function's **inputs** are called arguments. The value produced by the formula is its **result** or return value.
+
+## Text, Numbers, and Quotes
+
+Text constants inside formulas normally need double quotes:
+
+```excel
+=IF(A2="Approved","Release","Hold")
+```
+
+Numbers normally do not:
+
+```excel
+=IF(B2>100000,"High","Normal")
+```
+
+A common mistake is writing:
+
+```excel
+=IF(A2=Approved,Release,Hold)
+```
+
+Excel may interpret those words as names instead of text.
+
+## Formula vs Displayed Value
+
+Formatting does not normally change the underlying number.
+
+If a cell stores:
+
+```text
+0.185
+```
+
+and is formatted as a percentage with one decimal place, it may display:
+
+```text
+18.5%
+```
+
+Formulas still calculate using the underlying value.
+
+## When a Formula Should Not Be Used
+
+Do not create a formula merely because Excel can. Prefer:
+
+- Power Query for repeatable data transformation,
+- PivotTables for flexible aggregation,
+- database logic for large multi-user transactional systems,
+- a helper column when one huge nested formula becomes difficult to audit.
+
+The best Excel solution is the one that remains understandable and maintainable.
+
+
 ---
 
 # 9. Cell References: Relative, Absolute, and Mixed
@@ -902,6 +1039,55 @@ Returns the second-smallest value.
 
 Ranks from largest to smallest.
 
+## How to Read the Main Aggregation Functions
+
+| Function | Typical syntax | Main inputs | Returns | Use when |
+|---|---|---|---|---|
+| `SUM` | `SUM(number1,[number2],...)` | Numbers or ranges | Total | You need an unconditional total |
+| `AVERAGE` | `AVERAGE(number1,[number2],...)` | Numeric values | Arithmetic mean | You need a typical average |
+| `COUNT` | `COUNT(value1,...)` | Values/ranges | Count of numeric cells | Only numeric entries should count |
+| `COUNTA` | `COUNTA(value1,...)` | Values/ranges | Count of non-empty cells | Text and numbers should count |
+| `COUNTBLANK` | `COUNTBLANK(range)` | Range | Number of blank cells | You are checking missing entries |
+| `SUMIF` | `SUMIF(range,criteria,[sum_range])` | Criteria range, condition, optional sum range | Conditional total | One condition is enough |
+| `SUMIFS` | `SUMIFS(sum_range,criteria_range1,criteria1,...)` | Sum range plus pairs of criteria ranges and criteria | Conditional total | Multiple conditions must all be met |
+| `COUNTIF` | `COUNTIF(range,criteria)` | Range and condition | Matching count | You need one-condition counting |
+| `COUNTIFS` | `COUNTIFS(criteria_range1,criteria1,...)` | Criteria pairs | Matching count | Multiple conditions must all be met |
+
+### Criteria examples
+
+```excel
+=SUMIFS(D:D,B:B,"Mumbai",C:C,">="&DATE(2026,1,1))
+```
+
+The date condition is built by joining the comparison operator to a real Excel date value.
+
+### Common mistake: mismatched `SUMIFS` ranges
+
+In `SUMIFS`, the sum range and every criteria range should cover corresponding rows.
+
+Risky:
+
+```excel
+=SUMIFS(D2:D100,B2:B90,"Mumbai")
+```
+
+Better:
+
+```excel
+=SUMIFS(D2:D100,B2:B100,"Mumbai")
+```
+
+### `ROUND`, `ROUNDUP`, and `ROUNDDOWN`
+
+```excel
+=ROUND(number,num_digits)
+=ROUNDUP(number,num_digits)
+=ROUNDDOWN(number,num_digits)
+```
+
+They return numbers, not formatted text. Use them when the **stored result** must be rounded. If you only want fewer decimals on screen, change the number format instead.
+
+
 ---
 
 # 11. Logical Functions
@@ -998,6 +1184,34 @@ Useful when comparing one value against several known options.
 "UK","United Kingdom",
 "Unknown")
 ```
+
+## Inputs and Return Values
+
+| Function | Inputs | Returns |
+|---|---|---|
+| `IF(test, true_result, false_result)` | One logical test and two possible results | One of the two results |
+| `AND(test1,...)` | Multiple tests | `TRUE` only when all are true |
+| `OR(test1,...)` | Multiple tests | `TRUE` when at least one is true |
+| `NOT(test)` | One logical test | Reversed Boolean value |
+| `IFS(test1,result1,...)` | Ordered condition/result pairs | Result belonging to first true condition |
+| `SWITCH(expression,value1,result1,...,[default])` | One expression and comparison/result pairs | Matching result or optional default |
+
+### Order matters in `IFS`
+
+Excel evaluates conditions from top to bottom. Put more restrictive/highest-threshold conditions first.
+
+Correct grading pattern:
+
+```excel
+=IFS(B2>=90,"A",B2>=75,"B",B2>=60,"C",TRUE,"D")
+```
+
+If `B2>=60` came first, a score of 95 would match that earlier condition and never reach the `"A"` rule.
+
+### When not to nest more logic
+
+If the business rule contains many mappings such as 30 status codes or tax slabs, a lookup table is often easier to maintain than a very long `IF`/`SWITCH` formula.
+
 
 ---
 
@@ -1193,6 +1407,41 @@ Converts numeric text to number.
 
 Very useful for delimited values.
 
+## Function Inputs, Outputs, and Differences
+
+| Function | Key inputs | Returns | Important distinction |
+|---|---|---|---|
+| `LEFT(text,[num_chars])` | Text and optional character count | Leftmost text | Position-based |
+| `RIGHT(text,[num_chars])` | Text and optional character count | Rightmost text | Position-based |
+| `MID(text,start_num,num_chars)` | Text, starting position, length | Middle portion | Position-based |
+| `FIND(find_text,within_text,[start_num])` | Search text and source text | Character position | Case-sensitive |
+| `SEARCH(find_text,within_text,[start_num])` | Search text and source text | Character position | Case-insensitive; supports wildcards |
+| `SUBSTITUTE(text,old_text,new_text,[instance_num])` | Text values | Modified text | Replaces matching text |
+| `REPLACE(old_text,start_num,num_chars,new_text)` | Text and positions | Modified text | Replaces by character position |
+| `TEXT(value,format_text)` | Number/date plus format pattern | **Text** | Good for display strings; result is no longer numeric |
+| `VALUE(text)` | Numeric text | Number | Useful when imported numbers are stored as text |
+
+### `TEXT` warning
+
+This formula:
+
+```excel
+=TEXT(A2,"dd-mmm-yyyy")
+```
+
+returns text such as `14-Aug-2026`. If later calculations require a real date, keep the source as a date and use cell formatting instead.
+
+### Cleaning imported text
+
+A common baseline is:
+
+```excel
+=TRIM(CLEAN(A2))
+```
+
+But `TRIM` is not a complete data-standardization solution. Non-breaking spaces, inconsistent punctuation, alternate spellings, and vendor aliases may require `SUBSTITUTE`, Power Query, or a maintained mapping table.
+
+
 ---
 
 # 13. Date and Time Functions
@@ -1335,6 +1584,55 @@ For business-day payment logic:
 =WORKDAY(A2,30,Holidays)
 ```
 
+## Dates Are Numbers, Times Are Fractions of a Day
+
+In the default date system used by modern Excel workbooks, valid dates are stored as serial numbers and times are stored as fractions of a day. That is why subtraction works:
+
+```excel
+=B2-A2
+```
+
+If `A2` and `B2` are dates, the result is a number of days.
+
+## Main Date-Function Inputs and Outputs
+
+| Function | Typical syntax | Returns |
+|---|---|---|
+| `TODAY()` | No arguments | Current date |
+| `NOW()` | No arguments | Current date and time |
+| `DATE(year,month,day)` | Numeric year/month/day | Valid Excel date |
+| `EDATE(start_date,months)` | Date and month offset | Date shifted by months |
+| `EOMONTH(start_date,months)` | Date and month offset | Last day of target month |
+| `DAYS(end_date,start_date)` | Two dates | Difference in days |
+| `NETWORKDAYS(start_date,end_date,[holidays])` | Date range and optional holidays | Count of working days |
+| `WORKDAY(start_date,days,[holidays])` | Start date, working-day offset, optional holidays | Future/past working date |
+
+### Calendar days vs working days
+
+Use:
+
+```excel
+=A2+30
+```
+
+when the rule literally means 30 calendar days.
+
+Use:
+
+```excel
+=WORKDAY(A2,30,Holidays)
+```
+
+when weekends and optional holidays should be excluded.
+
+### Common mistakes
+
+- Typing ambiguous date text such as `01/02/26` without knowing the locale.
+- Comparing a date-time value to a date while forgetting the time portion.
+- Using `TEXT` to turn dates into text and then expecting normal date arithmetic.
+- Assuming `DATEDIF(...,"Y")` plus separate month/day calculations automatically forms a precise age breakdown without checking the boundary logic.
+
+
 ---
 
 # 14. Lookup and Reference Functions
@@ -1445,6 +1743,51 @@ Possible modern approach:
 
 Always understand whether you need exact or approximate matching.
 
+## XLOOKUP Syntax Explained
+
+```excel
+=XLOOKUP(lookup_value,lookup_array,return_array,[if_not_found],[match_mode],[search_mode])
+```
+
+| Argument | Purpose |
+|---|---|
+| `lookup_value` | Value you are trying to find |
+| `lookup_array` | One row/column containing possible matches |
+| `return_array` | Row/column from which Excel returns the result |
+| `if_not_found` | Optional fallback instead of `#N/A` |
+| `match_mode` | Optional exact/approximate/wildcard behavior |
+| `search_mode` | Optional search direction/method |
+
+For ordinary master-data lookups, exact matching is usually safest.
+
+### Why approximate lookup needs care
+
+Approximate matching is powerful for slabs, brackets, and thresholds, but the data must be designed for that purpose. Do not use approximate matching simply to hide bad master data.
+
+### `INDEX` + `MATCH` mental model
+
+```excel
+=INDEX(return_range,MATCH(lookup_value,lookup_range,0))
+```
+
+1. `MATCH` returns the position of the item.
+2. `INDEX` returns the value at that position.
+
+This decomposition makes the formula easier to debug.
+
+### Duplicate keys
+
+A normal lookup returns one match. If the lookup key is not unique, that may hide a data-quality problem. For one-to-many results, consider `FILTER`:
+
+```excel
+=FILTER(Orders,Orders[CustomerID]=A2,"No orders")
+```
+
+### When not to use a cell-by-cell lookup
+
+For hundreds of thousands of rows or repeatable merges between large datasets, Power Query, the Data Model, SQL, or another data-processing tool may be more maintainable and performant.
+
+
 ---
 
 # 15. Dynamic Array Functions
@@ -1552,6 +1895,52 @@ You can reference all spilled values using:
 ```excel
 =G2#
 ```
+
+## What "Spill" Means
+
+A dynamic-array formula is entered once but may return many cells. The top-left cell owns the formula; the surrounding cells are the **spill range**.
+
+If something blocks the required output area, Excel can return:
+
+```text
+#SPILL!
+```
+
+Common causes include existing values, merged cells, or a formula placed where the required spill area is unavailable.
+
+## Key Inputs and Outputs
+
+| Function | Main inputs | Output |
+|---|---|---|
+| `FILTER(array,include,[if_empty])` | Source array and Boolean include array | Matching rows/columns |
+| `UNIQUE(array,[by_col],[exactly_once])` | Array plus optional uniqueness behavior | Distinct values |
+| `SORT(array,[sort_index],[sort_order],[by_col])` | Array and sort rules | Sorted array |
+| `SORTBY(array,by_array1,[sort_order1],...)` | Array plus one or more sort arrays | Sorted array |
+| `TAKE(array,rows,[columns])` | Array and requested count | Leading/trailing rows/columns |
+| `DROP(array,rows,[columns])` | Array and count to remove | Remaining rows/columns |
+| `VSTACK(array1,[array2],...)` | Arrays | Vertically combined array |
+| `HSTACK(array1,[array2],...)` | Arrays | Horizontally combined array |
+
+### Boolean include arrays
+
+This formula:
+
+```excel
+=FILTER(A2:D100,(B2:B100="Mumbai")*(D2:D100>10000))
+```
+
+uses multiplication as logical AND because `TRUE/FALSE` values are coerced to `1/0`.
+
+For logical OR, addition is commonly used:
+
+```excel
+=FILTER(A2:D100,(B2:B100="Mumbai")+(B2:B100="Pune"))
+```
+
+### Do not type into the spill area
+
+Edit the formula in the top-left cell. Values typed inside the intended spill output can block future expansion.
+
 
 ---
 
@@ -1800,6 +2189,65 @@ Common codes:
 ```
 
 Codes `101–111` can also ignore manually hidden rows.
+
+## Sorting Safely
+
+A sort changes row order; it should not break the relationship between fields in the same record.
+
+For a sales table:
+
+```text
+Invoice | Customer | Date | Amount
+```
+
+sort the complete dataset, not just the Amount cells.
+
+### Multi-level sort
+
+Example business requirement:
+
+```text
+1. Region ascending
+2. Customer ascending
+3. Amount descending
+```
+
+Use the Sort dialog and add levels in that priority order.
+
+## Filtering
+
+Filtering temporarily hides records that do not meet the selected criteria. It does **not** delete them.
+
+Useful filters include:
+
+- text contains/begins with,
+- number greater than/less than/between,
+- dates by year/month/quarter,
+- multiple selected categories,
+- color or icon filters where applicable.
+
+After copying visible filtered data, verify whether your workflow should copy only visible cells; careless copy/paste operations can affect hidden rows depending on the action.
+
+## Subtotals
+
+The classic Subtotal command works best on a normal sorted range where records for each group are adjacent.
+
+Typical process:
+
+```text
+Sort by Department
+→ Data > Subtotal
+→ At each change in Department
+→ Use SUM
+→ Add subtotal to Amount
+```
+
+For modern analysis, PivotTables are often more flexible because they summarize without inserting subtotal rows into the source data.
+
+### When not to use manual subtotal rows
+
+Do not embed manual totals throughout raw source data. They make filtering, Power Query, PivotTables, and database-style processing harder.
+
 
 ---
 
@@ -2134,6 +2582,68 @@ Sales Data
 
 Names cannot contain normal spaces.
 
+## What a Name Actually Represents
+
+A defined name is an alias that can refer to:
+
+- a cell,
+- a range,
+- a constant,
+- a formula,
+- or a `LAMBDA`.
+
+Example constant:
+
+```text
+Name: TaxRate
+Refers to: =0.18
+```
+
+Then:
+
+```excel
+=B2*TaxRate
+```
+
+## Scope
+
+A name can normally be workbook-scoped or worksheet-scoped.
+
+- **Workbook scope:** available throughout the workbook.
+- **Worksheet scope:** local to one worksheet.
+
+Prefer workbook scope for shared assumptions unless there is a specific reason to keep names local.
+
+## Creating a Name
+
+A reliable workflow:
+
+1. Select the target cell/range.
+2. Use **Formulas → Define Name** or **Name Manager**.
+3. Give the name a meaningful description.
+4. Confirm the `Refers to` expression.
+5. Test it in a formula.
+
+## Dynamic Data: Prefer Tables
+
+Older workbooks often used `OFFSET` or complicated formulas to create expanding named ranges. For ordinary tabular data, an Excel Table is usually simpler:
+
+```excel
+=SUM(Sales[Amount])
+```
+
+The table column expands automatically when new records are added.
+
+## Common Mistakes
+
+- Creating names that look like cell references.
+- Reusing the same name with different worksheet scopes and confusing readers.
+- Leaving obsolete names that point to deleted ranges.
+- Using a name when a structured table reference would be clearer.
+
+Use Name Manager periodically to audit names and broken references.
+
+
 ---
 
 # 24. Advanced Formula Design
@@ -2277,6 +2787,85 @@ Then:
 ```
 
 LAMBDA becomes especially powerful when combined with dynamic arrays and helper functions.
+
+## `LET` Syntax, Inputs, and Return Value
+
+```excel
+=LET(name1,name_value1,[name2,name_value2,...],calculation)
+```
+
+`LET` creates temporary names that exist only inside that formula. The **last argument is the calculation returned by the function**.
+
+Example:
+
+```excel
+=LET(
+    qty,B2,
+    price,C2,
+    gross,qty*price,
+    ROUND(gross,2)
+)
+```
+
+Inputs:
+
+```text
+B2 = quantity
+C2 = unit price
+```
+
+Output:
+
+```text
+Rounded quantity × price
+```
+
+Use `LET` when a complex expression is repeated or when meaningful intermediate names make the formula easier to read. It can also avoid recalculating the same expression repeatedly.
+
+## `LAMBDA` Syntax, Inputs, and Return Value
+
+```excel
+=LAMBDA([parameter1,parameter2,...],calculation)
+```
+
+Parameters are inputs supplied when the function is called. The final calculation is the return value.
+
+Test a LAMBDA directly:
+
+```excel
+=LAMBDA(amount,rate,amount*rate)(1000,0.18)
+```
+
+Result:
+
+```text
+180
+```
+
+Once tested, define it in Name Manager:
+
+```text
+Name: TaxAmount
+Refers to: =LAMBDA(amount,rate,amount*rate)
+```
+
+Then use:
+
+```excel
+=TaxAmount(B2,$F$1)
+```
+
+## Common Errors
+
+- A LAMBDA typed into a cell but not called can return `#CALC!`.
+- Passing the wrong number of arguments can return an error.
+- Recursive LAMBDAs need a valid stopping condition; uncontrolled recursion can fail.
+- Parameter names must follow Excel naming rules.
+
+## When Not to Use LAMBDA
+
+Do not hide simple arithmetic inside dozens of custom functions. Use LAMBDA when reuse and clarity improve. For processes that import files, modify workbook structure, send data elsewhere, or require side effects, Power Query, VBA, Office Scripts, or an external application may be more appropriate.
+
 
 ---
 
@@ -2847,6 +3436,53 @@ Filter → Status = Left
 =IF(AND(Rating>=4,Tenure>=1),"Eligible","Not Eligible")
 ```
 
+## Attendance Percentage
+
+Suppose:
+
+```text
+B2 = Working Days
+C2 = Present Days
+```
+
+Formula:
+
+```excel
+=IFERROR(C2/B2,0)
+```
+
+Format the result as Percentage.
+
+**Input:** present days and working days.  
+**Output:** attendance rate.  
+**Why `IFERROR`:** protects the report when working days is zero or missing, but you should still investigate unexpected zero denominators instead of silently ignoring bad source data.
+
+## Overtime Hours
+
+If a policy counts only hours above 9:
+
+```excel
+=MAX(0,D2-9)
+```
+
+This returns `0` instead of a negative number when total hours are below the threshold.
+
+## Payroll Design Practice
+
+Keep these separate:
+
+```text
+Employee master
+Attendance input
+Pay components
+Statutory/configuration rates
+Calculation sheet
+Payslip/report output
+```
+
+Avoid embedding changing tax, benefit, or payroll rules directly into many formulas. Put controlled assumptions in a clearly documented configuration table and have the workbook reviewed by the responsible payroll/finance team.
+
+
 ---
 
 # 32. Sales and Operations Use Cases
@@ -2909,6 +3545,63 @@ Example:
 =IF(ResolvedDate<=DueDate,"Within SLA","SLA Breach")
 ```
 
+## Target Variance
+
+```excel
+=Actual-Target
+```
+
+Variance percentage:
+
+```excel
+=IFERROR((Actual-Target)/Target,0)
+```
+
+A positive number is not automatically "good" in every KPI. Higher cost, defect, or delay may be unfavorable, so define KPI direction explicitly.
+
+## Weighted Sales Pipeline
+
+If:
+
+```text
+C2 = Opportunity Value
+D2 = Probability
+```
+
+then:
+
+```excel
+=C2*D2
+```
+
+can provide a simple weighted amount.
+
+This is a planning estimate, not guaranteed revenue. Probability should come from a defined sales methodology rather than arbitrary user guesses.
+
+## Conversion Rate
+
+```excel
+=IFERROR(WonDeals/QualifiedDeals,0)
+```
+
+Always state the denominator. "Conversion rate" is ambiguous unless the report says which stages are being compared.
+
+## Operations Dashboard Pattern
+
+Useful measures might include:
+
+```text
+Orders received
+Orders fulfilled
+Backlog
+On-time %
+Average cycle time
+Exceptions older than SLA
+```
+
+Use PivotTables or the Data Model when users need to slice these measures by region, product, owner, or month.
+
+
 ---
 
 # 33. Inventory and Procurement Use Cases
@@ -2962,6 +3655,58 @@ PO Price vs Invoice Price
 ```
 
 Excel can be used to build exception reports where any mismatch is highlighted.
+
+## Reorder Status
+
+A simple rule:
+
+```excel
+=IF(CurrentStock<=ReorderPoint,"REORDER","OK")
+```
+
+Inputs:
+
+- current usable stock,
+- agreed reorder point.
+
+Output:
+
+- a status label.
+
+A real reorder point may also consider lead time, demand variability, safety stock, open purchase orders, and reserved stock.
+
+## Available Stock
+
+```excel
+=OnHand-Reserved
+```
+
+If open inbound quantity should be shown separately, do not automatically add it to physically available stock unless the business definition says so.
+
+## Purchase Price Variance
+
+```excel
+=ActualPrice-StandardPrice
+```
+
+Percentage:
+
+```excel
+=IFERROR((ActualPrice-StandardPrice)/StandardPrice,0)
+```
+
+## Aging Open Purchase Orders
+
+```excel
+=IF(Status="Open",TODAY()-PODate,"")
+```
+
+Use conditional formatting or buckets to highlight old open items.
+
+### Data-model warning
+
+Do not store repeated supplier names, product descriptions, or categories independently in every transaction if a controlled master-data model is available. Use stable IDs and lookups/Power Query/Data Model relationships where appropriate.
+
 
 ---
 
@@ -3263,6 +4008,62 @@ End Sub
 - Avoid hard-coded ranges when possible.
 - Document business rules.
 
+## `Sub` vs `Function`
+
+A `Sub` performs actions and does not directly return a value to the caller.
+
+```vb
+Sub ClearInput()
+    Range("B2:B10").ClearContents
+End Sub
+```
+
+A VBA `Function` can accept parameters and return a value:
+
+```vb
+Function NetAmount(ByVal Gross As Double, ByVal Discount As Double) As Double
+    NetAmount = Gross - Discount
+End Function
+```
+
+Inputs:
+
+```text
+Gross
+Discount
+```
+
+Return value:
+
+```text
+Gross - Discount
+```
+
+Use a worksheet formula when the logic is naturally cell calculation. Use VBA when you need procedural automation such as creating sheets, opening files, looping through workbook objects, or coordinating multiple actions.
+
+### Workbook qualification matters
+
+Risky:
+
+```vb
+Range("A1").Value = "Done"
+```
+
+It acts on the active sheet.
+
+Safer:
+
+```vb
+ThisWorkbook.Worksheets("Sales").Range("A1").Value = "Done"
+```
+
+This makes the target explicit.
+
+### Macro security
+
+Macros can modify files and data. Keep macro-enabled files (`.xlsm`) from trusted sources only, sign/deploy code according to organizational policy, and never tell users to bypass security warnings simply to make a workbook run.
+
+
 ---
 
 # 38. Office Scripts and Modern Automation
@@ -3296,6 +4097,31 @@ Potential scenarios:
 | Large legacy ecosystem | Modern automation ecosystem |
 
 It is useful to know both if you work with enterprise Excel automation.
+
+## `main` Function
+
+An Office Script normally exposes a `main` function:
+
+```typescript
+function main(workbook: ExcelScript.Workbook) {
+    // automation steps
+}
+```
+
+**Input:** the current workbook object supplied by the Office Scripts runtime.  
+**Output:** scripts can optionally return a value, but many automation scripts primarily modify workbook content.
+
+Example with a returned value:
+
+```typescript
+function main(workbook: ExcelScript.Workbook): string {
+    const sheet = workbook.getActiveWorksheet();
+    return sheet.getName();
+}
+```
+
+Use Office Scripts when your environment supports them and the workflow fits web/cloud automation. Use VBA when desktop object-model integration or a legacy VBA ecosystem is required. Neither is automatically "better"; platform, governance, deployment, and maintenance requirements decide.
+
 
 ---
 
@@ -4290,6 +5116,24 @@ Suggested sheets:
 
 Build examples yourself rather than only reading them.
 
+A useful practice workbook should contain both **clean master data** and **imperfect transaction data** so you can practice validation and reconciliation.
+
+Example transaction columns:
+
+| Column | Example | Intended type |
+|---|---|---|
+| InvoiceNo | `INV-10025` | Text |
+| VendorCode | `V0031` | Text |
+| InvoiceDate | `14-Aug-2026` | Date |
+| Department | `IT` | Text/category |
+| Quantity | `5` | Number |
+| UnitPrice | `1250.00` | Number/currency |
+| Status | `Approved` | Controlled text |
+| PaymentDate | blank or date | Date/blank |
+
+Add a separate vendor master with `VendorCode`, `VendorName`, `Category`, and `IsActive`. Then deliberately create a few duplicates, missing codes, text-formatted numbers, and inconsistent names in a copy of the raw data. Use formulas, validation, Power Query, and PivotTables to clean and analyze it without modifying the original raw-data sheet.
+
+
 ---
 
 # Suggested 30-Day Practice Plan
@@ -4361,6 +5205,20 @@ VBA
 Office Scripts
 Final project
 ```
+
+## How to Use the Plan
+
+Spend more time **building** than reading. A useful daily routine is:
+
+```text
+10 min  Review yesterday's concept
+25 min  Rebuild one example without copying
+15 min  Apply it to the practice dataset
+10 min  Write down one mistake and how you fixed it
+```
+
+At the end of each week, rebuild one small report from a blank workbook. If you can explain why each formula, table, query, or chart exists, you are learning the model rather than memorizing clicks.
+
 
 ---
 
@@ -4558,6 +5416,43 @@ Closing Balance
 
 This teaches absolute references, dates, financial functions, and amortization.
 
+## Sign Convention
+
+Financial functions distinguish cash received from cash paid. A common model uses opposite signs for inflows and outflows.
+
+For example:
+
+```excel
+=PMT(10%/12,60,500000)
+```
+
+usually returns a negative payment because the loan principal is treated as money received and periodic payments are money paid.
+
+If you want a positive payment display, you may use:
+
+```excel
+=-PMT(10%/12,60,500000)
+```
+
+or pass the present value as negative, as shown earlier.
+
+## Important Optional Arguments
+
+Many financial functions support optional arguments such as:
+
+- `fv` — desired future value,
+- `type` — whether payments occur at end (`0`) or beginning (`1`) of a period,
+- `guess` — starting estimate for iterative rate functions.
+
+Always match the periodic interest rate to the period count. If `nper` is months, the rate should normally be a monthly rate too.
+
+## `NPV` vs `XNPV`, `IRR` vs `XIRR`
+
+Use periodic functions when cash flows are equally spaced. Use `XNPV`/`XIRR` when real dates are irregular.
+
+Do not choose between them based only on convenience; timing assumptions materially affect financial results.
+
+
 ---
 
 # 48. Statistical and Analytical Functions
@@ -4664,6 +5559,54 @@ z-Test
 ```
 
 These tools are useful for analysts, but you should still understand the statistical concepts behind them.
+
+## Choosing Sample vs Population Functions
+
+Use:
+
+```excel
+=STDEV.S(range)
+=VAR.S(range)
+```
+
+when your data is a sample used to estimate a larger population.
+
+Use:
+
+```excel
+=STDEV.P(range)
+=VAR.P(range)
+```
+
+when the range represents the entire population you intend to describe.
+
+## Percentiles
+
+```excel
+=PERCENTILE.INC(array,k)
+```
+
+`k` is typically between `0` and `1`.
+
+Example:
+
+```excel
+=PERCENTILE.INC(B2:B1000,0.9)
+```
+
+returns the value at the 90th percentile according to the inclusive method.
+
+## Correlation Caution
+
+`CORREL` returns a value between `-1` and `1` describing linear association. It does not tell you:
+
+- whether one variable causes the other,
+- whether the relationship is nonlinear,
+- whether outliers are driving the result,
+- whether the result is statistically meaningful for your decision.
+
+Visualize the data and understand the business process before interpreting the coefficient.
+
 
 ---
 
@@ -4776,6 +5719,37 @@ Can help identify the underlying value type.
 Returns the formula stored in a cell as text.
 
 Useful for auditing and documentation.
+
+## Why Information Functions Matter
+
+These functions are often used to make formulas defensive.
+
+Example:
+
+```excel
+=IF(ISNUMBER(A2),A2*1.18,"Check input")
+```
+
+The formula first checks the input type before calculating.
+
+### Blank vs empty string
+
+A formula that returns:
+
+```excel
+=""
+```
+
+looks blank but is not always equivalent to a truly empty cell. This matters for some counting, filtering, and downstream logic. Test the exact behavior your model requires.
+
+### `FORMULATEXT`
+
+`FORMULATEXT(reference)` returns the formula stored in the referenced cell as text. It is useful for documentation and auditing, but it does not evaluate that text as a formula.
+
+### Volatility and indirect references
+
+Functions such as `INDIRECT` and `OFFSET` can be useful but may make dependencies harder to trace and can contribute to recalculation overhead. Prefer direct references, Tables, `INDEX`, or modern dynamic-array patterns when they solve the same problem more transparently.
+
 
 ---
 
@@ -4985,6 +5959,50 @@ Known limitations
 
 This is especially important when someone else may maintain the workbook later.
 
+## Comments vs Notes
+
+In modern Excel:
+
+- **Comments** are threaded and designed for collaboration/replies.
+- **Notes** are simple cell annotations similar to the older comment behavior.
+
+Use a comment when discussion is expected. Use a note for a short explanation that does not need a conversation.
+
+## Hyperlinks
+
+A hyperlink can point to a web address, file, email target, or a location in the workbook.
+
+For internal navigation, prefer meaningful labels:
+
+```text
+Go to assumptions
+Open source documentation
+View exception report
+```
+
+instead of displaying long raw URLs.
+
+## Documentation Pattern
+
+For important workbooks, document:
+
+```text
+Purpose
+Owner
+Source systems
+Refresh process
+Key assumptions
+Critical formulas
+Named ranges
+Macros/scripts
+Control totals
+Known limitations
+Change history
+```
+
+Good documentation is part of the workbook design, not an afterthought.
+
+
 ---
 
 # 53. Sparklines, Icons, and In-Cell Visualization
@@ -5031,6 +6049,38 @@ Red ↓ = Below target
 ```
 
 Icons should supplement numbers, not replace them.
+
+## Sparklines
+
+A sparkline is a tiny chart stored in a cell. It is useful for showing a trend beside a row without creating a full chart.
+
+Good use:
+
+```text
+Product | Jan | Feb | Mar | Apr | Trend
+A       |  10 |  12 |   9 |  15 | [sparkline]
+```
+
+Use sparklines for compact pattern recognition. Do not rely on them when exact values or detailed axes are required.
+
+## Icon Sets and Data Bars
+
+Conditional-formatting icon sets can classify values visually, while data bars show relative magnitude inside cells.
+
+Always define the rule explicitly. A red/amber/green icon should not depend on arbitrary default thresholds when it represents a business KPI.
+
+### Accessibility
+
+Do not communicate status by color or icon alone. Pair visual indicators with text such as:
+
+```text
+Overdue
+At Risk
+On Track
+```
+
+so the meaning remains understandable for users who cannot distinguish the visual encoding.
+
 
 ---
 
@@ -5194,6 +6244,34 @@ TRUE,"90+"
 ```excel
 =VSTACK(tblJan,tblFeb,tblMar)
 ```
+
+## How to Adapt These Patterns
+
+Treat every formula here as a **pattern**, not a copy-paste rule.
+
+Before reusing one, identify:
+
+1. **Inputs** — which cells, columns, or names the formula expects.
+2. **Business rule** — what condition or transformation it represents.
+3. **Return value** — number, text status, Boolean, or spilled array.
+4. **Failure behavior** — what should happen for blanks, missing lookups, zeros, or errors.
+
+For example, the safe percentage pattern:
+
+```excel
+=IFERROR(A2/B2,0)
+```
+
+returns `0` for *any* error, not only division by zero. In an audited model you may prefer:
+
+```excel
+=IF(B2=0,"",A2/B2)
+```
+
+so unexpected errors are not silently hidden.
+
+Likewise, a lookup fallback should only return `"Not Found"` when that is the intended business outcome; missing master data may need an exception flag instead.
+
 
 ---
 
@@ -5362,3 +6440,19 @@ LEVEL 5 — Excel Developer / Expert
 
 
 **End of Excel Mastery Handbook**
+
+## A Practical Definition of Mastery
+
+You do not need to know every Excel feature. A strong practitioner can:
+
+- choose a clean data structure before writing formulas,
+- explain formula inputs and outputs,
+- recognize when Tables/PivotTables/Power Query are better than manual work,
+- design checks that prove data completeness and reconciliation,
+- debug errors without random trial and error,
+- build reports another person can maintain,
+- automate only after the manual process is understood,
+- recognize when the problem has outgrown Excel.
+
+A useful final exercise is to take one real business process and implement it three ways—formula-based, Power Query/Pivot-based, and automated—then compare maintainability, refresh effort, risk, and scalability.
+

@@ -1,8 +1,10 @@
 # ChatGPT Free vs Go vs Plus — Master Guide to Getting Maximum Value
 
-> **Last verified:** 13 August 2026  
+> **Last verified:** 17 August 2026  
 > **Scope:** Personal ChatGPT plans — Free, Go, and Plus  
 > **Goal:** Help you use each plan efficiently for learning, coding, research, files, projects, handbook creation, productivity, and daily work.
+
+> **Freshness rule:** This guide separates durable workflow advice from volatile product facts. For plan limits, model availability, pricing, or newly launched/retired features, verify the current OpenAI Help Center and the controls shown in your own account.
 
 ---
 
@@ -26,7 +28,7 @@
 16. [ChatGPT Work](#16-chatgpt-work)
 17. [Codex](#17-codex)
 18. [Scheduled Tasks and Monitoring](#18-scheduled-tasks-and-monitoring)
-19. [Agent Mode](#19-agent-mode)
+19. [Legacy Agent Mode and Its Replacements](#19-legacy-agent-mode-and-its-replacements)
 20. [Memory and Personalization](#20-memory-and-personalization)
 21. [Voice and English Practice](#21-voice-and-english-practice)
 22. [Image Generation](#22-image-generation)
@@ -38,6 +40,8 @@
 28. [Which Plan Should You Choose?](#28-which-plan-should-you-choose)
 29. [Known Documentation Differences](#29-known-documentation-differences)
 30. [Official Sources](#30-official-sources)
+31. [Final Cheat Sheet](#31-final-cheat-sheet)
+32. [The Best Overall Strategy](#32-the-best-overall-strategy)
 
 ---
 
@@ -97,13 +101,15 @@ instead of repeatedly asking disconnected questions.
 
 # 2. Current Plan Comparison
 
-OpenAI changes models, limits, and feature availability frequently. This table reflects official documentation verified on **13 August 2026**.
+ChatGPT changes quickly. Model names, quotas, tools, rollout status, and even plan wording can change independently. Treat this section as a **dated snapshot**, not a permanent contract.
+
+The table below reflects official OpenAI documentation checked on **17 August 2026**.
 
 | Capability | Free | Go | Plus |
-|---|---:|---:|---:|
-| Everyday text chats | Unlimited* | Unlimited* | Unlimited* |
-| Default current family | GPT-5.6 Luna | GPT-5.6 Luna | GPT-5.6 Sol on eligible paid experience |
-| Think option | Yes, Luna | Yes, Luna | Advanced Sol reasoning available |
+|---|---|---|---|
+| Everyday chat | Available with lower/dynamic limits | Higher limits than Free | Higher limits than Free/Go |
+| Current default family | GPT-5.6 Luna as rollout reaches the account | GPT-5.6 Luna as rollout reaches the account | Eligible paid experience with GPT-5.5 Instant plus GPT-5.6 Sol reasoning |
+| Think / reasoning shortcut | Luna-based Think as rollout reaches the account | Luna-based Think; separate usage allowance | Medium/High reasoning with GPT-5.6 Sol |
 | GPT-5.6 Sol Medium | No | No | Yes |
 | GPT-5.6 Sol High | No | No | Yes |
 | GPT-5.6 Sol Extra High | No | No | No |
@@ -111,74 +117,93 @@ OpenAI changes models, limits, and feature availability frequently. This table r
 | Web search | Yes | Yes | Yes |
 | Study Mode | Yes | Yes | Yes |
 | File uploads | Limited | Expanded | Expanded/higher |
-| Data analysis | Limited | Expanded | Expanded |
-| Image generation | Limited | Expanded | Expanded |
-| Deep Research | Limited | More/plan-dependent | Expanded |
+| Advanced data analysis | Limited | Expanded | Expanded/higher |
+| Image generation | Limited | Expanded | Expanded/higher |
+| Deep Research | Limited / plan-specific allowance | Available subject to current plan limits | Expanded access |
 | Projects | Yes | Yes | Yes |
-| Maximum project files | 5 | 25 | 25 |
+| Maximum files per Project | 5 | 25 | 25 |
 | Number of Projects | No fixed count limit | No fixed count limit | No fixed count limit |
 | Library storage | 500 MB | 4 GB | 20 GB |
-| Memory/context | Limited | Longer | Expanded |
-| Codex | Limited | Included with plan limits | Expanded |
-| ChatGPT Work | Limited | Limited | Expanded on desktop/web/mobile |
-| Scheduled Tasks | Not listed on Free pricing | Account/rollout dependent | Yes |
-| Agent Mode | Not standard Free benefit | Not standard Go benefit | Included; separate allowance |
-| Connections to internal tools/apps | Limited | Plan-dependent | Broader access |
-| API usage | Separate | Separate | Separate |
-| Plus price | — | — | US list price: $20/month |
+| Memory/context | More limited | Longer than Free | Expanded |
+| Codex | Limited-time/current plan access can apply; Terra in GPT-5.6 family | Limited-time/current plan access can apply; Terra in GPT-5.6 family | Included with broader model access; Sol/Terra/Luna where available |
+| ChatGPT Work | No | No | Yes, subject to rollout |
+| Cloud browser through Work | No | No | Yes in supported regions, subject to rollout |
+| Scheduled Tasks | Basic task availability can be account/feature dependent | Tasks are listed as a Go benefit; specific Scheduled rollout can vary | Scheduled workflow support is available/rolling out |
+| Legacy Agent Mode | Retired | Retired | Retired; use Work/cloud browser instead |
+| Plugins/apps/connectors | Availability varies by plugin, plan, surface, and permissions | Broader than Free for some workflows | Broader professional access |
+| API usage | Separate billing | Separate billing | Separate billing |
 
-\* “Unlimited” is subject to abuse-prevention guardrails. Premium reasoning, files, images, voice, data analysis, Deep Research, Agent, and other tools can have **separate quotas**.
+> **Important:** Never infer your exact remaining quota from this table. ChatGPT can apply different limits to chat, reasoning, files, images, data analysis, Deep Research, Codex, scheduled work, and other tools. The product UI and current Help Center pages are the authority for your account.
 
-## What this means in simple language
+## 2.1 The model names can be confusing
+
+A beginner may see both of these statements in current documentation:
+
+```text
+Free/Go default → GPT-5.6 Luna
+Instant → GPT-5.5 Instant
+```
+
+They describe different parts of a rolling product transition. OpenAI's current GPT-5.6 article says Luna is becoming the default Free/Go experience, while `Instant` is the fast-response option on eligible paid experiences. Model controls can differ by plan and rollout.
+
+The practical rule is:
+
+```text
+Do not memorize the marketing name.
+Look at the model/tool picker in your own account.
+```
+
+## 2.2 What this means in simple language
 
 ### Free
 
 Best when you mainly need:
 
-- normal text chat,
-- web search,
-- Study Mode,
-- occasional files,
-- occasional image generation,
-- basic data analysis,
-- Projects,
-- lightweight coding,
-- GPT-5.6 Luna.
+- everyday questions and explanations;
+- web search;
+- Study Mode;
+- occasional files and data analysis;
+- occasional image generation;
+- Projects;
+- lightweight coding;
+- limited use of premium tools.
+
+Free is capable, but tool and model limits can be dynamic.
 
 ### Go
 
-Best when Free is good enough intellectually, but you repeatedly hit tool limits.
+Best when Free already gives you sufficient answer quality but you regularly need **more usage**.
 
 You mainly gain:
 
-- more file usage,
-- more image usage,
-- more data-analysis usage,
-- more storage,
-- longer memory/context,
-- larger Projects,
-- Think using GPT-5.6 Luna.
+- more chat usage;
+- more file uploads;
+- more image generation;
+- more advanced data analysis;
+- longer memory/context;
+- 25-file Projects;
+- 4 GB Library storage;
+- access to Tasks and other features subject to rollout.
 
-Go does **not** currently include GPT-5.6 Sol.
+Go does **not** currently include GPT-5.6 Sol in normal ChatGPT reasoning.
 
 ### Plus
 
-Best when the quality of reasoning matters.
+Best when both **reasoning quality and professional tools** matter.
 
 You mainly gain:
 
-- GPT-5.6 Sol,
-- Medium and High reasoning,
-- broader model/tool access,
-- higher usage limits,
-- expanded Deep Research,
-- expanded Codex,
-- ChatGPT Work,
-- larger Library,
-- scheduled workflows,
-- Agent mode,
-- broader connected-app capabilities,
-- earlier access to some new capabilities.
+- GPT-5.6 Sol Medium and High reasoning;
+- higher limits;
+- expanded Deep Research;
+- broader Codex access;
+- ChatGPT Work;
+- cloud-browser workflows where supported;
+- 20 GB Library storage;
+- broader connected-app/plugin capabilities;
+- earlier or broader access to some advanced features.
+
+The most important Plus distinction is not simply “more messages.” It is **access to stronger reasoning and professional agentic workflows**.
 
 ---
 
@@ -186,20 +211,32 @@ You mainly gain:
 
 Knowing **when not to use expensive reasoning** is one of the best ways to get more from a paid plan.
 
-## 3.1 Instant
+Model names are volatile, so learn the durable mental model first:
 
-Use Instant for:
+```text
+Fast/default response
+        ↓
+Need more deliberate reasoning?
+        ↓
+Think / Medium
+        ↓
+Still genuinely difficult?
+        ↓
+High
+```
 
-- definitions,
-- syntax questions,
-- rewriting,
-- grammar,
-- small code snippets,
-- simple SQL,
-- explanations,
-- brainstorming,
-- summaries,
-- straightforward handbook sections,
+## 3.1 Default / fast chat
+
+Use the normal fast/default experience for:
+
+- definitions;
+- syntax questions;
+- rewriting and grammar;
+- small code snippets;
+- straightforward SQL;
+- brainstorming;
+- summaries;
+- routine handbook sections;
 - common programming concepts.
 
 Example:
@@ -210,19 +247,28 @@ Explain Java HashMap in beginner-friendly language with a small example.
 
 You usually do **not** need High reasoning for this.
 
+### Current model note
+
+OpenAI's current GPT-5.6 documentation says:
+
+- GPT-5.6 Luna is becoming the default Free/Go experience;
+- on eligible paid plans, `Instant` is the fast-response option and GPT-5.6 Sol powers the reasoning levels.
+
+Because rollouts can be gradual, use the **model picker shown in your account** rather than assuming every account looks identical.
+
 ---
 
 ## 3.2 Think on Free and Go
 
-Free and Go can use **Think**, powered by GPT-5.6 Luna.
+Free and Go can receive a **Think** option powered by GPT-5.6 Luna as the GPT-5.6 rollout reaches their account. Think does not provide GPT-5.6 Sol.
 
 Use Think when:
 
-- a normal answer misses something,
-- logic has multiple steps,
-- debugging is moderately difficult,
-- you want a more careful comparison,
-- you want better planning.
+- a normal answer misses something;
+- logic has several dependent steps;
+- debugging needs hypothesis testing;
+- you want a more careful comparison;
+- you want a stronger plan.
 
 Example:
 
@@ -236,22 +282,24 @@ Give me a step-by-step debugging tree and tell me what evidence
 I should collect at each layer.
 ```
 
+Do not select Think merely because the task is important. Use it when **additional reasoning changes the work**.
+
 ---
 
 ## 3.3 Medium Reasoning on Plus
 
-Medium should be your default advanced-reasoning option.
+Medium uses GPT-5.6 Sol on eligible Plus accounts and is a strong default for serious technical reasoning.
 
-Excellent for:
+Good uses:
 
-- code reviews,
-- moderately difficult debugging,
-- architecture,
-- SQL optimization,
-- API design,
-- business logic,
-- DSA,
-- technical comparisons,
+- code reviews;
+- moderately difficult debugging;
+- architecture;
+- SQL optimization;
+- API design;
+- business logic;
+- DSA;
+- technical comparisons;
 - detailed learning.
 
 Use Medium before automatically jumping to High.
@@ -260,19 +308,19 @@ Use Medium before automatically jumping to High.
 
 ## 3.4 High Reasoning on Plus
 
-Save High for tasks where additional reasoning is likely to materially improve the result.
+Save High for problems where additional reasoning is likely to materially improve the result.
 
-Use it for:
+Good uses:
 
-- difficult production bugs,
-- distributed-system design,
-- difficult DSA,
-- security analysis,
-- migration planning,
-- complex database logic,
-- multi-file root-cause analysis,
-- detailed architecture trade-offs,
-- ambiguous business rules,
+- difficult production bugs;
+- distributed-system design;
+- difficult algorithms;
+- defensive security analysis;
+- migration planning;
+- complex database logic;
+- multi-file root-cause analysis;
+- architecture trade-offs;
+- ambiguous business rules;
 - critical code review.
 
 Example:
@@ -300,12 +348,27 @@ I want:
 
 ## 3.5 Extra High and Pro
 
-As of this guide:
+As of 17 August 2026:
 
-- Plus does **not** include GPT-5.6 Sol Extra High.
-- Plus does **not** include GPT-5.6 Sol Pro.
+- Plus includes GPT-5.6 Sol **Medium and High**;
+- Plus does **not** include Sol Extra High;
+- Plus does **not** include Sol Pro.
 
-Those are higher-tier capabilities.
+Those higher reasoning tiers require another eligible plan.
+
+### Best practice
+
+Do not build workflows around a model label alone. Write prompts that express the required quality:
+
+```text
+Analyze competing causes.
+State assumptions.
+Verify current claims.
+Show evidence for the conclusion.
+List unresolved uncertainties.
+```
+
+That instruction remains useful even when model names change.
 
 ---
 
@@ -313,38 +376,51 @@ Those are higher-tier capabilities.
 
 A common misunderstanding is:
 
-> Unlimited chat = every ChatGPT feature is unlimited.
+> Unlimited or high-volume chat means every ChatGPT feature is unlimited.
 
 That is **not** correct.
 
-Think of ChatGPT usage as separate buckets:
+Current OpenAI plan language can use terms such as “more access,” “higher limits,” or “unlimited/virtually unlimited” for particular chat experiences, while still applying model-specific allowances, dynamic limits, abuse-prevention guardrails, and separate tool quotas.
+
+Think of usage as multiple buckets:
 
 ```text
-Everyday text
+Core chat
     │
+    ├── Reasoning
     ├── Files
     ├── Images
     ├── Voice
     ├── Data analysis
     ├── Deep Research
-    ├── Advanced reasoning
-    ├── Agent
+    ├── Codex
+    ├── Scheduled work
     └── Other premium tools
 ```
 
-You may still be able to chat even after exhausting a particular premium tool or reasoning allowance.
+Reaching one limit does not necessarily mean the entire product becomes unusable.
 
 ## Example
 
 Suppose you use Plus heavily for:
 
-- 20 difficult High-reasoning requests,
-- several Deep Research reports,
-- many images,
-- Agent tasks,
-- file analysis.
+- difficult High-reasoning requests;
+- several Deep Research reports;
+- many images;
+- large file-analysis jobs;
+- Codex sessions;
+- Work tasks.
 
-A particular tool/model may temporarily reach its allowance even though ordinary ChatGPT remains usable.
+A particular model or tool can become temporarily unavailable or fall back even while ordinary chat still works.
+
+## Four kinds of limits to understand
+
+| Limit type | Meaning |
+|---|---|
+| Message/model allowance | How much you can use a specific chat or reasoning model |
+| Tool allowance | Separate usage for files, research, images, voice, or other tools |
+| Storage limit | How much persistent file content your account can keep |
+| Safety/abuse guardrail | Temporary restrictions that can apply independently of the advertised plan |
 
 ## Important rule
 
@@ -354,7 +430,7 @@ Never assume there is one number called:
 Your total ChatGPT quota = 5,000 messages
 ```
 
-There can be multiple independent limits.
+Instead, check the in-product message, model picker, usage counter, storage page, or feature-specific settings.
 
 ---
 
@@ -364,7 +440,7 @@ The Free plan is much stronger than many people realize.
 
 ## 5.1 Use normal text aggressively
 
-Free currently supports unlimited everyday text chats, subject to abuse guardrails.
+Use everyday chat freely for normal work, but remember that Free has dynamic/model-specific usage limits and separate tool limits. Do not ration every ordinary question; instead, save scarce tools for tasks that actually need them.
 
 Use it for:
 
@@ -531,11 +607,11 @@ Image generation  → selective
 
 # 6. How to Get the Most From ChatGPT Go
 
-Go is primarily an **expanded-usage plan** rather than a top reasoning plan.
+Go is primarily an **expanded-usage plan** rather than the plan for GPT-5.6 Sol reasoning.
 
 ## 6.1 What Go is good at
 
-Go is excellent when you:
+Go is useful when Free's quality is sufficient but its usage limits interrupt your workflow. It is especially helpful when you:
 
 - chat heavily,
 - upload documents frequently,
@@ -651,7 +727,7 @@ If you constantly need difficult architecture/debugging/research reasoning, Plus
 
 # 7. How to Get the Most From ChatGPT Plus
 
-Plus is most valuable when you use its **advanced intelligence**, not merely when you send more messages.
+Plus is most valuable when you use its **advanced reasoning and professional tools**, not merely when you send more messages.
 
 ## 7.1 Plus priority stack
 
@@ -669,7 +745,7 @@ Use Plus in this order:
 9. Codex
 10. Work
 11. Tasks
-12. Agent
+12. Cloud browser when a supported public-web action is required
 ```
 
 Not every task needs every feature.
@@ -838,32 +914,67 @@ Finally, create test scenarios as QA.
 
 # 8. The Best Mode/Tool for Each Type of Work
 
+Start with the **simplest capability that can solve the task well**. Escalate only when the task genuinely requires more reasoning, current information, a connected tool, or delegated action.
+
 | Task | Best starting option |
 |---|---|
-| Simple definition | Instant |
-| Grammar | Instant |
-| Small code example | Instant |
-| Framework explanation | Instant / Study |
-| Interview practice | Instant / Study |
-| Moderate debugging | Medium or Think |
-| Difficult debugging | High on Plus |
-| Architecture | Medium → High if needed |
+| Simple definition | Default/fast chat |
+| Grammar or rewriting | Default/fast chat |
+| Small code example | Default/fast chat |
+| Framework explanation | Chat / Study Mode |
+| Interview practice | Chat / Study Mode |
+| Moderate debugging | Think or Medium, depending on plan |
+| Difficult debugging | High on Plus when available |
+| Architecture | Medium → High only if needed |
 | SQL optimization | Medium |
-| Production incident | High |
-| Current software version | Search |
-| Current news | Search |
-| Multi-source market research | Deep Research |
+| Production incident analysis | High when available |
+| Current software version | Web Search |
+| Current news | Web Search |
+| Multi-source research | Deep Research |
 | PDF analysis | File upload |
 | Spreadsheet analysis | Data analysis |
-| Repository coding | Codex |
-| Deliverable creation | Work |
-| Recurring reminder | Scheduled Task |
-| Website action workflow | Agent where appropriate |
-| Learning course | Study Mode |
+| Repository implementation | Codex |
+| Finished document/spreadsheet/presentation/report | Work |
+| Recurring reminder or monitoring | Scheduled Task, if available |
+| Supported public-website action | Cloud browser through Work, if available |
+| Guided learning | Study Mode |
 | Long-running topic | Project |
 | Preference continuity | Memory |
 | Conversation practice | Voice |
 | Visual concept | Image generation |
+
+## 8.1 A simple decision tree
+
+```text
+Can normal chat answer it?
+    ├── Yes → use chat
+    └── No
+         ↓
+Does it require current facts?
+    ├── Yes → Search
+    └── No
+         ↓
+Does it require many sources and synthesis?
+    ├── Yes → Deep Research
+    └── No
+         ↓
+Does it require stronger reasoning?
+    ├── Yes → Think / Medium / High
+    └── No
+         ↓
+Does it need to modify a repository?
+    ├── Yes → Codex
+    └── No
+         ↓
+Does it need a finished work artifact or multi-step delegated work?
+    ├── Yes → Work
+    └── No
+         ↓
+Does it need to act on a supported public website?
+    └── Cloud browser through Work
+```
+
+This saves quota, reduces unnecessary complexity, and makes it easier to understand which capability actually produced the result.
 
 ---
 
@@ -945,7 +1056,7 @@ Teaching rules:
 
 ## 9.4 Current project limits
 
-As of this guide:
+As of 17 August 2026:
 
 ```text
 Number of projects:
@@ -956,10 +1067,17 @@ Free     5
 Go      25
 Plus    25
 
-Only a limited number of files can be uploaded simultaneously.
+Maximum files uploaded at one time:
+10
 ```
 
-Use multiple focused Projects instead of creating one enormous dumping ground.
+The file cap is **per Project**, not a global limit on how many Projects you can create.
+
+Use multiple focused Projects instead of creating one enormous dumping ground. However, do not fragment one coherent topic into dozens of tiny Projects just to maximize file count; organization should follow the work, not the quota.
+
+### Project memory note
+
+Projects can keep chats, files, and instructions together, but memory behavior depends on your account and the Project's memory settings. For sensitive or isolated work, prefer a project-specific context boundary rather than assuming unrelated chats should influence the Project.
 
 ---
 
@@ -1800,72 +1918,152 @@ That avoids:
 
 # 16. ChatGPT Work
 
-ChatGPT Work is intended for creating/editing work artifacts such as:
+ChatGPT Work is designed for **longer, more involved tasks** and finished work products. It can research and analyze information, work across connected apps and files, and create deliverables such as:
 
-- documents,
-- presentations,
-- spreadsheets,
-- charts,
-- PDFs,
-- other deliverables.
+- documents;
+- spreadsheets;
+- presentations;
+- reports;
+- Sites and other supported artifacts.
 
-Plus currently has broader Work access across desktop, web, and mobile than Free/Go.
+As of 17 August 2026, OpenAI says Work is available on paid plans **except Free and Go**, subject to rollout and workspace controls. Plus is therefore the first personal plan in this guide that can include Work.
 
-## When to use Work
+## 16.1 Chat versus Work
 
-Use Work when the final answer should become an actual artifact.
+Use normal Chat when you mainly need:
+
+- an answer;
+- an explanation;
+- brainstorming;
+- a small rewrite;
+- a quick code discussion;
+- a short analysis.
+
+Use Work when the task is more like:
+
+```text
+Goal
+  ↓
+Research / inspect inputs
+  ↓
+Work across files/apps
+  ↓
+Perform multiple steps
+  ↓
+Ask for approvals if needed
+  ↓
+Produce a finished deliverable
+```
 
 Examples:
 
 ```text
-Create:
-- a project kickoff presentation
-- a monthly budget spreadsheet
-- a technical design document
-- an executive PDF report
+Create a project kickoff presentation from these meeting notes.
+
+Build a budget spreadsheet from these source files and explain the assumptions.
+
+Research this market, create an executive report, and cite the evidence.
 ```
 
-Use ordinary Chat when you only need discussion or advice.
+## 16.2 Work is not just a longer chat
+
+The important difference is **execution and artifact creation**.
+
+A strong Work request specifies:
+
+```text
+Goal:
+What finished result do I need?
+
+Inputs:
+Which files, apps, or sources may be used?
+
+Constraints:
+What must not change or be accessed?
+
+Approvals:
+Which actions require my confirmation?
+
+Output:
+What deliverable should be created?
+
+Verification:
+How should the result be checked?
+```
+
+## 16.3 Work and Scheduled Tasks
+
+Work can support tasks that run once, repeat on a schedule or trigger, or monitor for changes when those capabilities are enabled for your plan/account.
+
+For anything that can cause an external side effect, inspect the proposed action before approving it.
 
 ---
 
 # 17. Codex
 
-Codex is built for software-development workflows.
+Codex is the software-development agent experience for repository-aware work.
 
-It is included across ChatGPT plans, but limits vary by plan.
+Current OpenAI documentation says Codex is included with Plus and other eligible paid plans, and may also be available to Free/Go under current limited-time or plan-specific access. In the GPT-5.6 family, current documentation lists:
 
-Plus gets expanded access relative to Free/Go.
+```text
+Free / Go Codex:
+GPT-5.6 Terra
+
+Plus and higher eligible Codex:
+GPT-5.6 Sol
+GPT-5.6 Terra
+GPT-5.6 Luna
+```
+
+Availability and limits can change, so check your Codex UI rather than hard-coding this mapping into automation.
 
 ## Use Codex when
 
-- working across a repository,
-- implementing features,
-- modifying multiple files,
-- running tests,
-- understanding a codebase,
-- reviewing code changes,
-- fixing a bug in context.
+- working across a repository;
+- implementing a feature;
+- modifying several files;
+- running tests;
+- understanding an unfamiliar codebase;
+- reviewing a patch;
+- fixing a bug in context;
+- performing repository-scoped refactoring.
 
 ## Use ordinary Chat when
 
-- asking conceptual programming questions,
-- learning syntax,
-- discussing architecture,
-- reviewing a small snippet.
+- asking conceptual programming questions;
+- learning syntax;
+- discussing architecture before touching code;
+- reviewing a tiny self-contained snippet.
 
-## Powerful workflow
+## Strong workflow
 
 ```text
-ChatGPT:
-requirements + architecture + reasoning
+Chat:
+requirements + architecture + acceptance criteria
 
 Codex:
-repository implementation + tests
+inspect repository
+→ plan
+→ edit
+→ test
+→ inspect diff
 
-ChatGPT:
-final review + documentation
+Chat or reviewer:
+independent final review + documentation
 ```
+
+## Codex safety rule
+
+A coding agent can execute commands and modify files, so always define:
+
+- the repository scope;
+- files or directories that must not change;
+- allowed commands;
+- required tests;
+- whether dependency upgrades are permitted;
+- whether network access or secrets are allowed.
+
+Do not confuse “the model proposed a correct change” with “the repository is verified.” The verification step is still tests, static analysis, review, and runtime evidence.
 
 ---
 
@@ -1873,22 +2071,31 @@ final review + documentation
 
 Scheduled Tasks let ChatGPT perform future or recurring work such as:
 
-- reminders,
-- daily briefings,
-- weekly reports,
-- monitoring,
-- recurring prompts.
+- reminders;
+- recurring summaries;
+- scheduled prompts;
+- web/app monitoring;
+- notifications when a condition changes.
 
-Current official task documentation lists:
+OpenAI redesigned Scheduled Tasks in June 2026. Current documentation says the dedicated Scheduled experience is rolling out across eligible paid tiers, while the Go plan page separately lists **Tasks** as a Go feature subject to current availability. Because those documents can describe different rollout surfaces, verify the Scheduled page in your own account before depending on a specific tier entitlement.
+
+## 18.1 Do not memorize a fixed task-count table
+
+Earlier documentation exposed fixed active-task caps for some tiers. Current release documentation says active-task limits **vary by tier**.
+
+Therefore:
 
 ```text
-Go    → up to 3 active tasks
-Plus  → up to 5 active tasks
+Do not write:
+"Plus will always have exactly N active tasks."
+
+Prefer:
+"Check the current Scheduled page for the limit applied to this account."
 ```
 
-Feature availability can vary by account/rollout, especially on Go. Check your UI.
+The platform currently limits scheduled tasks to no more than once per hour, and unattended tasks may pause after a period of inactivity.
 
-## High-value task examples
+## 18.2 High-value task examples
 
 ### Daily learning
 
@@ -1900,7 +2107,7 @@ Do not show the answer until I reply.
 ### Weekly review
 
 ```text
-Every Sunday, give me a 20-question review based on the
+Every Sunday, give me a review based on the
 programming topics I studied that week.
 ```
 
@@ -1912,44 +2119,122 @@ Notify me only if a new version appears.
 Summarize the important breaking changes.
 ```
 
-## Avoid wasting tasks
+## 18.3 Write recurring tasks as an execution contract
 
-Do not use a scheduled task for something you will never look at.
+A good task answers:
 
-Five high-value recurring workflows beat five noisy daily notifications.
+```text
+What should be checked?
+How often?
+What counts as a meaningful change?
+When should I be notified?
+What should happen when nothing changed?
+Which sources should be trusted?
+```
+
+Example:
+
+```text
+Every Monday, check the official framework release page.
+
+Notify me only if a new stable release was published since the previous check.
+
+Include:
+- version
+- release date
+- breaking changes
+- migration link
+- whether my current major version is affected
+
+If nothing changed, do not notify me.
+```
+
+This is much more useful than:
+
+```text
+Check framework news every week.
+```
+
+## 18.4 Avoid noisy automation
+
+Do not create recurring tasks that produce output you never act on.
+
+A few high-value automations beat a large feed of low-value notifications.
 
 ---
 
-# 19. Agent Mode
+# 19. Legacy Agent Mode and Its Replacements
 
-Agent Mode is useful when ChatGPT must perform a more involved web/computer workflow rather than only answer a question.
+**ChatGPT Agent Mode is no longer available as the current standalone product experience.**
 
-Plus currently has a separate Agent allowance; official documentation lists **40 agent messages/month** for Plus.
-
-Because that allowance is much smaller than everyday chat, use Agent carefully.
-
-## Good Agent use
-
-- multi-step website workflow,
-- gathering information across pages,
-- completing supported web tasks,
-- actions requiring browser interaction.
-
-## Bad Agent use
+OpenAI's current Help Center directs users to:
 
 ```text
-What is dependency injection?
+Longer multi-step delegated work
+→ ChatGPT Work
+
+Supported public-web actions
+→ Cloud browser through ChatGPT Work
 ```
 
-Normal chat should answer that.
+This is an important change because older documentation, screenshots, or articles can still describe Agent Mode limits and workflows.
 
-## Quota-saving rule
+## 19.1 What happened to older Agent guidance?
 
-Before using Agent ask:
+Older Agent Mode could navigate websites and perform multi-step actions. Some current Help Center pages still preserve historical implementation details, but the top-level guidance now says the feature itself is no longer available.
 
-> Does this require ChatGPT to **do something across websites/apps**, or do I merely need an answer?
+Do not build a new workflow around:
 
-If you only need an answer, use Search/Deep Research/Chat.
+```text
+/agent
+Agent monthly message count
+old Agent-mode UI
+```
+
+unless your actual account still exposes a transitional experience and current product guidance explicitly supports it.
+
+## 19.2 Use Work for multi-step delegated tasks
+
+Good Work examples:
+
+- research several sources and create a report;
+- combine connected-app information with files;
+- produce a spreadsheet or presentation;
+- run a longer workflow that needs checkpoints or approvals.
+
+## 19.3 Use cloud browser for supported website actions
+
+Cloud browser is available to eligible paid plans except Free and Go in supported regions, subject to rollout.
+
+At launch it is designed for supported **public** web pages. Current documentation says it does not accept credentials, sign in, use password managers/autofill, or complete payments.
+
+Examples:
+
+- check public restaurant availability;
+- compare public stock or product availability;
+- find flights matching constraints;
+- submit supported public quote forms;
+- track a package using a public tracking page plus connected information.
+
+## 19.4 Browser-agent safety
+
+When delegating browser work:
+
+1. give the exact outcome you want;
+2. limit the sites/data it may use;
+3. review confirmations;
+4. inspect the final source;
+5. never paste passwords or payment details into the request;
+6. stop the task if it navigates to the wrong site or uses the wrong information.
+
+The durable mental model is:
+
+```text
+Answer a question       → Chat/Search/Deep Research
+Build a work product    → Work
+Modify a repository     → Codex
+Act on a public website → Cloud browser through Work
+```
 
 ---
 
@@ -2192,16 +2477,16 @@ Use Search.
 
 ---
 
-## Rule 3 — Do not use Agent when Search is enough
+## Rule 3 — Do not use Work/cloud browser when Search is enough
 
 Bad:
 
 ```text
-Agent:
+Cloud browser:
 Find the current Node.js LTS version.
 ```
 
-Search official Node documentation.
+Use Search and the official Node.js source. Delegated browser actions are for tasks that require action, not simple lookup.
 
 ---
 
@@ -2756,8 +3041,8 @@ You need:
 - deeper technical analysis,
 - expanded Deep Research,
 - stronger Codex usage,
-- Work,
-- Agent,
+- ChatGPT Work,
+- cloud-browser workflows through Work where supported,
 - higher file/tool allowances,
 - 20 GB Library,
 - professional workflows.
@@ -2816,61 +3101,79 @@ Quality on difficult topics → major Plus advantage
 
 # 29. Known Documentation Differences
 
-OpenAI updates ChatGPT rapidly. Sometimes official pages are updated at different times and temporarily disagree.
+OpenAI updates ChatGPT rapidly. Help Center pages, release notes, pricing pages, and the in-product UI can be updated on different schedules. During a rollout, two official pages can appear to disagree without either page necessarily describing every account.
 
-As of 13 August 2026, examples include:
+This guide was checked on **17 August 2026**.
 
-## 29.1 Personal GPT creation
+## 29.1 GPT-5.6 Luna versus Instant wording
 
-The current Free Tier FAQ says new GPT creation/publishing is unavailable on personal accounts including Free, Go, Plus, and Pro, while some pricing copy still references custom GPTs on paid plans.
+The current GPT-5.6 page says Luna is becoming the default Free/Go experience, while the same documentation describes `Instant` as GPT-5.5 Instant for eligible paid model controls.
 
-Practical recommendation:
+Practical interpretation:
 
-> Check your actual ChatGPT UI. For personal reusable context, Projects + Project Instructions are a reliable alternative.
-
----
-
-## 29.2 Go voice limits
-
-The Go help article says Voice is included with the same usage limits as Free, while the pricing comparison uses wording suggesting expanded voice.
-
-Practical recommendation:
-
-> Treat the usage shown in your account as authoritative for your current rollout.
+> Treat the model picker shown in your account as the source of truth for what you can select today. Learn the capability tier—fast/default versus deeper reasoning—rather than memorizing one label.
 
 ---
 
-## 29.3 Go Scheduled Tasks
+## 29.2 Go Tasks versus Scheduled Tasks rollout
 
-The Go article references access to Tasks subject to feature availability, and the Scheduled Tasks FAQ lists a 3-active-task cap for Go, while another availability paragraph in that FAQ may list only higher plans.
+The Go help page lists Tasks as a Go benefit subject to availability. The June 2026 Scheduled Tasks release note describes the redesigned Scheduled page as rolling out to Plus, Pro, Business, and Enterprise.
 
-Practical recommendation:
+Practical interpretation:
 
-> If Tasks appears in your Go account, follow the limit shown by the product. Do not subscribe solely for a rollout-dependent feature without checking your account.
+> “Tasks” entitlement and the newest Scheduled/monitoring surface can have different rollout status. Check whether the Scheduled page exists in the specific Go account before subscribing for that feature.
 
 ---
 
-## 29.4 Why this matters
+## 29.3 Agent Mode documentation contains legacy detail
 
-Never permanently memorize a plan comparison.
+The current Agent Help Center article begins by saying **ChatGPT agent is no longer available**, while the same page still contains older Agent usage and safety details farther down.
 
-For anything important, verify:
+Practical interpretation:
+
+> Follow the current top-level product direction: use Work for longer multi-step tasks and cloud browser for supported web actions. Treat old Agent limits/UI instructions as historical unless the product explicitly shows them.
+
+---
+
+## 29.4 Rollouts are account-specific
+
+Features can vary because of:
+
+- staged rollout;
+- platform (web, desktop, iOS, Android);
+- country/region;
+- workspace admin controls;
+- plan;
+- account-level experiments;
+- current system capacity.
+
+Therefore, an official article can truthfully say “rolling out” while your account does not yet show the feature.
+
+---
+
+## 29.5 A reliable verification order
+
+For anything important, verify in this order:
 
 ```text
-ChatGPT Pricing
-+
-Plan Help Page
-+
-Model Help Page
-+
-Your actual in-product model/tool picker
+1. Your actual in-product UI / model picker
+2. Current feature-specific Help Center page
+3. Current plan Help Center page
+4. ChatGPT release notes
+5. Pricing page
 ```
+
+If two official pages conflict, prefer the **newer, more feature-specific document**, then check your account UI.
+
+Do not permanently memorize a plan comparison. Treat it as versioned documentation.
 
 ---
 
 # 30. Official Sources
 
 This handbook intentionally uses official OpenAI/ChatGPT documentation rather than third-party plan summaries.
+
+Because product documentation changes frequently, use these pages as **live references**, not merely as citations frozen to this edition.
 
 ## Plans
 
@@ -2889,7 +3192,7 @@ This handbook intentionally uses official OpenAI/ChatGPT documentation rather th
 ## Models
 
 - GPT-5.6 in ChatGPT  
-  https://help.openai.com/en/articles/11909943-gpt-53-and-54-in-chatgpt
+  https://help.openai.com/en/articles/20001354-gpt-5-6-in-chatgpt
 
 ## Projects
 
@@ -2906,7 +3209,7 @@ This handbook intentionally uses official OpenAI/ChatGPT documentation rather th
 - Deep Research in ChatGPT  
   https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt
 
-## Storage
+## Storage and files
 
 - File storage and Library in ChatGPT  
   https://help.openai.com/en/articles/20001052-file-storage-and-library-in-chatgpt
@@ -2914,27 +3217,44 @@ This handbook intentionally uses official OpenAI/ChatGPT documentation rather th
 - File Uploads FAQ  
   https://help.openai.com/articles/8555545-file-uploads-faq
 
+## Work and browser automation
+
+- ChatGPT release notes — Work  
+  https://help.openai.com/en/articles/6825453-chatgpt-release-notes
+
+- Using cloud browser in ChatGPT  
+  https://help.openai.com/en/articles/20001280-using-cloud-browser-in-chatgpt
+
+- ChatGPT Agent — legacy/retirement notice  
+  https://help.openai.com/en/articles/11752874-chatgpt-agent
+
 ## Coding
 
 - Using Codex with your ChatGPT plan  
   https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan
 
-## Automation / Agent
+## Automation
 
-- Scheduled Tasks in ChatGPT  
-  https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt
-
-- ChatGPT Agent  
-  https://help.openai.com/en/articles/11752874-chatgpt-agent
+- ChatGPT release notes — Scheduled Tasks  
+  https://help.openai.com/en/articles/6825453-chatgpt-release-notes
 
 ## Memory
 
 - Memory FAQ  
   https://help.openai.com/articles/8590148-memory-faq
 
+## Verification habit
+
+Whenever this handbook and the product UI disagree:
+
+```text
+Current product UI + current official Help Center
+wins over this dated handbook snapshot.
+```
+
 ---
 
-# Final Cheat Sheet
+# 31. Final Cheat Sheet
 
 ```text
 Need a quick answer?
@@ -2967,14 +3287,14 @@ Need long-running context?
 Need repo-level coding?
 → Codex
 
-Need a polished work artifact?
+Need a polished artifact or multi-step delegated work?
 → Work
 
 Need something later/repeatedly?
 → Scheduled Task
 
-Need multi-step website/computer action?
-→ Agent
+Need supported public-website action?
+→ Cloud browser through Work
 
 Need continuity about preferences?
 → Memory
@@ -2988,7 +3308,7 @@ Need a visual?
 
 ---
 
-# The Best Overall Strategy
+# 32. The Best Overall Strategy
 
 The best ChatGPT user is not the person who sends the most prompts.
 
@@ -3005,7 +3325,7 @@ Search
    ↓
 Deep Research
    ↓
-Agent
+Work / cloud browser when action is required
 ```
 
 And keeps important work organized as:

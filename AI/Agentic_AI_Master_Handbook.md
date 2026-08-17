@@ -5,7 +5,7 @@
 >
 > **Audience:** Beginners, software engineers, AI engineers, architects, DevOps engineers, technical leads, and anyone who wants to move from "LLM chatbot" knowledge to real AI agents.
 >
-> **Updated:** August 13, 2026
+> **Updated:** August 17, 2026
 >
 > **Learning philosophy:** Learn the mental model first, then the architecture, then implementation patterns, then production reliability and safety.
 
@@ -93,6 +93,10 @@
 78. [Cheat Sheet](#78-cheat-sheet)
 79. [Further Reading and Primary Sources](#79-further-reading-and-primary-sources)
 80. [Final Mental Model](#80-final-mental-model)
+81. [Suggested Next-Level Study Topics](#81-suggested-next-level-study-topics)
+82. [Practice Questions](#82-practice-questions)
+83. [Mini Architecture Exercises](#83-mini-architecture-exercises)
+84. [Mastery Definition](#84-mastery-definition)
 
 ---
 
@@ -132,7 +136,7 @@ Production architecture
 
 Use this handbook in three passes:
 
-### Pass 1 — Beginner
+## Pass 1 — Beginner
 
 Focus on:
 
@@ -146,7 +150,7 @@ Focus on:
 - Human approvals
 - Basic security
 
-### Pass 2 — Builder
+## Pass 2 — Builder
 
 Focus on:
 
@@ -161,7 +165,7 @@ Focus on:
 - Retry/recovery
 - Cost optimization
 
-### Pass 3 — Production Engineer
+## Pass 3 — Production Engineer
 
 Focus on:
 
@@ -244,7 +248,20 @@ An agent can:
 
 # 3. AI, Generative AI, Chatbots, Workflows, and Agents
 
-These terms are related but not identical.
+These terms are related but not identical. Confusing them leads to over-engineering—for example, building an autonomous agent when a fixed workflow or one model call would be safer and cheaper.
+
+Use this comparison as a first decision guide:
+
+| System type | Main job | Who controls the next step? | Typical output | Good fit |
+|---|---|---|---|---|
+| Traditional AI/ML | Predict or classify | Application code | Score, label, forecast | Stable prediction problems |
+| Generative AI | Generate new content | Usually the caller | Text, code, image, JSON | Drafting, extraction, transformation |
+| Chatbot | Conversational interface | User + application | Conversational response | Q&A and guided support |
+| Workflow | Execute known steps | Developer-defined logic | Deterministic process result | Repeatable business processes |
+| Agent | Choose actions toward a goal | Model within policy boundaries | Actions + final result | Ambiguous, multi-step work |
+| Agentic workflow | Mix fixed flow and model decisions | Code for critical flow; model for selected decisions | Controlled automation | Most production business automation |
+
+A user interface can be a chatbot without being an agent, and an agent can exist without a chat interface. The important question is **who decides the next action and whether the system can act on the environment**.
 
 ## Traditional AI
 
@@ -466,11 +483,34 @@ goal
 
 The environment becomes part of the reasoning process.
 
+### Inputs and outputs of one loop iteration
+
+A loop iteration normally receives the current goal, recent state, allowed tools, policy constraints, and the latest observation. It should produce exactly one controlled next step: a tool request, a handoff, a request for human approval, or a final answer. Treat malformed or ambiguous model output as an error rather than guessing what the model intended.
+
+### Stop conditions
+
+A production loop must know when to stop. Common stop conditions include:
+
+- the goal is satisfied;
+- the model returns a valid final result;
+- a human rejects or cancels the task;
+- a maximum turn/tool-call/time/cost budget is reached;
+- a non-recoverable error occurs;
+- policy blocks the next required action.
+
+Without explicit limits, an agent can loop, repeat expensive calls, or continue acting after it no longer has enough information to proceed safely.
+
+### Common loop mistake
+
+Do not let the model be the only authority on whether an action is safe. The runtime should independently validate tool name, arguments, authorization, approval state, and execution limits before side effects occur.
+
 ---
 
 # 6. Anatomy of an Agent
 
-A serious agent usually contains the following components.
+A serious agent usually contains the following components. These pieces form a system: the **goal** says what success means, the **model** proposes decisions, **instructions** shape behavior, **tools** change or inspect the environment, **state** records the current run, **memory/retrieval** supply useful knowledge, **policies** constrain actions, and **observability** records what happened.
+
+A small agent may omit some components. Add a component because a requirement needs it—not because an architecture diagram looks more sophisticated with it.
 
 ## 6.1 Goal
 
@@ -482,7 +522,9 @@ Example:
 Investigate why invoice INV-1042 cannot be posted and resolve the issue if safe.
 ```
 
-A goal is different from a single command because multiple steps may be needed.
+A goal is different from a single command because multiple steps may be needed. A good goal also defines **completion criteria**. “Investigate invoice INV-1042” is open-ended; “identify the posting blocker, cite supporting records, and either resolve an allowed issue or escalate with evidence” gives the agent a clearer stopping point.
+
+Avoid goals that secretly grant authority, such as “do whatever is necessary.” Authority should come from policy and credentials, not from goal wording.
 
 ## 6.2 Model
 
@@ -497,9 +539,11 @@ Responsibilities may include:
 - synthesizing results
 - deciding when to stop
 
+The model is a decision component, not the whole agent. It should not directly hold production credentials or bypass application authorization. Model choice depends on the task: a smaller/faster model may be enough for routing or extraction, while harder planning or coding work may justify a stronger reasoning model.
+
 ## 6.3 Instructions
 
-Rules that shape behavior.
+Rules that shape behavior. Instructions are useful for describing role, priorities, workflow expectations, and output format. They are **not a security boundary**: a model can misunderstand, conflict with, or be manipulated away from natural-language instructions. Enforce critical rules again in deterministic code.
 
 Example:
 
@@ -530,9 +574,11 @@ send_email()
 post_to_erp()
 ```
 
+Each tool should have a narrow purpose, explicit input schema, documented return shape, known side effects, and an authorization policy. Prefer `get_invoice(invoice_id)` and `post_invoice(invoice_id)` over one vague `invoice(action, data)` tool; narrow tools are easier to validate, test, audit, and approve.
+
 ## 6.5 State
 
-Information about the current run.
+Information about the current run. State answers “what is true **for this task right now?**” and should normally live outside the model so the runtime can persist, validate, resume, and inspect it reliably.
 
 Example:
 
@@ -560,7 +606,7 @@ Memory should only store information that is useful, correct, allowed, and appro
 
 ## 6.7 Retrieval
 
-Fetch relevant external knowledge.
+Fetch relevant external knowledge at run time. Retrieval is useful when the information is too large, too dynamic, or too authoritative to rely on model training or long-term memory. The retrieval system should return evidence plus metadata such as document ID, version, owner, and source location when those details matter.
 
 Examples:
 
@@ -573,7 +619,7 @@ Examples:
 
 ## 6.8 Planner
 
-Breaks a goal into steps.
+Breaks a goal into steps. Planning is valuable when dependencies matter, but a plan is a hypothesis—not a contract. The runtime should allow replanning when tool results contradict assumptions or when a step becomes unnecessary.
 
 Example:
 
@@ -590,7 +636,7 @@ Example:
 
 ## 6.9 Policies and Guardrails
 
-Control what the agent can do.
+Control what the agent can do. Separate **soft behavioral guidance** (“prefer read-only investigation first”) from **hard enforcement** (“this credential cannot call the delete endpoint”). High-risk controls belong in authorization, approval, sandbox, network, or service layers that remain effective even if the model makes a bad decision.
 
 Example:
 
@@ -615,7 +661,7 @@ Captures:
 - state transitions
 - final outcome
 
-Without observability, debugging an agent becomes guesswork.
+Without observability, debugging an agent becomes guesswork. A useful trace links a user request to model decisions, tool calls, approvals, retries, state changes, and the final outcome while redacting secrets and sensitive data according to policy.
 
 ---
 
@@ -690,7 +736,7 @@ This level requires especially strong:
 
 ### Key rule
 
-Do not maximize autonomy.
+Do not maximize autonomy. Increase autonomy only after lower levels are reliable and measurable. A practical progression is **read before write, reversible before irreversible, narrow scope before broad scope, and human approval before delegated authority**.
 
 Maximize:
 
@@ -757,6 +803,18 @@ Multi-agent system
 
 Only move downward when simpler options are insufficient.
 
+### A quick architecture test
+
+Before adding an agent, ask:
+
+1. Can ordinary code express the decision correctly?
+2. Is the input/output contract stable enough for rules or a state machine?
+3. Does the task genuinely require interpreting ambiguous language, unstructured evidence, or changing plans?
+4. What can go wrong if the model chooses the wrong action?
+5. Can that risk be contained with read-only tools, approvals, or a sandbox?
+
+If questions 1–2 are “yes,” an agent may add cost and failure modes without adding useful capability.
+
 ---
 
 # 9. LLM Foundations You Need for Agents
@@ -772,6 +830,8 @@ Token usage affects:
 - context capacity
 - latency
 - cost
+
+A token is not the same as a word. Tokenization varies by model and language, so production systems should use the provider/model tokenizer or usage metadata when exact accounting matters. Tool schemas, retrieved text, conversation history, and tool results also consume context.
 
 ## 9.2 Context window
 
@@ -794,13 +854,13 @@ intermediate state
 
 More context is not always better.
 
-Irrelevant context can reduce quality.
+Irrelevant context can reduce quality. Long contexts can also increase latency and cost. Context engineering therefore includes **selection, ordering, compression, freshness, and provenance**, not merely appending everything available.
 
 ## 9.3 Temperature and stochasticity
 
-Model outputs can vary.
+Model outputs can vary even for similar inputs. Some model families expose sampling controls such as temperature or top-p; others constrain or ignore them. Treat these controls as model/API-specific rather than universal guarantees.
 
-In production, design for nondeterminism instead of assuming identical outputs.
+In production, design for nondeterminism instead of assuming identical outputs. Validate structured results, test behavior across multiple runs when variability matters, and make side-effecting tools idempotent whenever practical.
 
 ## 9.4 Hallucination
 
@@ -932,7 +992,16 @@ This is often more useful than raw history.
 
 # 11. Instructions and Agent Policies
 
-Good instructions are specific, hierarchical, and testable.
+Good instructions are specific, hierarchical, and testable, but production systems need more than prompts. It helps to separate four layers:
+
+| Layer | Example | Best enforcement location |
+|---|---|---|
+| Goal/instructions | “Investigate the invoice and cite evidence.” | Prompt/runtime |
+| Business policy | “Invoices above ₹500,000 require controller approval.” | Policy service/application code |
+| Authorization | “This identity may create but not approve a refund.” | IAM/service boundary |
+| Safety invariant | “Never modify vendor bank details automatically.” | Tool availability/permissions + code |
+
+Natural-language instructions guide the model. Deterministic controls decide what is actually allowed.
 
 ## Weak instruction
 
@@ -1000,7 +1069,9 @@ The runtime is enforcement.
 
 # 12. Structured Outputs
 
-Structured outputs allow deterministic software to consume model decisions.
+Structured outputs allow deterministic software to consume model decisions. A structured response is a contract: downstream code can validate it before branching, storing data, or authorizing another step.
+
+Use structured output when software needs fields, types, enums, or machine-readable decisions. Free-form prose is still better for explanations intended only for humans.
 
 Example schema:
 
@@ -1020,6 +1091,8 @@ Example schema:
   ]
 }
 ```
+
+A production schema should define field names, types, required/optional fields, allowed enum values, and—where supported—constraints such as ranges or patterns. Invalid output should be rejected, retried, or sent for review rather than silently coerced into a dangerous value.
 
 ## Benefits
 
@@ -1062,7 +1135,13 @@ Prefer:
 
 # 13. Tool Use and Function Calling
 
-A tool is a capability exposed to an agent.
+A tool is a capability exposed to an agent. Function/tool calling is usually a **two-part protocol**: the model proposes a structured call, and trusted application code decides whether and how to execute it. The model normally does not receive direct access to a database connection, shell credential, or backend function object.
+
+A tool contract has three important surfaces:
+
+- **input:** arguments the model may propose;
+- **execution:** validation, authorization, approval, and side-effect handling;
+- **output:** a bounded observation returned to the agent.
 
 Example:
 
@@ -1157,7 +1236,9 @@ Require very strict policy.
 
 # 14. Designing Good Agent Tools
 
-Tool design is one of the most important agent-engineering skills.
+Tool design is one of the most important agent-engineering skills. A good tool makes the correct action easy to select and the dangerous action difficult or impossible to express. Tool design is therefore an API-design and security problem, not merely prompt engineering.
+
+For every important tool, document its purpose, input schema, return schema, side effects, required permission, approval requirement, retry/idempotency behavior, and expected failure modes.
 
 ## 14.1 Give tools narrow responsibilities
 
@@ -1332,7 +1413,16 @@ the runtime must independently enforce:
 
 # 16. State, Sessions, and Context
 
-These terms are often confused.
+These terms are often confused. Use this distinction:
+
+| Term | Question it answers | Typical lifetime | Example |
+|---|---|---|---|
+| Context | What information can the model see for this inference? | One model call/turn | instructions + recent tool result |
+| State | What does the runtime know about the current task? | Task/run | current phase, approval status |
+| Session | Which interactions belong to the same ongoing exchange? | Multiple turns/runs | support conversation ID |
+| Persistent state | What must survive restarts or long waits? | Hours to months | durable workflow record |
+
+Context may be reconstructed from state; it should not be the only source of truth for business progress.
 
 ## Context
 
@@ -1504,7 +1594,9 @@ Store metadata:
 
 # 18. RAG vs Memory
 
-This is a common interview and architecture question.
+This is a common interview and architecture question. **RAG retrieves external knowledge relevant to the current query; memory retains selected information learned from earlier interactions or runs.** The same storage technology can support both, but their meaning, retention rules, and authority are different.
+
+Use RAG for authoritative source material that already exists. Use memory for durable user/task facts that the application intentionally learned. Do not copy a policy document into memory just because it was mentioned once; retrieve the authoritative policy instead.
 
 ## RAG
 
@@ -1619,7 +1711,9 @@ Retrieve less but better.
 
 # 20. Planning and Task Decomposition
 
-Complex goals require multiple actions.
+Complex goals require multiple actions. Planning creates an **inspectable execution structure** with dependencies, checkpoints, and completion criteria. It does not need to expose private reasoning; the useful artifact is the actionable plan or task graph.
+
+Treat a plan as a hypothesis. Replan when observations invalidate assumptions, when a step becomes unnecessary, or when policy prevents the original route.
 
 Example:
 
@@ -1677,6 +1771,18 @@ A good plan should be:
 ---
 
 # 21. Reasoning and Acting Patterns
+
+You will encounter many names in agent literature. These are architectural patterns, not mutually exclusive products. A production workflow may route first, plan second, run independent workers in parallel, and then evaluate the result before a write action.
+
+| Pattern | Best when | Avoid when |
+|---|---|---|
+| ReAct-style loop | Next action depends on fresh observations | Steps are already fixed |
+| Plan-and-execute | Dependencies benefit from an explicit plan | The plan becomes stale after each observation |
+| Reflection/evaluator | Quality can be checked against a rubric or evidence | No meaningful independent check exists |
+| Routing | Inputs fall into clear specialist categories | Categories overlap so heavily that routing adds little |
+| Sequential workflow | Ordered dependencies are known | Independent steps can safely run together |
+| Parallelization | Independent subtasks can run concurrently | Shared mutable state creates races |
+| Orchestrator-worker | Work can be decomposed dynamically | One agent/tool call is enough |
 
 You will encounter many names in agent literature.
 
@@ -1982,6 +2088,8 @@ Question → Router ├→ Competitor research
                       Synthesis
 ```
 
+A schema should define field names, types, required/optional fields, allowed enum values, and—where the platform supports it—constraints such as ranges or patterns. The runtime should reject or repair invalid data rather than silently coercing a dangerous value.
+
 Benefits:
 
 - lower wall-clock latency
@@ -2282,7 +2390,7 @@ Depending on protocol version and implementation, MCP can expose capabilities su
 
 ## Current version note
 
-As of this handbook update, the official MCP project published the **2026-07-28 specification**, which introduced a stateless protocol core and other changes such as updated routing/caching/authorization mechanisms.
+As of **August 17, 2026**, the current published MCP specification revision is **2026-07-28**. It made the protocol core stateless, retired the protocol-level initialization/session handshake used by earlier revisions, added header-based routing and cacheable list results, strengthened authorization, and formalized an extensions framework. Existing SDKs or servers may still support earlier revisions, so protocol-version negotiation and migration guidance matter.
 
 Protocol details evolve.
 
@@ -2310,7 +2418,7 @@ policy + auth + transaction controls
 
 # 35. Agent2Agent — A2A
 
-A2A is an open protocol focused on interoperability between agents.
+A2A is an open protocol focused on interoperability between independent, potentially opaque agents. As of **August 17, 2026**, the A2A project lists **1.0.0** as the latest released specification. The project is under the Linux Foundation after being donated by Google.
 
 Mental model:
 
@@ -2346,7 +2454,7 @@ A2A creates a communication contract between them.
 
 ## Agent Card concept
 
-A2A implementations use an agent-description mechanism so clients can discover capabilities and endpoints.
+A2A uses an **Agent Card** so clients can discover an agent's identity, endpoint, skills/capabilities, and supported interaction details. The protocol also models work as messages, parts/artifacts, and tasks, which is useful for long-running or asynchronous collaboration.
 
 Think:
 
@@ -2476,6 +2584,10 @@ npm test
 - Run lint before final output.
 - Never commit secrets.
 ```
+
+## How to use an `AGENTS.md` file
+
+Keep instructions close to the repository they govern, make commands copy-pasteable, and describe directory-specific constraints when different parts of the codebase have different rules. Avoid putting secrets, temporary task details, or vague preferences such as “write good code” into the file. The value comes from concrete, testable guidance.
 
 ## Good coding-agent context includes
 
@@ -3792,7 +3904,7 @@ Without this, you cannot explain behavior after a change.
 
 # 60. Framework Landscape
 
-Frameworks evolve rapidly.
+Frameworks evolve rapidly. Treat this section as a map of architectural styles rather than a permanent ranking. Before adopting a framework, verify its current maintenance status, supported model providers, persistence model, observability story, and security boundaries.
 
 Learn concepts first.
 
@@ -3954,6 +4066,8 @@ def run_agent(user_input: str, max_turns: int = 8):
     raise RuntimeError("Agent exceeded max turns")
 ```
 
+Expected behavior: a provider-specific `call_model()` implementation repeatedly returns either a validated tool request or a final answer. The example intentionally leaves model-provider integration unimplemented so the loop mechanics remain visible.
+
 What this demonstrates:
 
 ```text
@@ -3981,6 +4095,8 @@ A real implementation adds:
 # 62. OpenAI Agents SDK Example
 
 > Framework APIs evolve. Check the official documentation for the latest exact syntax before production use.
+
+A minimal current-style example uses `Agent` to define instructions and `Runner` to execute the managed agent loop. `Runner.run_sync(...)` returns a run result whose `final_output` contains the final agent output.
 
 A minimal current-style example:
 
@@ -4019,6 +4135,8 @@ agent = Agent(
     tools=[get_order],
 )
 ```
+
+For the first example, expected output is a short natural-language explanation of the agent loop; the exact wording can vary because model output is probabilistic.
 
 The SDK's modern design includes concepts such as:
 
@@ -4461,7 +4579,7 @@ create_brief
 ## Output
 
 ```markdown
-# Account Brief
+## Example Account Brief
 
 ## Company context
 ...
@@ -5485,13 +5603,15 @@ As of this handbook revision, the current published specification is dated **202
 
 https://modelcontextprotocol.io/specification/2026-07-28
 
+Release overview and migration details are also published by the MCP maintainers; check them when upgrading from a 2025-era stateful implementation.
+
 Because MCP is actively evolving, always verify current version and migration notes.
 
 ## A2A
 
 ### Agent2Agent Protocol
 
-Google introduced A2A in 2025 and later donated the project to the Linux Foundation.
+Google introduced A2A in 2025 and later donated the project to the Linux Foundation. As of August 17, 2026, the A2A specification repository identifies **1.0.0** as the latest released version.
 
 Current protocol/ecosystem documentation should be checked before implementation.
 
@@ -5601,7 +5721,7 @@ Surrounding everything:
 
 ---
 
-# Suggested Next-Level Study Topics
+# 81. Suggested Next-Level Study Topics
 
 After mastering this handbook, continue into:
 
@@ -5633,7 +5753,7 @@ After mastering this handbook, continue into:
 
 ---
 
-# Practice Questions
+# 82. Practice Questions
 
 Use these to test yourself without looking at the answers.
 
@@ -5670,7 +5790,7 @@ Use these to test yourself without looking at the answers.
 
 ---
 
-# Mini Architecture Exercises
+# 83. Mini Architecture Exercises
 
 ## Exercise A — Expense Approval
 
@@ -5751,7 +5871,7 @@ Do not allow the agent to make the final binding legal decision.
 
 ---
 
-# Mastery Definition
+# 84. Mastery Definition
 
 You can consider yourself strong in Agentic AI engineering when you can confidently answer:
 
@@ -5779,6 +5899,8 @@ You can consider yourself strong in Agentic AI engineering when you can confiden
 ```
 
 If you can design all twenty intentionally, you are thinking like an **Agentic AI engineer**, not just an LLM API user.
+
+Mastery is demonstrated by trade-off decisions, not vocabulary alone: you should be able to explain why a deterministic workflow, one model call, RAG pipeline, single agent, or multi-agent system is the right level of complexity for a specific requirement—and how you would test, observe, secure, and recover it in production.
 
 ---
 

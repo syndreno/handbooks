@@ -250,6 +250,24 @@ Important behavior should be easy to verify automatically.
 
 Important business rules, side effects, boundaries, and failures should be visible rather than hidden.
 
+## How the principles work together
+
+These ideas are not independent checkboxes.
+
+**Clarity** means the reader can identify intent without decoding abbreviations, hidden state, or surprising control flow.  
+**Simplicity** means avoiding machinery that does not solve a current problem. Simple does not mean simplistic: a complex domain may require a richer model.  
+**Consistency** reduces decision fatigue. If similar operations use the same naming, error, and boundary conventions, developers can predict behavior.  
+**Local reasoning** means understanding one unit without loading the whole system into your head. Hidden globals and long chains of side effects weaken it.  
+**Encapsulation** protects decisions that are likely to change and prevents callers from depending on internal details.  
+**Separation of concerns** prevents unrelated reasons for change from being tangled together.  
+**Testability** is often a design signal: code with explicit inputs, outputs, and dependencies is easier to verify.  
+**Explicitness** is especially important for money, permissions, state transitions, retries, destructive operations, and failure handling.
+
+### Trade-off example
+
+Do not split a five-line calculation into six interfaces merely to claim "separation of concerns." If the abstraction creates more navigation and concepts than the problem, simplicity and clarity should win.
+
+
 ---
 
 # 6. Naming Things Well
@@ -969,6 +987,37 @@ A wrong comment is often worse than no comment.
 
 Treat documentation as code: review and update it when behavior changes.
 
+## 12.4 Choose the right documentation level
+
+Different information belongs in different places:
+
+- **Name** — explains ordinary intent.
+- **Code structure** — explains the normal flow.
+- **Inline comment** — explains a non-obvious reason or constraint near the code.
+- **API documentation** — explains a public contract, inputs, outputs, errors, and compatibility.
+- **Architecture decision record (ADR)** — preserves why a significant design choice was made.
+- **README/runbook** — explains setup, operation, deployment, recovery, or support procedures.
+
+Do not force a comment to carry information that should be represented by a type, function name, invariant, or test.
+
+## 12.5 What useful API documentation should answer
+
+For an important public function or endpoint, document:
+
+```text
+Purpose
+Inputs and constraints
+Output/result
+Possible failures
+Side effects
+Security/authorization expectations
+Example
+Compatibility notes when relevant
+```
+
+Documentation should describe the contract, not duplicate every line of implementation.
+
+
 ---
 
 # 13. Formatting and Code Style
@@ -1397,6 +1446,20 @@ Build extension points when real requirements justify them.
 
 Code should behave in the way most developers would expect.
 
+
+Public behavior should match reasonable expectations created by names, types, documentation, and surrounding conventions.
+
+Examples of surprises to avoid:
+
+```text
+getUser() also updates last-login state
+isValid() throws for ordinary invalid input
+save() silently sends an email
+listItems() returns null instead of an empty collection
+```
+
+When a surprising side effect is necessary, make it explicit in the API and documentation.
+
 ## Law of Demeter
 
 Avoid long navigation chains:
@@ -1735,6 +1798,31 @@ These cases are different.
 
 Instead of allowing a null to fail 20 function calls later, reject invalid input at the boundary.
 
+## 23.4 Choose an absence model deliberately
+
+Different absence models communicate different contracts.
+
+- **Null/None/nil** — simple absence when there is only one clear meaning.
+- **Optional/Maybe** — makes possible absence visible in APIs and type systems that support it.
+- **Empty collection** — often best when “there are zero results” is a normal collection result.
+- **Result/Either** — useful when success and failure both carry meaningful information.
+- **Exception/error** — appropriate when the operation cannot fulfill its promised contract.
+
+Example:
+
+```text
+findUser(id) -> Optional<User>
+getUser(id)  -> User or NotFoundError
+listUsers()  -> []
+```
+
+Those three APIs tell different stories. Do not use one vague `null` value to represent all of them.
+
+## 23.5 Do not hide broken invariants
+
+Optional access operators and fallback values can reduce boilerplate, but they can also conceal invalid state. If an invoice **must** have a currency, defaulting a missing currency to `"USD"` may silently corrupt data. Validate mandatory domain facts early.
+
+
 ---
 
 # 24. Validation and Defensive Programming
@@ -1939,6 +2027,39 @@ if DATABASE_URL is missing:
 
 Failing immediately is often better than failing randomly during a user request.
 
+## Configuration loading pattern
+
+A maintainable application commonly has one configuration boundary:
+
+```text
+environment / config file / secret store
+              ↓
+        configuration loader
+              ↓
+       validated typed config
+              ↓
+          application
+```
+
+The rest of the application reads validated configuration rather than repeatedly reading environment variables or files.
+
+### Precedence must be predictable
+
+If several sources are supported, define the order explicitly, for example:
+
+```text
+defaults < config file < environment < command-line override
+```
+
+The exact order is a project choice; the important point is that it is documented and tested.
+
+### Secrets are configuration, but not ordinary configuration
+
+Passwords, private keys, tokens, and credentials should not be committed to source control or printed in logs. Prefer the secret-management mechanism provided by the deployment environment.
+
+Validate required values at startup and report the **name of the missing setting**, not the secret value.
+
+
 ---
 
 # 28. Logging and Observability
@@ -2106,6 +2227,17 @@ Returns predefined data.
 currencyRateStub.getRate("USD", "INR") -> 83.5
 ```
 
+
+A **stub** supplies predetermined answers so the test can exercise a path.
+
+Example:
+
+```text
+exchangeRateProvider.rate("USD", "INR") -> 83.50
+```
+
+The test usually cares about the behavior produced from that answer, not whether the call itself occurred.
+
 ## Mock
 
 Used to verify an expected interaction.
@@ -2113,6 +2245,17 @@ Used to verify an expected interaction.
 ```text
 verify(emailService).send(orderConfirmation)
 ```
+
+
+A **mock** is primarily used to verify an interaction with a collaborator.
+
+Example:
+
+```text
+verify emailGateway.send(welcomeMessage) called once
+```
+
+Use mocks at meaningful boundaries. Excessive interaction assertions can couple tests to implementation details.
 
 ## Fake
 
@@ -2129,6 +2272,11 @@ instead of a real database.
 ## Spy
 
 Records calls while allowing more real behavior than a strict mock.
+
+
+A **spy** records calls so the test can inspect them afterward. Unlike a pure mock expectation, the spy may allow normal behavior and later expose invocation history.
+
+Use a spy when observing an interaction is clearer than replacing all collaborator behavior.
 
 ## Practical rule
 
@@ -2198,37 +2346,64 @@ It is not automatically a bug.
 
 A function performs too many unrelated operations.
 
+
+A function has accumulated multiple stages or concepts. Fix by naming/extracting coherent steps, not by splitting at arbitrary line counts.
+
 ### Large class
 
 A class owns too many responsibilities.
+
+
+A class owns too many unrelated responsibilities or reasons to change. Split around cohesive concepts and stable boundaries.
 
 ### Long parameter list
 
 The API is difficult to understand and change.
 
+
+Many parameters increase call-site mistakes and often reveal missing domain concepts. Group only values that genuinely belong together.
+
 ### Duplicate code
 
 The same business rule appears in several places.
+
+
+Repeated business knowledge can drift when rules change. Centralize the rule after confirming the duplicated code represents the same concept.
 
 ### Primitive obsession
 
 Important concepts are represented only as strings/numbers.
 
+
+Important concepts are represented only by strings/numbers/booleans. Consider value types for money, IDs, status, ranges, or other values with rules.
+
 ### Feature envy
 
 A method uses another object's data more than its own.
+
+
+A method spends more time reading another object’s data than its own. The behavior may belong closer to the data it uses.
 
 ### Shotgun surgery
 
 One small feature requires edits in many unrelated files.
 
+
+One business change requires edits in many unrelated files. Look for scattered knowledge or an unstable boundary.
+
 ### Divergent change
 
 One module changes for many unrelated reasons.
 
+
+One module changes for many unrelated reasons. Separate responsibilities that evolve independently.
+
 ### God object
 
 One object knows and controls almost everything.
+
+
+One object coordinates or knows nearly everything. Extract focused services/modules and move behavior toward the concepts that own it.
 
 ### Boolean blindness
 
@@ -2284,6 +2459,11 @@ Use when object creation is complex or varies.
 PaymentProcessorFactory.create(type)
 ```
 
+
+A factory centralizes object creation when construction requires decisions, validation, or hidden dependencies.
+
+Use it when callers should request a capability without knowing which concrete type or construction sequence is needed. Do not wrap every `new`/constructor call in a factory when construction is already obvious.
+
 ## Adapter
 
 Use when integrating incompatible interfaces.
@@ -2293,6 +2473,21 @@ LegacyPaymentAdapter
 ```
 
 converts your clean interface to the vendor's API.
+
+
+An adapter translates one interface or data shape into another.
+
+Typical use:
+
+```text
+application PaymentGateway
+        ↑
+StripePaymentAdapter
+        ↓
+vendor SDK
+```
+
+This keeps vendor-specific types and naming at the boundary. Use an adapter when translation protects the rest of the codebase from external change.
 
 ## Decorator
 
@@ -2325,6 +2520,17 @@ Encapsulates persistence access.
 OrderRepository.findById(id)
 OrderRepository.save(order)
 ```
+
+
+A repository presents persistence in terms meaningful to the application/domain.
+
+```text
+findOrderById(id)
+save(order)
+findOverdueInvoices(cutoff)
+```
+
+It can hide database/ORM details, but it should not become a generic dumping ground for every query. Dedicated read models or query services can be cleaner for reporting and complex reads.
 
 ## Builder
 
@@ -2745,6 +2951,37 @@ is safer than a script that immediately deletes accounts.
 6. Execute
 7. Record audit output
 ```
+
+## Inputs, outputs, and exit codes
+
+A CLI is an API for humans and other programs. Its contract should be predictable.
+
+```text
+stdin / arguments / files -> command -> stdout/stderr + exit code + side effects
+```
+
+Common convention:
+
+- exit code `0` — success;
+- non-zero — failure or a documented non-success condition.
+
+Print normal machine-consumable output to standard output and diagnostics/errors to standard error when the environment makes that distinction useful.
+
+## Idempotency and retries
+
+Automation is frequently re-run after partial failure. Before making a script retryable, ask:
+
+- Can the same record be processed twice?
+- Can a file be overwritten?
+- Can an email/payment/account creation be duplicated?
+- How is already-completed work detected?
+
+For destructive operations, prefer preview/dry-run support and make the destructive intent explicit in the command line.
+
+## When a script should become an application
+
+Promote a script into a structured program when it gains persistent state, multiple commands, complex validation, external integrations, permissions, retries, or operational support requirements. The file extension does not make code disposable.
+
 
 ---
 
