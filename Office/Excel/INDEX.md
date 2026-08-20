@@ -6,3 +6,4 @@ Navigation index for this handbook section.
 
 - [Excel Mastery Handbook](Excel_Mastery_Handbook.md)
 - [Excel Shortcuts Productivity Master Handbook](Excel_Shortcuts_Productivity_Master_Handbook.md)
+- [Word Mastery Handbook](MS_Word_Master_Handbook.md)

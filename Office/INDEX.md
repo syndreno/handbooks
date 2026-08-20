@@ -6,3 +6,4 @@ Navigation index for this handbook section.
 
 - [Excel](Excel/INDEX.md)
 - [Microsoft Apps](Microsoft-Apps/INDEX.md)
+- [Word](Word/INDEX.md)
