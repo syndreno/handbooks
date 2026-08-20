@@ -1,0 +1,35 @@
+﻿# Handbook Navigation Index
+
+Use this index to browse handbook categories and subcategories without depending on the root README.
+
+## Categories
+
+- [AI](AI/INDEX.md)
+- [AWS](AWS/INDEX.md)
+- [Business](Business/INDEX.md)
+- [Clean Code](Clean%20Code/INDEX.md)
+- [CSS](CSS/INDEX.md)
+- [Debugging](Debuging/INDEX.md)
+- [Design Patterns and DSA](Design%20Pattern/INDEX.md)
+- [Docker, Kubernetes, and CI/CD](Docker%2C%20Kubernetes%2C%20CI%20CD/INDEX.md)
+- [Emmet](Emmet/INDEX.md)
+- [English](English/INDEX.md)
+- [Git](GIT/INDEX.md)
+- [Google Search Queries](Google%20Search%20Query/INDEX.md)
+- [HTML](HTML/INDEX.md)
+- [Java](Java/INDEX.md)
+- [JavaScript](JS/INDEX.md)
+- [JSDoc](JSDoc/INDEX.md)
+- [Linux](Linux/INDEX.md)
+- [Markdown](Markdown/INDEX.md)
+- [Office](Office/INDEX.md)
+- [Personality Development](PD/INDEX.md)
+- [PHP](PHP/INDEX.md)
+- [Power BI](PowerBI/INDEX.md)
+- [Python](Python/INDEX.md)
+- [Regular Expressions](Regular%20Expression/INDEX.md)
+- [SEO](SEO/INDEX.md)
+- [SQL](SQL/INDEX.md)
+- [Time Management](Time%20Managment/INDEX.md)
+- [VS Code](Vs%20Code/INDEX.md)
+- [WordPress](Wordpress/INDEX.md)
